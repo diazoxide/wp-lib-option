@@ -500,15 +500,18 @@ class Option
                                 $_field['value'] = $__value;
                                 $__html          .= self::_getField($_field);
                             }
-                            $html .= self::_group($__html);
+                            $html .= self::_group($__html . self::_tag('button', 'X',
+                                    ['class' => 'remove', 'onclick' => 'this.parentElement.remove()']));
                         }
 
                         $__html = '';
                         foreach ($template as $key => $_field) {
-                            $_field['name'] = $name . '[' . $last_key . ']' . '[' . $key . ']';
-                            $__html         .= self::_getField($_field);
+                            $_field['name']     = $name . '[' . $last_key . ']' . '[' . $key . ']';
+                            $_field['disabled'] = true;
+                            $__html             .= self::_getField($_field);
                         }
-                        $html .= self::_group($__html);
+                        $html .= self::_group($__html,
+                            ['onclick' => "alert();var e = this.querySelectorAll('[disabled]'); for( var i=0; i < e.length; i++){e[i].disabled = false;}"]);
                     }
                 }
                 break;
