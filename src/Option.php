@@ -518,10 +518,11 @@ class Option
                         [
                             self::_tagOpen(
                                 'input',
-                                ['class'       => 'key full',
-                                 'type'        => 'text',
-                                 'placeholder' => 'key',
-                                 'onchange'    => $on_change
+                                [
+                                    'class'       => 'key full',
+                                    'type'        => 'text',
+                                    'placeholder' => 'key',
+                                    'onchange'    => $on_change
                                 ]
                             ),
                             self::_group($_html)
@@ -574,6 +575,12 @@ class Option
 
                         $__html = '';
 
+                        foreach ($template as $key => $_field) {
+                            $_field['name']     = $name . '[' . $last_key . ']' . '[' . $key . ']';
+                            $_field['disabled'] = true;
+                            $__html             .= self::_getField($_field);
+                        }
+
                         $template_description = $template_params['description'] ?? null;
                         if (is_callable($template_description)) {
                             $template_description = call_user_func($template_description, null, $_value);
@@ -585,11 +592,6 @@ class Option
                         ) : '';
                         $__html               .= $template_description;
 
-                        foreach ($template as $key => $_field) {
-                            $_field['name']     = $name . '[' . $last_key . ']' . '[' . $key . ']';
-                            $_field['disabled'] = true;
-                            $__html             .= self::_getField($_field);
-                        }
                         $html .= self::_group(
                             $__html,
                             ['onclick' => "var e = this.querySelectorAll('[disabled]'); for( var i=0; i < e.length; i++){e[i].disabled = false;}"]
@@ -616,7 +618,11 @@ class Option
                                 $readonly_str
                             ] + $input_attrs
                         );
-                        $html            .= self::_tag('option', '-- Select --');
+                        $html            .= self::_tag(
+                            'option',
+                            '-- Select --',
+                            ['disabled' => true, 'selected' => true]
+                        );
                         $open_tag_select = true;
                     }
 
