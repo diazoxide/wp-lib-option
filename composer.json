@@ -18,7 +18,7 @@
   },
   "autoload": {
     "psr-4": {
-      "NovemBit\\wp\\lib\\option\\": "src/"
+      "diazoxide\\wp\\lib\\option\\": "src/"
     }
   },
   "repositories": [
