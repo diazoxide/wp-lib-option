@@ -800,7 +800,17 @@ class Option
                 <?php submit_button(); ?>
             </form>
         </div>
+
+        <style><?php echo self::getStyle($parent);?></style>
+
         <?php
+    }
+
+    public static function getStyle($parent = '')
+    {
+        $str = file_get_contents('assets/admin.css');
+        $str = str_replace("__PARENT_SLUG__", $parent, $str);
+        return $str;
     }
 
     /**
