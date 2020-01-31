@@ -589,20 +589,22 @@ class Option
                         $input_type = 'number';
                     }
 
-                    foreach ($value as $key => $_value) {
-                        if ( ! empty($_value)) {
-                            $html .= self::_group(
-                                self::_tagOpen('input',
-                                    [
-                                        'name'  => $name . '[]',
-                                        'class' => 'full',
-                                        'type'  => $input_type,
-                                        'value' => $_value,
-                                        $disabled_str,
-                                        $readonly_str,
-                                    ] + $input_attrs) . self::_tag('button', 'X',
-                                    ['class' => 'remove', 'onclick' => 'this.parentElement.remove()'])
-                            );
+                    if(is_array($value)) {
+                        foreach ($value as $key => $_value) {
+                            if ( ! empty($_value)) {
+                                $html .= self::_group(
+                                    self::_tagOpen('input',
+                                        [
+                                            'name'  => $name . '[]',
+                                            'class' => 'full',
+                                            'type'  => $input_type,
+                                            'value' => $_value,
+                                            $disabled_str,
+                                            $readonly_str,
+                                        ] + $input_attrs) . self::_tag('button', 'X',
+                                        ['class' => 'remove', 'onclick' => 'this.parentElement.remove()'])
+                                );
+                            }
                         }
                     }
 
