@@ -1,0 +1,30 @@
+{
+  "name": "novembit/wp-lib-option",
+  "description": "WordPress Option",
+  "keywords": [
+
+  ],
+  "license": [
+    "GPL-3.0-or-later"
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "php": ">=7.2",
+    "ext-mbstring": "*",
+    "ext-json": "*"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "NovemBit\\wp\\lib\\option\\": "src/"
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ]
+}
