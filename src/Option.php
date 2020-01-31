@@ -511,7 +511,7 @@ class Option
                             $__html             .= self::_getField($_field);
                         }
                         $html .= self::_group($__html,
-                            ['onclick' => "alert();var e = this.querySelectorAll('[disabled]'); for( var i=0; i < e.length; i++){e[i].disabled = false;}"]);
+                            ['onclick' => "var e = this.querySelectorAll('[disabled]'); for( var i=0; i < e.length; i++){e[i].disabled = false;}"]);
                     }
                 }
                 break;
