@@ -808,7 +808,7 @@ class Option
 
     public static function getStyle($parent = '')
     {
-        $str = file_get_contents('assets/admin.css');
+        $str = file_get_contents(__DIR__.'/assets/admin.css');
         $str = str_replace("__PARENT_SLUG__", $parent, $str);
         return $str;
     }
