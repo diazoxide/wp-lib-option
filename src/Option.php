@@ -249,16 +249,16 @@ class Option
 
     /*private static function _getDataString(array $data): string
     {
-    return implode(' ', array_map(
-    function ($k, $v) {
-    if (is_string($v)) {
-    $v = htmlspecialchars($v);
-    }
+        return implode(' ', array_map(
+            function ($k, $v) {
+                if (is_string($v)) {
+                    $v = htmlspecialchars($v);
+                }
 
-    return 'data-' . $k . '="' . $v . '"';
-    },
-    array_keys($data), $data
-    ));
+                return 'data-' . $k . '="' . $v . '"';
+            },
+            array_keys($data), $data
+        ));
     }*/
 
 
@@ -518,11 +518,10 @@ class Option
                         [
                             self::_tagOpen(
                                 'input',
-                                [
-                                    'class'       => 'key full',
-                                    'type'        => 'text',
-                                    'placeholder' => 'key',
-                                    'onchange'    => $on_change
+                                ['class'       => 'key full',
+                                 'type'        => 'text',
+                                 'placeholder' => 'key',
+                                 'onchange'    => $on_change
                                 ]
                             ),
                             self::_group($_html)
@@ -546,6 +545,13 @@ class Option
                         foreach ($value as $key => $_value) {
                             $__html = '';
 
+                            foreach ($template as $_key => $_field) {
+                                $_field          = $template[$_key];
+                                $_field['name']  = $name . '[' . $key . ']' . '[' . $_key . ']';
+                                $_field['value'] = $_value[$_key] ?? '';
+                                $__html          .= self::_getField($_field);
+                            }
+
                             $template_description = $template_params['description'] ?? null;
                             if (is_callable($template_description)) {
                                 $template_description = call_user_func($template_description, $key, $_value);
@@ -557,12 +563,6 @@ class Option
                             ) : '';
                             $__html               .= $template_description;
 
-                            foreach ($template as $_key => $_field) {
-                                $_field          = $template[$_key];
-                                $_field['name']  = $name . '[' . $key . ']' . '[' . $_key . ']';
-                                $_field['value'] = $_value[$_key] ?? '';
-                                $__html          .= self::_getField($_field);
-                            }
                             $html .= self::_group(
                                 $__html . self::_tag(
                                     'button',
