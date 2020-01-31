@@ -494,10 +494,10 @@ class Option
                         $last_key = count($value) + 1;
                         foreach ($value as $key => $_value) {
                             $__html = '';
-                            foreach ($_value as $_key => $__value) {
+                            foreach ($template as $_key => $_field) {
                                 $_field          = $template[$_key];
                                 $_field['name']  = $name . '[' . $key . ']' . '[' . $_key . ']';
-                                $_field['value'] = $__value;
+                                $_field['value'] = $_value[$_key] ?? '';
                                 $__html          .= self::_getField($_field);
                             }
                             $html .= self::_group($__html . self::_tag('button', 'X',
