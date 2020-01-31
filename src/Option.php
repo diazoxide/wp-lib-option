@@ -481,13 +481,13 @@ class Option
                 break;
             case self::TYPE_GROUP:
                 if ( ! empty($template)) {
-                    $_html = '';
+                    $html = '';
                     if ($method == self::METHOD_SINGLE) {
                         foreach ($template as $key => $_field) {
 
                             $_field['name']  = $name . '[' . $key . ']';
                             $_field['value'] = $value[$key];
-                            $_html           .= self::_getField($_field);
+                            $html            .= self::_getField($_field);
                         }
                     } elseif ($method == self::METHOD_MULTIPLE) {
 
@@ -500,7 +500,7 @@ class Option
                                 $_field['value'] = $__value;
                                 $__html          .= self::_getField($_field);
                             }
-                            $_html .= self::_group($__html);
+                            $html .= self::_group($__html);
                         }
 
                         $__html = '';
@@ -508,9 +508,8 @@ class Option
                             $_field['name'] = $name . '[' . $last_key . ']' . '[' . $key . ']';
                             $__html         .= self::_getField($_field);
                         }
-                        $_html .= self::_group($__html);
+                        $html .= self::_group($__html);
                     }
-                    $html .= self::_group($_html);
                 }
                 break;
 
@@ -589,7 +588,7 @@ class Option
                         $input_type = 'number';
                     }
 
-                    if(is_array($value)) {
+                    if (is_array($value)) {
                         foreach ($value as $key => $_value) {
                             if ( ! empty($_value)) {
                                 $html .= self::_group(
@@ -803,15 +802,16 @@ class Option
             </form>
         </div>
 
-        <style><?php echo self::getStyle($parent);?></style>
+        <style><?php echo self::getStyle($parent); ?></style>
 
         <?php
     }
 
     public static function getStyle($parent = '')
     {
-        $str = file_get_contents(__DIR__.'/assets/admin.css');
+        $str = file_get_contents(__DIR__ . '/assets/admin.css');
         $str = str_replace("__PARENT_SLUG__", $parent, $str);
+
         return $str;
     }
 
