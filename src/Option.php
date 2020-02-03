@@ -967,10 +967,10 @@ class Option
         ?>
         <script type="application/javascript">
             (function () {
-                var lists = document.querySelectorAll('.<?php echo $parent; ?>-admin-nested-fields>.<?php echo $parent; ?>-admin-nested-fields');
-                for (var i = 0; i < lists.length; i++) {
-                    var list = lists[i];
-                    var label = list.previousSibling;
+                let lists = document.querySelectorAll('.<?php echo $parent; ?>-admin-nested-fields>.<?php echo $parent; ?>-admin-nested-fields');
+                for (let i = 0; i < lists.length; i++) {
+                    let list = lists[i];
+                    let label = list.previousSibling;
                     label.addEventListener("click", function () {
                         if (this.nextSibling.offsetParent === null) {
                             this.nextSibling.style.display = "block";
