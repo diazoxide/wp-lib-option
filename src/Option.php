@@ -938,17 +938,43 @@ class Option
             </form>
         </div>
 
-        <style><?php echo self::getStyle($parent); ?></style>
+        <?php self::printStyle($parent); ?>
+
+        <?php self::printScript($parent); ?>
 
         <?php
     }
 
-    public static function getStyle($parent = '')
+    public static function printScript($parent = '')
+    {
+        ?>
+        <script type="application/javascript">
+            (function () {
+                var lists = document.querySelectorAll('.<?php echo $parent; ?>-admin-nested-fields>.<?php echo $parent; ?>-admin-nested-fields');
+                for (var i = 0; i < lists.length; i++) {
+                    var list = lists[i];
+                    var label = list.previousSibling;
+                    label.addEventListener("click", function () {
+                        if (this.nextSibling.offsetParent === null) {
+                            this.nextSibling.style.display = "block";
+                            this.classList.add('open');
+                        } else {
+                            this.nextSibling.style.display = "none";
+                            this.classList.remove('open');
+                        }
+                    });
+                }
+            })();
+        </script>
+        <?php
+    }
+
+    public static function printStyle($parent = '')
     {
         $str = file_get_contents(__DIR__ . '/assets/admin.css');
         $str = str_replace("__PARENT_SLUG__", $parent, $str);
 
-        return $str;
+        echo '<style type="text/css">' . $str . '</style>';
     }
 
     /**
