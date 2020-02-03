@@ -417,7 +417,6 @@ class Option
                     'input',
                     [
                         'class' => implode(' ', [$type, $method]),
-                        'id'    => $name,
                         'value' => '{{boolean_true}}',
                         'type'  => 'checkbox',
                         'name'  => $name,
@@ -576,14 +575,14 @@ class Option
                         $__html = '';
 
                         foreach ($template as $key => $_field) {
-                            $_field['name']     = $name . '[' . $last_key . ']' . '[' . $key . ']';
+                            $_field['name']     = $name . '[{{LAST_KEY}}]' . '[' . $key . ']';
                             $_field['disabled'] = true;
                             $__html             .= self::_getField($_field);
                         }
 
                         $template_description = $template_params['description'] ?? null;
                         if (is_callable($template_description)) {
-                            $template_description = call_user_func($template_description, null, $_value);
+                            $template_description = call_user_func($template_description, null, null);
                         }
 
                         $template_description = $template_description != null ? sprintf(
@@ -594,7 +593,20 @@ class Option
 
                         $html .= self::_group(
                             $__html,
-                            ['onclick' => "var e = this.querySelectorAll('[disabled]'); for( var i=0; i < e.length; i++){e[i].disabled = false;}"]
+                            ['new' => 'true', 'style' => 'display:none']
+                        );
+
+                        $html .= self::_group(
+                            self::_tag(
+                                'button',
+                                '+ Add new',
+                                [
+                                    'type'     => 'button',
+                                    'last-key' => $last_key,
+                                    'class'    => 'button button-primary',
+                                    'onclick'  => "var n = parseInt(this.getAttribute('last-key'))+1; this.setAttribute('last-key',n); var c = this.parentElement.parentElement.querySelector('[new]').cloneNode(true); c.removeAttribute('new'); c.style.display=''; var e = c.querySelectorAll('[name]'); for( var i=0; i < e.length; i++){e[i].disabled = false; e[i].name=(e[i].name).replace('{{LAST_KEY}}',n);}; this.parentElement.parentElement.insertBefore(c,this.parentElement);"
+                                ]
+                            )
                         );
                     }
                 }
@@ -610,7 +622,6 @@ class Option
                                     ' ',
                                     [$type, $method, 'full']
                                 ),
-                                'id'    => $name,
                                 'name'  => $name . ($method == self::METHOD_MULTIPLE ? '[]' : ''),
                                 $method == self::METHOD_MULTIPLE ? 'multiple' : '',
                                 'data'  => $data,
@@ -753,7 +764,6 @@ class Option
                     $html .= self::_tagOpen(
                         'input',
                         [
-                            'id'    => $name,
                             'class' => 'full',
                             'type'  => $input_type,
                             'name'  => $name,
