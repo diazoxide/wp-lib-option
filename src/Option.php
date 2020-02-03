@@ -526,6 +526,19 @@ class Option
                             ),
                             self::_group($_html)
                         ]
+                    ),
+                    ['new' => 'true', 'style' => 'display:none']
+                );
+
+                $html .= self::_group(
+                    self::_tag(
+                        'button',
+                        '+ Add new',
+                        [
+                            'type'    => 'button',
+                            'class'   => 'button button-primary',
+                            'onclick' => "var c = this.parentElement.parentElement.querySelector('[new]').cloneNode(true); c.removeAttribute('new'); c.style.display=''; var e = c.querySelectorAll('[name]'); for( var i=0; i < e.length; i++){e[i].disabled = false;}; this.parentElement.parentElement.insertBefore(c,this.parentElement);"
+                        ]
                     )
                 );
 
@@ -741,7 +754,11 @@ class Option
                                 'disabled'
                             ] + $input_attrs
                         ),
-                        ['onclick' => "var e=this.querySelector('input[name]'); e.disabled = false; e.focus()"]
+                        [
+                            'style'   => 'display:none',
+                            'new'     => 'true',
+                            'onclick' => "var e=this.querySelector('input[name]'); e.disabled = false; e.focus()"
+                        ]
                     );
 
                     $html .= self::_group(
@@ -751,7 +768,7 @@ class Option
                             [
                                 'type'    => 'button',
                                 'class'   => 'button button-primary',
-                                'onclick' => "var c = this.parentElement.previousSibling.cloneNode(true); c.children[0].value=''; this.parentElement.parentElement.insertBefore(c,this.parentElement);"
+                                'onclick' => "var c = this.parentElement.parentElement.querySelector('[new]').cloneNode(true); c.style.display=''; c.children[0].value=''; this.parentElement.parentElement.insertBefore(c,this.parentElement);"
                             ]
                         )
                     );
