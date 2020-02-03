@@ -908,6 +908,8 @@ class Option
             <?php
         }
 
+        $title = $params['title'] ?? 'Configuration';
+
         $_fields = [];
 
         static::arrayWalkWithRoute(
@@ -941,7 +943,7 @@ class Option
 
         ?>
         <div class="wrap <?php echo $parent; ?>-wrap">
-            <h2>Configuration</h2>
+            <h2><?php echo $title; ?></h2>
             <form method="post" action="">
                 <?php self::printArrayList($_fields, $parent); ?>
                 <input type="hidden" name="<?php echo $parent; ?>-form" value="1">
