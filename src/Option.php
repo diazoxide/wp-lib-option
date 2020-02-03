@@ -362,6 +362,15 @@ class Option
         return $html;
     }
 
+    private static function _removeButton()
+    {
+        return self::_tag(
+            'button',
+            'X',
+            ['class' => 'remove', 'onclick' => 'this.parentElement.remove()']
+        );
+    }
+
     /**
      * @param array $params
      *
@@ -445,11 +454,7 @@ class Option
                             implode(
                                 '',
                                 [
-                                    self::_tag(
-                                        'button',
-                                        'X',
-                                        ['class' => 'remove', 'onclick' => 'this.parentElement.remove()']
-                                    ),
+                                    self::_removeButton(),
                                     self::_tagOpen(
                                         'input',
                                         [
@@ -475,11 +480,7 @@ class Option
                             implode(
                                 '',
                                 [
-                                    self::_tag(
-                                        'button',
-                                        'X',
-                                        ['class' => 'remove', 'onclick' => 'this.parentElement.remove()']
-                                    ),
+                                    self::_removeButton(),
                                     self::_tagOpen(
                                         'input',
                                         [
@@ -524,7 +525,8 @@ class Option
                                     'onchange'    => $on_change
                                 ]
                             ),
-                            self::_group($_html)
+                            self::_group($_html),
+                            self::_removeButton()
                         ]
                     ),
                     ['new' => 'true', 'style' => 'display:none']
@@ -577,11 +579,7 @@ class Option
                             $__html               .= $template_description;
 
                             $html .= self::_group(
-                                $__html . self::_tag(
-                                    'button',
-                                    'X',
-                                    ['class' => 'remove', 'onclick' => 'this.parentElement.remove()']
-                                )
+                                $__html . self::_removeButton()
                             );
                         }
 
@@ -605,7 +603,7 @@ class Option
                         $__html               .= $template_description;
 
                         $html .= self::_group(
-                            $__html,
+                            $__html . self::_removeButton(),
                             ['new' => 'true', 'style' => 'display:none']
                         );
 
@@ -734,11 +732,7 @@ class Option
                                             $disabled_str,
                                             $readonly_str,
                                         ] + $input_attrs
-                                    ) . self::_tag(
-                                        'button',
-                                        'X',
-                                        ['class' => 'remove', 'onclick' => 'this.parentElement.remove()']
-                                    )
+                                    ) . self::_removeButton()
                                 );
                             }
                         }
