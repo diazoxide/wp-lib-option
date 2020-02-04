@@ -54,31 +54,26 @@ ul.__PARENT_SLUG__-admin-nested-fields .section {
     padding-bottom: 10px;
 }
 
-ul.__PARENT_SLUG__-admin-nested-fields .section>.field>.group {
+ul.__PARENT_SLUG__-admin-nested-fields .section > .field > .group {
     break-inside: avoid-column;
     margin-bottom: 7px;
     position: relative;
 }
 
-ul.__PARENT_SLUG__-admin-nested-fields .section>.field>.group > * {
+ul.__PARENT_SLUG__-admin-nested-fields .section > .field > .group > * {
     vertical-align: top;
     margin-bottom: 3px;
 }
 
-ul.__PARENT_SLUG__-admin-nested-fields .section>.field .group > .full {
+ul.__PARENT_SLUG__-admin-nested-fields .section > .field .group > .full {
     width: 100%;
 }
 
-ul.__PARENT_SLUG__-admin-nested-fields .section>.field > .group > .key {
+ul.__PARENT_SLUG__-admin-nested-fields .section > .field > .group > .key {
     background: #e6e6e6;
 }
 
-ul.__PARENT_SLUG__-admin-nested-fields .section>.field .group button.remove:hover {
-    background: #007cba;
-    opacity: 1;
-}
-
-ul.__PARENT_SLUG__-admin-nested-fields .section>.field .group button.remove {
+ul.__PARENT_SLUG__-admin-nested-fields .section > .field .group button.item-button {
     height: 15px;
     width: 20px;
     top: 0;
@@ -94,29 +89,38 @@ ul.__PARENT_SLUG__-admin-nested-fields .section>.field .group button.remove {
     font-weight: bolder;
 }
 
-ul.__PARENT_SLUG__-admin-nested-fields .section>.field {
+ul.__PARENT_SLUG__-admin-nested-fields .section > .field .group button.item-button + button.item-button {
+    right: 25px;
+}
+
+ul.__PARENT_SLUG__-admin-nested-fields .section > .field .group button.item-button:hover {
+    background: #007cba;
+    opacity: 1;
+}
+
+ul.__PARENT_SLUG__-admin-nested-fields .section > .field {
     padding: 0 1em;
-    display:grid;
+    display: grid;
     grid-column-gap: 0.5em;
 }
 
 /* Mobile Styles */
 @media only screen and (max-width: 400px) {
-    ul.__PARENT_SLUG__-admin-nested-fields .section>.field {
+    ul.__PARENT_SLUG__-admin-nested-fields .section > .field {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 /* Tablet Styles */
 @media only screen and (min-width: 401px) and (max-width: 960px) {
-    ul.__PARENT_SLUG__-admin-nested-fields .section>.field {
+    ul.__PARENT_SLUG__-admin-nested-fields .section > .field {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
 /* Desktop Styles */
 @media only screen and (min-width: 961px) {
-    ul.__PARENT_SLUG__-admin-nested-fields .section>.field {
+    ul.__PARENT_SLUG__-admin-nested-fields .section > .field {
         grid-template-columns: repeat(4, 1fr);
     }
 }

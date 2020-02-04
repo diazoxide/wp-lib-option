@@ -362,12 +362,36 @@ class Option
         return $html;
     }
 
+
+    private static function _itemButtons()
+    {
+        return self::_removeButton() . self::_duplicateButton();
+    }
+
     private static function _removeButton()
     {
         return self::_tag(
             'button',
             'X',
-            ['class' => 'remove', 'onclick' => 'this.parentElement.remove()']
+            [
+                'class'   => 'item-button remove',
+                'onclick' => 'diazoxide.wordpress.option.removeItem(this)',
+                'type'    => 'button',
+            ]
+        );
+    }
+
+    private static function _duplicateButton()
+    {
+        return self::_tag(
+            'button',
+            '+',
+            [
+                'type'    => 'button',
+                'class'   => 'item-button duplicate',
+                'onclick' => 'diazoxide.wordpress.option.duplicateItem(this)'
+            ]
+
         );
     }
 
@@ -454,7 +478,8 @@ class Option
                             implode(
                                 '',
                                 [
-                                    self::_removeButton(),
+                                    self::_itemButtons(),
+
                                     self::_tagOpen(
                                         'input',
                                         [
@@ -480,7 +505,7 @@ class Option
                             implode(
                                 '',
                                 [
-                                    self::_removeButton(),
+                                    self::_itemButtons(),
                                     self::_tagOpen(
                                         'input',
                                         [
@@ -526,7 +551,8 @@ class Option
                                 ]
                             ),
                             self::_group($_html),
-                            self::_removeButton()
+                            self::_itemButtons()
+
                         ]
                     ),
                     ['new' => 'true', 'style' => 'display:none']
@@ -579,7 +605,8 @@ class Option
                             $__html               .= $template_description;
 
                             $html .= self::_group(
-                                $__html . self::_removeButton()
+                                $__html . self::_itemButtons()
+
                             );
                         }
 
@@ -603,7 +630,7 @@ class Option
                         $__html               .= $template_description;
 
                         $html .= self::_group(
-                            $__html . self::_removeButton(),
+                            $__html . self::_itemButtons(),
                             ['new' => 'true', 'style' => 'display:none']
                         );
 
@@ -732,7 +759,7 @@ class Option
                                             $disabled_str,
                                             $readonly_str,
                                         ] + $input_attrs
-                                    ) . self::_removeButton()
+                                    ) . self::_itemButtons()
                                 );
                             }
                         }
@@ -977,6 +1004,28 @@ class Option
                         }
                     });
                 }
+
+                if (!window.hasOwnProperty('diazoxide')) {
+                    window.diazoxide = {};
+                    if (!window.diazoxide.hasOwnProperty()) {
+                        window.diazoxide.wordpress = {};
+                        if (!window.diazoxide.wordpress.hasOwnProperty('option')) {
+                            window.diazoxide.wordpress.option = {
+                                removeItem: function (button) {
+                                    button.parentElement.remove();
+                                },
+                                duplicateItem: function (button) {
+                                    var item = button.parentElement.cloneNode(true);
+                                    button.parentElement.parentElement.insertBefore(item, button.parentElement);
+                                }
+                            };
+                        }
+                    }
+                }
+
+                //window.diazoxide.wordpess.option.<?php //echo $parent;?>// = {
+                //
+                //}
             })();
         </script>
         <?php
