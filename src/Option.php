@@ -168,7 +168,7 @@ class Option
     /**
      * @return string
      */
-    public function getField()
+    public function getField(): string
     {
         $parent          = $this->getParam('parent', null);
         $type            = $this->getParam('type', null);
@@ -210,7 +210,7 @@ class Option
      *
      * @return string
      */
-    private static function _encodeKey($key)
+    private static function _encodeKey($key): string
     {
         return "{{encode_key}}" . base64_encode($key);
     }
@@ -234,7 +234,7 @@ class Option
     /**
      * @param $str
      *
-     * @return bool
+     * @return bool|string
      */
     private static function _maybeBoolean($str)
     {
@@ -308,7 +308,7 @@ class Option
      *
      * @return string
      */
-    private static function _tagOpen(string $tag, ?array $attrs = null)
+    private static function _tagOpen(string $tag, ?array $attrs = null): string
     {
         if ($attrs !== null) {
             $attrs = self::_getAttrsString($attrs);
@@ -326,7 +326,7 @@ class Option
      *
      * @return string
      */
-    private static function _tagClose(string $tag)
+    private static function _tagClose(string $tag): string
     {
         return sprintf('</%s>', $tag);
     }
@@ -363,7 +363,12 @@ class Option
     }
 
 
-    private static function _itemButtons($buttons = null)
+    /**
+     * @param null $buttons
+     *
+     * @return string
+     */
+    private static function _itemButtons(?array $buttons = null): string
     {
         $html = '';
         if ($buttons == null || ! is_array($buttons)) {
@@ -380,7 +385,10 @@ class Option
         return $html;
     }
 
-    private static function _removeButton()
+    /**
+     * @return string
+     */
+    private static function _removeButton(): string
     {
         return self::_tag(
             'button',
@@ -394,7 +402,10 @@ class Option
         );
     }
 
-    private static function _duplicateButton()
+    /**
+     * @return string
+     */
+    private static function _duplicateButton(): string
     {
         return self::_tag(
             'button',
