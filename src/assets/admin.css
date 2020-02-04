@@ -79,7 +79,7 @@ ul.__PARENT_SLUG__-admin-nested-fields .section > .field .group button.item-butt
     top: 0;
     right: 0;
     cursor: pointer;
-    font-size: 0.8em;
+    font-size: 8px;
     opacity: 0.4;
     background: #7b0000;
     color: #fff;
@@ -90,7 +90,7 @@ ul.__PARENT_SLUG__-admin-nested-fields .section > .field .group button.item-butt
 }
 
 ul.__PARENT_SLUG__-admin-nested-fields .section > .field .group button.item-button + button.item-button {
-    right: 25px;
+    right: 22px;
 }
 
 ul.__PARENT_SLUG__-admin-nested-fields .section > .field .group button.item-button:hover {

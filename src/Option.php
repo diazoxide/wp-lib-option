@@ -363,9 +363,21 @@ class Option
     }
 
 
-    private static function _itemButtons()
+    private static function _itemButtons($buttons = null)
     {
-        return self::_removeButton() . self::_duplicateButton();
+        $html = '';
+        if ($buttons == null || ! is_array($buttons)) {
+            $html = self::_removeButton() . self::_duplicateButton();;
+        } elseif (is_array($buttons)) {
+            if (in_array('remove', $buttons)) {
+                $html .= self::_removeButton();
+            }
+            if (in_array('duplicate', $buttons)) {
+                $html .= self::_duplicateButton();
+            }
+        }
+
+        return $html;
     }
 
     private static function _removeButton()
@@ -377,6 +389,7 @@ class Option
                 'class'   => 'item-button remove',
                 'onclick' => 'diazoxide.wordpress.option.removeItem(this)',
                 'type'    => 'button',
+                'title'   => 'Remove item'
             ]
         );
     }
@@ -385,11 +398,12 @@ class Option
     {
         return self::_tag(
             'button',
-            '+',
+            '&#65291;',
             [
                 'type'    => 'button',
                 'class'   => 'item-button duplicate',
-                'onclick' => 'diazoxide.wordpress.option.duplicateItem(this)'
+                'onclick' => 'diazoxide.wordpress.option.duplicateItem(this)',
+                'title'   => 'Duplicate item'
             ]
 
         );
@@ -630,7 +644,7 @@ class Option
                         $__html               .= $template_description;
 
                         $html .= self::_group(
-                            $__html . self::_itemButtons(),
+                            $__html . self::_itemButtons(['remove']),
                             ['new' => 'true', 'style' => 'display:none']
                         );
 
