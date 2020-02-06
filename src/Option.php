@@ -170,37 +170,23 @@ class Option
      */
     public function getField(): string
     {
-        $parent          = $this->getParam('parent', null);
-        $type            = $this->getParam('type', null);
-        $method          = $this->getParam('method', self::METHOD_SINGLE);
-        $values          = $this->getParam('values', []);
-        $markup          = $this->getParam('markup', null);
-        $template        = $this->getParam('template', null);
-        $template_params = $this->getParam('template_params', null);
-        $field           = $this->getParam('field', null);
-        $disabled        = $this->getParam('disabled', false);
-        $readonly        = $this->getParam('readonly', false);
-
-        $data = $this->getParam('data', []);
-
-        $value = $this->getValue();
-        $name  = $this->getName();
-
         return self::_getField(
             [
-                'type'            => $type,
-                'parent'          => $parent,
-                'method'          => $method,
-                'values'          => $values,
-                'markup'          => $markup,
-                'template'        => $template,
-                'template_params' => $template_params,
-                'field'           => $field,
-                'value'           => $value,
-                'name'            => $name,
-                'data'            => $data,
-                'disabled'        => $disabled,
-                'readonly'        => $readonly
+                'name'            => $this->getName(),
+                'value'           => $this->getValue(),
+                'type'            => $this->getParam('type', null),
+                'label'           => $this->getParam('label', $this->getName()),
+                'description'     => $this->getParam('description', null),
+                'parent'          => $this->getParam('parent', null),
+                'method'          => $this->getParam('method', null),
+                'values'          => $this->getParam('values', []),
+                'markup'          => $this->getParam('markup', null),
+                'template'        => $this->getParam('template', null),
+                'template_params' => $this->getParam('template_params', null),
+                'field'           => $this->getParam('field', null),
+                'data'            => $this->getParam('data', null),
+                'disabled'        => $this->getParam('disabled', false),
+                'readonly'        => $this->getParam('readonly', false)
             ]
         );
     }
@@ -429,6 +415,7 @@ class Option
     {
         $parent          = $params['parent'] ?? null;
         $description     = $params['description'] ?? null;
+        $label           = $params['label'] ?? null;
         $type            = $params['type'] ?? null;
         $method          = $params['method'] ?? null;
         $values          = $params['values'] ?? [];
@@ -459,10 +446,7 @@ class Option
             $description = call_user_func($description, $params);
         }
 
-        $description != null ? sprintf('<div class="description">%s</div>', $description) : '';
-
-        $html = $description;
-
+        $html = '';
 
         switch ($type) {
             case self::TYPE_BOOL:
@@ -674,7 +658,6 @@ class Option
                     }
                 }
                 break;
-
             default:
                 if ( ! empty($values)) {
                     if ($markup == null || $markup == self::MARKUP_SELECT) {
@@ -799,7 +782,7 @@ class Option
                                 'type'  => $input_type,
                                 'disabled'
                             ] + $input_attrs
-                        ),
+                        ) . self::_itemButtons(),
                         [
                             'style'   => 'display:none',
                             'new'     => 'true',
@@ -840,6 +823,16 @@ class Option
                     $html .= self::_group("Not handled!");
                 }
                 break;
+        }
+
+        $html = self::_tag('div', $html, ['class' => 'group']);
+
+        if ( ! empty($label)) {
+            $html = self::_tag('div', $label, ['class' => 'label']) . $html;
+        }
+
+        if ( ! empty($description)) {
+            $html .= self::_tag('div', $description, ['class' => 'description']);;
         }
 
         return $html;
@@ -977,12 +970,7 @@ class Option
                     }
 
                     $field = $item->getField();
-                    $html  = sprintf(
-                        '<div class="section"><div class="label">%s</div><div class="field">%s</div>%s</div>',
-                        $label,
-                        $field,
-                        $description != null ? sprintf('<div class="description">%s</div>', $description) : ''
-                    );
+                    $html  = '<div class="section">' . $field . '</div>';
                     $temp  = &$_fields;
                     foreach ($route as $key) {
                         $temp = &$temp[$key];
@@ -1047,10 +1035,6 @@ class Option
                         }
                     }
                 }
-
-                //window.diazoxide.wordpess.option.<?php //echo $parent;?>// = {
-                //
-                //}
             })();
         </script>
         <?php
