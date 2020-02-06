@@ -111,6 +111,14 @@ ul.__PARENT_SLUG__-admin-nested-fields .section > .group {
     grid-column-gap: 0.5em;
 }
 
+ul.__PARENT_SLUG__-admin-nested-fields .section .group.clone {
+    background: #e5f6ff;
+}
+
+ul.__PARENT_SLUG__-admin-nested-fields .section .group.cloned {
+    background: #fff9e9;
+}
+
 ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group > * > * {
     margin-top: 1px;
 }

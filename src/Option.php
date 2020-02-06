@@ -1025,10 +1025,18 @@ class Option
                         if (!window.diazoxide.wordpress.hasOwnProperty('option')) {
                             window.diazoxide.wordpress.option = {
                                 removeItem: function (button) {
-                                    button.parentElement.remove();
+                                    if (confirm("Are you sure?")) {
+                                        button.parentElement.remove();
+                                    }
                                 },
                                 duplicateItem: function (button) {
-                                    var item = button.parentElement.cloneNode(true);
+                                    let item = button.parentElement.cloneNode(true);
+                                    item.classList.add('clone');
+                                    button.parentElement.classList.add('cloned');
+                                    setTimeout(function () {
+                                        item.classList.remove('clone');
+                                        button.parentElement.classList.remove('cloned');
+                                    }, 1000);
                                     button.parentElement.parentElement.insertBefore(item, button.parentElement);
                                 }
                             };
