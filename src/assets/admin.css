@@ -104,6 +104,10 @@ ul.__PARENT_SLUG__-admin-nested-fields .section > .field {
     grid-column-gap: 0.5em;
 }
 
+ul.__PARENT_SLUG__-admin-nested-fields .section > .field > .group > * > * {
+    margin-top: 1px;
+}
+
 /* Mobile Styles */
 @media only screen and (max-width: 400px) {
     ul.__PARENT_SLUG__-admin-nested-fields .section > .field {
