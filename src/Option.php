@@ -494,7 +494,7 @@ class Option
                                         [
                                             'class'       => 'key full',
                                             'type'        => 'text',
-                                            'placeholder' => 'key',
+                                            'placeholder' => $label,
                                             'value'       => $key,
                                             'onchange'    => $on_change
                                         ]
@@ -520,7 +520,7 @@ class Option
                                         [
                                             'class'       => 'key full',
                                             'type'        => 'text',
-                                            'placeholder' => 'key',
+                                            'placeholder' => $label,
                                             'value'       => $key,
                                             'onchange'    => $on_change
                                         ]
@@ -555,7 +555,7 @@ class Option
                                 [
                                     'class'       => 'key full',
                                     'type'        => 'text',
-                                    'placeholder' => 'key',
+                                    'placeholder' => $label,
                                     'onchange'    => $on_change
                                 ]
                             ),
@@ -763,6 +763,7 @@ class Option
                                             'name'  => $name . '[]',
                                             'class' => 'full',
                                             'type'  => $input_type,
+                                            'placeholder'  => $label,
                                             'value' => $_value,
                                             $disabled_str,
                                             $readonly_str,
@@ -780,6 +781,7 @@ class Option
                                 'name'  => $name . '[]',
                                 'class' => 'full',
                                 'type'  => $input_type,
+                                'placeholder'  => $label,
                                 'disabled'
                             ] + $input_attrs
                         ) . self::_itemButtons(),
@@ -812,6 +814,7 @@ class Option
                         [
                             'class' => 'full',
                             'type'  => $input_type,
+                            'placeholder'  => $label,
                             'name'  => $name,
                             'value' => $value,
                             'data'  => $data,
