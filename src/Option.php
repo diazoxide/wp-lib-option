@@ -470,7 +470,7 @@ class Option
                 );
                 break;
             case self::TYPE_OBJECT:
-                $on_change = "var fields = this.parentElement.querySelectorAll('[name]'); for(var i=0; i<fields.length; i++){ var field= fields[i]; if(this.value!=null){field.removeAttribute('disabled')}; if(field.getAttribute('data-name') == null){ field.setAttribute('data-name',field.getAttribute('name')) } var attr = field.getAttribute('data-name'); attr = attr.replace('{key}','{{encode_key}}'+btoa(this.value)); fields[i].setAttribute('name',attr); }";
+                $on_change = "var fields = this.parentElement.querySelectorAll('[name]'); for (var i = 0; i < fields.length; i++) { var field = fields[i]; if (this.value != null) { field.removeAttribute('disabled') }; var attr =  field.getAttribute('name'); attr = attr.replace(/{{encode_key}}.*?(?=\])/gm, '{{encode_key}}' + btoa(this.value)); fields[i].setAttribute('name', attr); }";
 
                 if ($template != null && !empty($template)) {
                     foreach ($value as $key => $_value) {
@@ -478,7 +478,7 @@ class Option
 
                         foreach ($template as $_key => $_field) {
                             $_field['value'] = $_value[$_key] ?? null;
-                            $_field['data']['name'] = $name . '[{key}]' . '[' . $_key . ']';
+                            $_field['data']['name'] = $name . '[{{encode_key}}]' . '[' . $_key . ']';
                             $_field['name'] = $name . '[' . self::_encodeKey($key) . ']' . '[' . $_key . ']';
                             $_html .= self::_getField($_field);
                         }
@@ -508,7 +508,7 @@ class Option
                     foreach ($value as $key => $_value) {
                         $_field = $field;
                         $_field['value'] = $_value;
-                        $_field['data']['name'] = $name . '[{key}]';
+                        $_field['data']['name'] = $name . '[{{encode_key}}]';
                         $_field['name'] = $name . '[' . self::_encodeKey($key) . ']';
                         $html .= self::_group(
                             implode(
@@ -536,12 +536,12 @@ class Option
 
                 if ($template != null && !empty($template)) {
                     foreach ($template as $key => $_field) {
-                        $_field['name'] = $name . '[{key}]' . '[' . $key . ']';
+                        $_field['name'] = $name . '[{{encode_key}}]' . '[' . $key . ']';
                         $_field['disabled'] = true;
                         $_html .= self::_getField($_field);
                     }
                 } elseif ($field != null && !empty($field)) {
-                    $field['name'] = $name . '[{key}]';
+                    $field['name'] = $name . '[{{encode_key}}]';
                     $field['disabled'] = true;
                     $_html .= self::_getField($field);
                 }
@@ -574,7 +574,7 @@ class Option
                         [
                             'type' => 'button',
                             'class' => 'button button-primary',
-                            'onclick' => "var c = this.parentElement.parentElement.querySelector('[new]').cloneNode(true); c.removeAttribute('new'); c.style.display=''; var e = c.querySelectorAll('[name]'); for( var i=0; i < e.length; i++){e[i].disabled = false;}; this.parentElement.parentElement.insertBefore(c,this.parentElement);"
+                            'onclick' => "var c = this.parentElement.parentElement.querySelector(':scope>[new]').cloneNode(true); c.removeAttribute('new'); c.style.display=''; var e = c.querySelectorAll('[name]'); for( var i=0; i < e.length; i++){e[i].disabled = false;}; this.parentElement.parentElement.insertBefore(c,this.parentElement);"
                         ]
                     )
                 );

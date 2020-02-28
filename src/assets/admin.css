@@ -3,6 +3,10 @@
     max-width: 900px;
 }
 
+ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group {
+    position:relative;
+}
+
 ul.__PARENT_SLUG__-admin-nested-fields > ul.__PARENT_SLUG__-admin-nested-fields > ul.__PARENT_SLUG__-admin-nested-fields {
     display: none;
 }
