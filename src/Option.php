@@ -591,32 +591,35 @@ class Option
                             $html .= self::_getField($_field);
                         }
                     } elseif ($method == self::METHOD_MULTIPLE) {
-                        $last_key = count($value) + 1;
-                        foreach ($value as $key => $_value) {
-                            $__html = '';
+                        $last_key = 1;
+                        if($value!=null) {
+                            $last_key = count($value) + 1;
+                            foreach ($value as $key => $_value) {
+                                $__html = '';
 
-                            foreach ($template as $_key => $_field) {
-                                $_field = $template[$_key];
-                                $_field['name'] = $name . '[' . $key . ']' . '[' . $_key . ']';
-                                $_field['value'] = $_value[$_key] ?? '';
-                                $__html .= self::_getField($_field);
+                                foreach ($template as $_key => $_field) {
+                                    $_field = $template[$_key];
+                                    $_field['name'] = $name . '[' . $key . ']' . '[' . $_key . ']';
+                                    $_field['value'] = $_value[$_key] ?? '';
+                                    $__html .= self::_getField($_field);
+                                }
+
+                                $template_description = $template_params['description'] ?? null;
+                                if (is_callable($template_description)) {
+                                    $template_description = call_user_func($template_description, $key, $_value);
+                                }
+
+                                $template_description = $template_description != null ? sprintf(
+                                    '<div class="description">%s</div>',
+                                    $template_description
+                                ) : '';
+                                $__html .= $template_description;
+
+                                $html .= self::_group(
+                                    $__html . self::_itemButtons()
+
+                                );
                             }
-
-                            $template_description = $template_params['description'] ?? null;
-                            if (is_callable($template_description)) {
-                                $template_description = call_user_func($template_description, $key, $_value);
-                            }
-
-                            $template_description = $template_description != null ? sprintf(
-                                '<div class="description">%s</div>',
-                                $template_description
-                            ) : '';
-                            $__html .= $template_description;
-
-                            $html .= self::_group(
-                                $__html . self::_itemButtons()
-
-                            );
                         }
 
                         $__html = '';
