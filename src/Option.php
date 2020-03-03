@@ -505,30 +505,32 @@ class Option
                         );
                     }
                 } elseif ($field != null && !empty($field)) {
-                    foreach ($value as $key => $_value) {
-                        $_field = $field;
-                        $_field['value'] = $_value;
-                        $_field['data']['name'] = $name . '[{{encode_key}}]';
-                        $_field['name'] = $name . '[' . self::_encodeKey($key) . ']';
-                        $html .= self::_group(
-                            implode(
-                                '',
-                                [
-                                    self::_itemButtons(),
-                                    self::_tagOpen(
-                                        'input',
-                                        [
-                                            'class' => 'key full',
-                                            'type' => 'text',
-                                            'placeholder' => $label,
-                                            'value' => $key,
-                                            'onchange' => $on_change
-                                        ]
-                                    ),
-                                    self::_getField($_field)
-                                ]
-                            )
-                        );
+                    if(!empty($value)) {
+                        foreach ($value as $key => $_value) {
+                            $_field = $field;
+                            $_field['value'] = $_value;
+                            $_field['data']['name'] = $name . '[{{encode_key}}]';
+                            $_field['name'] = $name . '[' . self::_encodeKey($key) . ']';
+                            $html .= self::_group(
+                                implode(
+                                    '',
+                                    [
+                                        self::_itemButtons(),
+                                        self::_tagOpen(
+                                            'input',
+                                            [
+                                                'class' => 'key full',
+                                                'type' => 'text',
+                                                'placeholder' => $label,
+                                                'value' => $key,
+                                                'onchange' => $on_change
+                                            ]
+                                        ),
+                                        self::_getField($_field)
+                                    ]
+                                )
+                            );
+                        }
                     }
                 }
 
