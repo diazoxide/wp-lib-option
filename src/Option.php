@@ -657,7 +657,7 @@ class Option
                                     'type' => 'button',
                                     'last-key' => $last_key,
                                     'class' => 'button button-primary',
-                                    'onclick' => "var n = parseInt(this.getAttribute('last-key'))+1; this.setAttribute('last-key',n); var c = this.parentElement.parentElement.querySelector('[new]').cloneNode(true); c.removeAttribute('new'); c.style.display=''; var e = c.querySelectorAll('[name]'); for( var i=0; i < e.length; i++){e[i].disabled = false; e[i].name=(e[i].name).replace('{{LAST_KEY}}',n);}; this.parentElement.parentElement.insertBefore(c,this.parentElement);"
+                                    'onclick' => "var n = parseInt(this.getAttribute('last-key'))+1; this.setAttribute('last-key',n); var c = this.parentElement.parentElement.querySelector(':scope>[new]').cloneNode(true); c.removeAttribute('new'); c.style.display=''; var e = c.querySelectorAll('[name]'); for( var i=0; i < e.length; i++){e[i].disabled = false; e[i].name=(e[i].name).replace('{{LAST_KEY}}',n);}; this.parentElement.parentElement.insertBefore(c,this.parentElement);"
                                 ]
                             )
                         );
