@@ -420,7 +420,15 @@ class Option
         $type = $params['type'] ?? null;
         $method = $params['method'] ?? null;
         $values = $params['values'] ?? [];
-        $markup = $params['markup'] ?? self::MARKUP_TEXT;
+        $markup = $params['markup'] ?? null;
+
+        /**
+         * Automatically select markup type when it missing
+         * */
+        if ($markup == null) {
+            $markup = empty($values) ? self::MARKUP_TEXT : self::MARKUP_SELECT;
+        }
+
         $template = $params['template'] ?? null;
         $template_params = $params['template_params'] ?? null;
         $field = $params['field'] ?? null;
