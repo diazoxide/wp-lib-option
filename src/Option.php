@@ -173,6 +173,7 @@ class Option
     {
         return self::_getField(
             [
+                'main_params' => $this->getParam('main_params', false),
                 'name' => $this->getName(),
                 'value' => $this->getValue(),
                 'type' => $this->getParam('type', null),
@@ -187,7 +188,7 @@ class Option
                 'field' => $this->getParam('field', null),
                 'data' => $this->getParam('data', null),
                 'disabled' => $this->getParam('disabled', false),
-                'readonly' => $this->getParam('readonly', false)
+                'readonly' => $this->getParam('readonly', false),
             ]
         );
     }
@@ -414,21 +415,15 @@ class Option
      */
     private static function _getField($params = []): string
     {
+        $main_params = $params['main_params'] ?? [];
+
         $parent = $params['parent'] ?? null;
         $description = $params['description'] ?? null;
         $label = $params['label'] ?? null;
         $type = $params['type'] ?? null;
         $method = $params['method'] ?? null;
         $values = $params['values'] ?? [];
-        $markup = $params['markup'] ?? null;
-
-        /**
-         * Automatically select markup type when it missing
-         * */
-        if ($markup == null) {
-            $markup = empty($values) ? self::MARKUP_TEXT : self::MARKUP_SELECT;
-        }
-
+        $markup = $params['markup'] ?? self::MARKUP_TEXT;
         $template = $params['template'] ?? null;
         $template_params = $params['template_params'] ?? null;
         $field = $params['field'] ?? null;
@@ -601,7 +596,8 @@ class Option
                             $_field['value'] = $value[$key];
                             $html .= self::_getField($_field);
                         }
-                    } elseif ($method == self::METHOD_MULTIPLE) {
+                    }
+                    elseif ($method == self::METHOD_MULTIPLE) {
                         $last_key = 1;
                         if ($value != null) {
                             $last_key = count($value) + 1;
@@ -850,7 +846,9 @@ class Option
                 break;
         }
 
-        $html = self::_tag('div', $html, ['class' => 'group']);
+        $main_params['class'] = $main_params['class'] ?? 'group';
+
+        $html = self::_tag('div', $html, $main_params);
 
         if (!empty($label)) {
             $html = self::_tag('div', $label, ['class' => 'label']) . $html;
