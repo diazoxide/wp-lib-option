@@ -16,6 +16,7 @@ class Option
 
     const MARKUP_CHECKBOX = 'checkbox';
     const MARKUP_TEXT = 'text';
+    const MARKUP_TEXTAREA = 'textarea';
     const MARKUP_NUMBER = 'number';
     const MARKUP_SELECT = 'select';
 
@@ -419,7 +420,7 @@ class Option
         $type = $params['type'] ?? null;
         $method = $params['method'] ?? null;
         $values = $params['values'] ?? [];
-        $markup = $params['markup'] ?? null;
+        $markup = $params['markup'] ?? self::MARKUP_TEXT;
         $template = $params['template'] ?? null;
         $template_params = $params['template_params'] ?? null;
         $field = $params['field'] ?? null;
@@ -505,7 +506,7 @@ class Option
                         );
                     }
                 } elseif ($field != null && !empty($field)) {
-                    if(!empty($value)) {
+                    if (!empty($value)) {
                         foreach ($value as $key => $_value) {
                             $_field = $field;
                             $_field['value'] = $_value;
@@ -594,7 +595,7 @@ class Option
                         }
                     } elseif ($method == self::METHOD_MULTIPLE) {
                         $last_key = 1;
-                        if($value!=null) {
+                        if ($value != null) {
                             $last_key = count($value) + 1;
                             foreach ($value as $key => $_value) {
                                 $__html = '';
@@ -752,11 +753,6 @@ class Option
                         $html .= self::_tagClose('select');
                     }
                 } elseif ($method == self::METHOD_MULTIPLE) {
-                    $input_type = 'text';
-
-                    if ($markup == self::MARKUP_NUMBER) {
-                        $input_type = 'number';
-                    }
 
                     if (is_array($value)) {
                         foreach ($value as $key => $_value) {
@@ -767,7 +763,7 @@ class Option
                                         [
                                             'name' => $name . '[]',
                                             'class' => 'full',
-                                            'type' => $input_type,
+                                            'type' => $markup,
                                             'placeholder' => $label,
                                             'value' => $_value,
                                             $disabled_str,
@@ -785,7 +781,7 @@ class Option
                             [
                                 'name' => $name . '[]',
                                 'class' => 'full',
-                                'type' => $input_type,
+                                'type' => $markup,
                                 'placeholder' => $label,
                                 'disabled'
                             ] + $input_attrs
@@ -809,24 +805,37 @@ class Option
                         )
                     );
                 } elseif ($method != self::METHOD_MULTIPLE) {
-                    $input_type = 'text';
 
-                    if ($markup == self::MARKUP_NUMBER) {
-                        $input_type = 'number';
+                    if (in_array($markup, [self::MARKUP_TEXT, self::MARKUP_NUMBER])) {
+                        $html .= self::_tagOpen(
+                            'input',
+                            [
+                                'class' => 'full',
+                                'type' => $markup,
+                                'placeholder' => $label,
+                                'name' => $name,
+                                'value' => $value,
+                                'data' => $data,
+                                $disabled_str,
+                                $readonly_str
+                            ]
+                        );
+                    } elseif ($markup == self::MARKUP_TEXTAREA) {
+                        $html .= self::_tagOpen(
+                            'textarea',
+                            [
+                                'class' => 'full',
+                                'type' => $markup,
+                                'placeholder' => $label,
+                                'name' => $name,
+                                'data' => $data,
+                                $disabled_str,
+                                $readonly_str
+                            ]
+                        );
+                        $html .= $value;
+                        $html .= self::_tagClose('textarea');
                     }
-                    $html .= self::_tagOpen(
-                        'input',
-                        [
-                            'class' => 'full',
-                            'type' => $input_type,
-                            'placeholder' => $label,
-                            'name' => $name,
-                            'value' => $value,
-                            'data' => $data,
-                            $disabled_str,
-                            $readonly_str
-                        ]
-                    );
                 } else {
                     $html .= self::_group("Not handled!");
                 }
