@@ -358,17 +358,17 @@ class Option
      */
     private static function _itemButtons(?array $buttons = null): string
     {
-        $html = '';
-        if ($buttons == null || !is_array($buttons)) {
-            $html = self::_removeButton() . self::_duplicateButton();;
-        } elseif (is_array($buttons)) {
-            if (in_array('remove', $buttons)) {
-                $html .= self::_removeButton();
-            }
-            if (in_array('duplicate', $buttons)) {
-                $html .= self::_duplicateButton();
-            }
+        $html = self::_tagOpen('div',['class'=>'buttons']);
+
+        if($buttons == null){
+            $buttons = ['duplicate','minimise','remove'];
         }
+        foreach ($buttons as $button){
+            $fn_name = "_".$button.'Button';
+            $html.=call_user_func([self::class,$fn_name]);
+        }
+
+        $html .= self::_tagClose('div');
 
         return $html;
     }
@@ -386,6 +386,23 @@ class Option
                 'onclick' => 'diazoxide.wordpress.option.removeItem(this)',
                 'type' => 'button',
                 'title' => 'Remove item'
+            ]
+        );
+    }
+
+    /**
+     * @return string
+     */
+    private static function _minimiseButton(): string
+    {
+        return self::_tag(
+            'button',
+            '-',
+            [
+                'class' => 'item-button minimise',
+                'onclick' => 'diazoxide.wordpress.option.minimiseItem(this)',
+                'type' => 'button',
+                'title' => 'Minimise item'
             ]
         );
     }
@@ -432,7 +449,7 @@ class Option
         }
 
         $template = $params['template'] ?? null;
-        $template_params = $params['template_params'] ?? null;
+        $template_params = $params['template_params'] ?? [];
         $field = $params['field'] ?? null;
 
         $value = $params['value'] ?? null;
@@ -468,7 +485,7 @@ class Option
 
                 $html .= self::_tagOpen(
                     'input',
-                    [
+                    $input_attrs + [
                         'class' => implode(' ', [$type, $method]),
                         'value' => '{{boolean_true}}',
                         'type' => 'checkbox',
@@ -477,7 +494,7 @@ class Option
                         $value ? 'checked' : '',
                         $readonly_str,
                         $disabled_str
-                    ] + $input_attrs
+                    ]
                 );
                 break;
             case self::TYPE_OBJECT:
@@ -573,7 +590,7 @@ class Option
                                 ]
                             ),
                             self::_group($_html),
-                            self::_itemButtons()
+                            self::_itemButtons(['duplicate','remove'])
 
                         ]
                     ),
@@ -603,8 +620,7 @@ class Option
                             $_field['value'] = $value[$key] ?? null;
                             $html .= self::_getField($_field);
                         }
-                    }
-                    elseif ($method == self::METHOD_MULTIPLE) {
+                    } elseif ($method == self::METHOD_MULTIPLE) {
                         $last_key = 1;
                         if ($value != null) {
                             $last_key = count($value) + 1;
@@ -680,7 +696,7 @@ class Option
                     if ($markup == null || $markup == self::MARKUP_SELECT) {
                         $html .= self::_tagOpen(
                             'select',
-                            [
+                            $input_attrs + [
                                 'class' => implode(
                                     ' ',
                                     [$type, $method, 'full']
@@ -690,7 +706,7 @@ class Option
                                 'data' => $data,
                                 $disabled_str,
                                 $readonly_str
-                            ] + $input_attrs
+                            ]
                         );
                         $html .= self::_tag(
                             'option',
@@ -771,7 +787,7 @@ class Option
                                 $html .= self::_group(
                                     self::_tagOpen(
                                         'input',
-                                        [
+                                        $input_attrs + [
                                             'name' => $name . '[]',
                                             'class' => 'full',
                                             'type' => $markup,
@@ -779,7 +795,7 @@ class Option
                                             'value' => $_value,
                                             $disabled_str,
                                             $readonly_str,
-                                        ] + $input_attrs
+                                        ]
                                     ) . self::_itemButtons()
                                 );
                             }
@@ -789,14 +805,14 @@ class Option
                     $html .= self::_group(
                         self::_tagOpen(
                             'input',
-                            [
+                            $input_attrs + [
                                 'name' => $name . '[]',
                                 'class' => 'full',
                                 'type' => $markup,
                                 'placeholder' => $label,
                                 'disabled'
-                            ] + $input_attrs
-                        ) . self::_itemButtons(),
+                            ]
+                        ) . self::_itemButtons(['remove']),
                         [
                             'style' => 'display:none',
                             'new' => 'true',
@@ -1070,18 +1086,29 @@ class Option
                             window.diazoxide.wordpress.option = {
                                 removeItem: function (button) {
                                     if (confirm("Are you sure?")) {
-                                        button.parentElement.remove();
+                                        button.parentElement.parentElement.remove();
                                     }
                                 },
                                 duplicateItem: function (button) {
-                                    let item = button.parentElement.cloneNode(true);
-                                    item.classList.add('clone');
-                                    button.parentElement.classList.add('cloned');
+                                    let item = button.parentElement.parentElement;
+                                    let clone = item.cloneNode(true);
+                                    clone.classList.add('clone');
+                                    item.classList.add('cloned');
                                     setTimeout(function () {
-                                        item.classList.remove('clone');
-                                        button.parentElement.classList.remove('cloned');
+                                        clone.classList.remove('clone');
+                                        item.classList.remove('cloned');
                                     }, 1000);
-                                    button.parentElement.parentElement.insertBefore(item, button.parentElement);
+                                    item.parentElement.insertBefore(clone, item);
+                                },
+                                minimiseItem: function (button) {
+                                    let item = button.parentElement.parentElement;
+                                    if(item.classList.contains('minimised')){
+                                        item.classList.remove('minimised');
+                                        button.innerHTML = "-"
+                                    } else{
+                                        item.classList.add('minimised');
+                                        button.innerHTML = "&#9634;"
+                                    }
                                 }
                             };
                         }

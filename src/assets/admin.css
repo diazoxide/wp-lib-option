@@ -4,7 +4,7 @@
 }
 
 ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group {
-    position:relative;
+    position: relative;
 }
 
 ul.__PARENT_SLUG__-admin-nested-fields > ul.__PARENT_SLUG__-admin-nested-fields > ul.__PARENT_SLUG__-admin-nested-fields {
@@ -86,9 +86,31 @@ ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group > .key {
     border: solid 2px #0073aa;
 }
 
+ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group .buttons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-right: 3px;
+}
+
+ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group.minimised > :not(.buttons):not(:nth-child(2)) {
+    display: none;
+}
+
+ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group.minimised > .buttons button {
+    background: #000;
+    height: 35px;
+    width: 35px;
+}
+
+ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group.minimised {
+    padding: 0 120px 0 0;
+}
+
 ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group button.item-button {
-    height: 15px;
+    height: 17px;
     width: 20px;
+    margin-left: 2px;
     top: 4px;
     right: 3px;
     cursor: pointer;
@@ -97,12 +119,7 @@ ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group button.item-butt
     color: #fff;
     border: none;
     border-radius: 4px;
-    position: absolute;
     font-weight: bolder;
-}
-
-ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group button.item-button + button.item-button {
-    right: 24px;
 }
 
 ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group button.item-button:hover {
