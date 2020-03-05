@@ -77,6 +77,7 @@ ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group > * {
 
 ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group > .full {
     width: 100%;
+    max-width: 100%;
 }
 
 ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group > .key {
