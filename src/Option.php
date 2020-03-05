@@ -1104,10 +1104,12 @@ class Option
                                     let item = button.parentElement.parentElement;
                                     if(item.classList.contains('minimised')){
                                         item.classList.remove('minimised');
-                                        button.innerHTML = "-"
+                                        button.setAttribute('title','Minimise');
+                                        button.innerHTML = "-";
                                     } else{
                                         item.classList.add('minimised');
-                                        button.innerHTML = "&#9634;"
+                                        button.setAttribute('title','Maximise');
+                                        button.innerHTML = "&#9634;";
                                     }
                                 }
                             };
