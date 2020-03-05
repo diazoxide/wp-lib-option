@@ -600,7 +600,7 @@ class Option
                     if ($method == self::METHOD_SINGLE) {
                         foreach ($template as $key => $_field) {
                             $_field['name'] = $name . '[' . $key . ']';
-                            $_field['value'] = $value[$key];
+                            $_field['value'] = $value[$key] ?? null;
                             $html .= self::_getField($_field);
                         }
                     }
