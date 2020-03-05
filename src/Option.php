@@ -515,8 +515,6 @@ class Option
                             implode(
                                 '',
                                 [
-                                    self::_itemButtons(),
-
                                     self::_tagOpen(
                                         'input',
                                         [
@@ -527,7 +525,8 @@ class Option
                                             'onchange' => $on_change
                                         ]
                                     ),
-                                    self::_group($_html)
+                                    self::_group($_html),
+                                    self::_itemButtons()
                                 ]
                             )
                         );
@@ -543,7 +542,7 @@ class Option
                                 implode(
                                     '',
                                     [
-                                        self::_itemButtons(),
+
                                         self::_tagOpen(
                                             'input',
                                             [
@@ -554,7 +553,8 @@ class Option
                                                 'onchange' => $on_change
                                             ]
                                         ),
-                                        self::_getField($_field)
+                                        self::_getField($_field),
+                                        self::_itemButtons()
                                     ]
                                 )
                             );

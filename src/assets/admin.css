@@ -93,7 +93,7 @@ ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group .buttons {
     margin-right: 3px;
 }
 
-ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group.minimised > :not(.buttons):not(:nth-child(2)) {
+ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group.minimised > :not(.buttons):not(:first-child) {
     display: none;
 }
 
