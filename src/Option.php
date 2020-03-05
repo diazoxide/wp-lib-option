@@ -1019,12 +1019,12 @@ class Option
             function ($key, $item, $route) use (&$_fields) {
                 if ($item instanceof Option) {
                     array_pop($route);
-                    $label = $item->getParam('label', $item->getName());
+                    /*$label = $item->getParam('label', $item->getName());
                     $description = $item->getParam('description', null);
 
                     if (is_callable($description)) {
                         $description = call_user_func($description, $key, $item, $route);
-                    }
+                    }*/
 
                     $field = $item->getField();
                     $html = '<div class="section">' . $field . '</div>';
