@@ -4,6 +4,8 @@
 namespace diazoxide\wp\lib\option;
 
 
+use NovemBit\wp\plugins\i18n\Bootstrap;
+
 class Option
 {
     private $_name;
@@ -358,14 +360,14 @@ class Option
      */
     private static function _itemButtons(?array $buttons = null): string
     {
-        $html = self::_tagOpen('div',['class'=>'buttons']);
+        $html = self::_tagOpen('div', ['class' => 'buttons']);
 
-        if($buttons == null){
-            $buttons = ['duplicate','minimise','remove'];
+        if ($buttons == null) {
+            $buttons = ['duplicate', 'minimise', 'remove'];
         }
-        foreach ($buttons as $button){
-            $fn_name = "_".$button.'Button';
-            $html.=call_user_func([self::class,$fn_name]);
+        foreach ($buttons as $button) {
+            $fn_name = "_" . $button . 'Button';
+            $html .= call_user_func([self::class, $fn_name]);
         }
 
         $html .= self::_tagClose('div');
@@ -590,7 +592,7 @@ class Option
                                 ]
                             ),
                             self::_group($_html),
-                            self::_itemButtons(['duplicate','remove'])
+                            self::_itemButtons(['duplicate', 'remove'])
 
                         ]
                     ),
@@ -701,6 +703,7 @@ class Option
                                     ' ',
                                     [$type, $method, 'full']
                                 ),
+                                'select2'=>'true',
                                 'name' => $name . ($method == self::METHOD_MULTIPLE ? '[]' : ''),
                                 $method == self::METHOD_MULTIPLE ? 'multiple' : '',
                                 'data' => $data,
@@ -708,11 +711,11 @@ class Option
                                 $readonly_str
                             ]
                         );
-                        $html .= self::_tag(
+                       /* $html .= self::_tag(
                             'option',
                             '-- Select --',
                             ['disabled' => true, 'selected' => true]
-                        );
+                        );*/
                         $open_tag_select = true;
                     }
 
@@ -884,6 +887,11 @@ class Option
         return $html;
     }
 
+    private static function getNonceFieldName($parent)
+    {
+        return $parent . '-save-form';
+    }
+
     /**
      * @param $parent
      * @param string $method
@@ -892,18 +900,21 @@ class Option
      */
     public static function getFormData($parent, $method = 'post')
     {
+
         if ($method == 'post') {
-            $fields = $_POST[$parent] ?? null;
+            $nonce_field = $_POST[self::getNonceFieldName($parent)] ?? null;
+            $fields = wp_verify_nonce($nonce_field, $parent)
+                ? ($_POST[$parent] ?? null) : null;
         } elseif ($method == 'get') {
-            $fields = $_GET[$parent] ?? null;
+            $nonce_field = $_POST[self::getNonceFieldName($parent)] ?? null;
+            $fields = wp_verify_nonce($nonce_field, $parent)
+                ? ($_GET[$parent] ?? null) : null;
         } else {
             $fields = null;
         }
-
         if ($fields !== null) {
             $fields = self::decodeKeys($fields);
         }
-
         return $fields;
     }
 
@@ -1044,21 +1055,45 @@ class Option
             <form method="post" action="">
                 <?php self::printArrayList($_fields, $parent); ?>
                 <input type="hidden" name="<?php echo $parent; ?>-form" value="1">
+                <?php wp_nonce_field($parent, self::getNonceFieldName($parent)); ?>
                 <?php submit_button(); ?>
             </form>
         </div>
 
-        <?php self::printStyle($parent); ?>
+        <?php
+        self::printSelect2Assets($parent);
+        self::printStyle($parent);
+        self::printScript($parent);
+    }
 
-        <?php self::printScript($parent); ?>
+    private static $select2_loaded;
 
+    private static function printSelect2Assets($parent)
+    {
+
+        if (!self::$select2_loaded) {
+            self::$select2_loaded = true;
+            ?>
+            <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet"/>
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+            <?php
+        }
+        ?>
+
+        <script>
+            (function ($) {
+                $(document).ready(function () {
+                    $('.<?php echo $parent;?>-wrap select[select2=true]').select2();
+                });
+            })(jQuery)
+        </script>
         <?php
     }
 
     /**
      * @param string $parent
      */
-    public static function printScript($parent = ''): void
+    private static function printScript($parent = ''): void
     {
         ?>
         <script type="application/javascript">
@@ -1102,13 +1137,13 @@ class Option
                                 },
                                 minimiseItem: function (button) {
                                     let item = button.parentElement.parentElement;
-                                    if(item.classList.contains('minimised')){
+                                    if (item.classList.contains('minimised')) {
                                         item.classList.remove('minimised');
-                                        button.setAttribute('title','Minimise');
+                                        button.setAttribute('title', 'Minimise');
                                         button.innerHTML = "-";
-                                    } else{
+                                    } else {
                                         item.classList.add('minimised');
-                                        button.setAttribute('title','Maximise');
+                                        button.setAttribute('title', 'Maximise');
                                         button.innerHTML = "&#9634;";
                                     }
                                 }
@@ -1121,7 +1156,7 @@ class Option
         <?php
     }
 
-    public static function printStyle($parent = '')
+    private static function printStyle($parent = '')
     {
         $str = file_get_contents(__DIR__ . '/assets/admin.css');
         $str = str_replace("__PARENT_SLUG__", $parent, $str);
