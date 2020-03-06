@@ -12,8 +12,7 @@
   "require": {
     "php": ">=7.2",
     "ext-mbstring": "*",
-    "ext-json": "*",
-    "select2/select2": "dev-master"
+    "ext-json": "*"
   },
   "require-dev": {
   },
