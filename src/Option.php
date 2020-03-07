@@ -1078,14 +1078,24 @@ class Option
             <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
             <?php
         }
+
+        $selector = '.'. $parent.'-wrap select[select2=true]';
         ?>
 
         <script>
-            (function ($) {
+            (function ($,parent) {
+
                 $(document).ready(function () {
-                    $('.<?php echo $parent;?>-wrap select[select2=true]').select2();
+                    $('.'+parent+'-wrap select[select2=true]').each(function() {
+                        if($(this).parents('[new=true]').length === 0 ) {
+                            $(this).select2();
+                        }
+                    });
                 });
-            })(jQuery)
+                $(document).on('DOMNodeInserted', 'select[select2=true]', function () {
+                    $(this).select2();
+                });
+            })(jQuery,"<?php echo $parent;?>")
         </script>
         <?php
     }
