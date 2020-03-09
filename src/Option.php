@@ -4,8 +4,6 @@
 namespace diazoxide\wp\lib\option;
 
 
-use NovemBit\wp\plugins\i18n\Bootstrap;
-
 class Option
 {
     private $_name;
@@ -428,6 +426,29 @@ class Option
     }
 
     /**
+     * @param int|null $last_key
+     *
+     * @return string
+     */
+    private static function addNewButton(?int $last_key = 0): string
+    {
+        return self::_group(
+            self::_tag(
+                'button',
+                '+ Add new',
+                [
+                    'type' => 'button',
+                    'last-key' => $last_key,
+                    'class' => 'button button-primary',
+                    'onclick' => 'diazoxide.wordpress.option.addNew(this)',
+                    'title' => 'Add new item'
+                ]
+
+            )
+        );
+    }
+
+    /**
      * @param array $params
      *
      * @return string
@@ -599,17 +620,7 @@ class Option
                     ['new' => 'true', 'style' => 'display:none']
                 );
 
-                $html .= self::_group(
-                    self::_tag(
-                        'button',
-                        '+ Add new',
-                        [
-                            'type' => 'button',
-                            'class' => 'button button-primary',
-                            'onclick' => "var c = this.parentElement.parentElement.querySelector(':scope>[new]').cloneNode(true); c.removeAttribute('new'); c.style.display=''; var e = c.querySelectorAll('[name]'); for( var i=0; i < e.length; i++){e[i].disabled = false;}; this.parentElement.parentElement.insertBefore(c,this.parentElement);"
-                        ]
-                    )
-                );
+                $html .= self::addNewButton();
 
                 break;
             case self::TYPE_GROUP:
@@ -678,18 +689,7 @@ class Option
                             ['new' => 'true', 'style' => 'display:none']
                         );
 
-                        $html .= self::_group(
-                            self::_tag(
-                                'button',
-                                '+ Add new',
-                                [
-                                    'type' => 'button',
-                                    'last-key' => $last_key,
-                                    'class' => 'button button-primary',
-                                    'onclick' => "var n = parseInt(this.getAttribute('last-key'))+1; this.setAttribute('last-key',n); var c = this.parentElement.parentElement.querySelector(':scope>[new]').cloneNode(true); c.removeAttribute('new'); c.style.display=''; var e = c.querySelectorAll('[name]'); for( var i=0; i < e.length; i++){e[i].disabled = false; e[i].name=(e[i].name).replace('{{LAST_KEY}}',n);}; this.parentElement.parentElement.insertBefore(c,this.parentElement);"
-                                ]
-                            )
-                        );
+                        $html .= self::addNewButton($last_key);
                     }
                 }
                 break;
@@ -703,7 +703,7 @@ class Option
                                     ' ',
                                     [$type, $method, 'full']
                                 ),
-                                'select2'=>'true',
+                                'select2' => 'true',
                                 'name' => $name . ($method == self::METHOD_MULTIPLE ? '[]' : ''),
                                 $method == self::METHOD_MULTIPLE ? 'multiple' : '',
                                 'data' => $data,
@@ -711,11 +711,11 @@ class Option
                                 $readonly_str
                             ]
                         );
-                       /* $html .= self::_tag(
-                            'option',
-                            '-- Select --',
-                            ['disabled' => true, 'selected' => true]
-                        );*/
+                        /* $html .= self::_tag(
+                             'option',
+                             '-- Select --',
+                             ['disabled' => true, 'selected' => true]
+                         );*/
                         $open_tag_select = true;
                     }
 
@@ -823,17 +823,7 @@ class Option
                         ]
                     );
 
-                    $html .= self::_group(
-                        self::_tag(
-                            'button',
-                            '+ Add new',
-                            [
-                                'type' => 'button',
-                                'class' => 'button button-primary',
-                                'onclick' => "var c = this.parentElement.parentElement.querySelector('[new]').cloneNode(true); c.style.display=''; c.children[0].value=''; this.parentElement.parentElement.insertBefore(c,this.parentElement);"
-                            ]
-                        )
-                    );
+                    $html .= self::addNewButton();
                 } elseif ($method != self::METHOD_MULTIPLE) {
 
                     if (in_array($markup, [self::MARKUP_TEXT, self::MARKUP_NUMBER])) {
@@ -1078,27 +1068,22 @@ class Option
             <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
             <?php
         }
-
-        $selector = '.'. $parent.'-wrap select[select2=true]';
         ?>
 
         <script>
-            (function ($,parent) {
-
+            (function ($, parent) {
                 $(document).ready(function () {
-                    $('.'+parent+'-wrap select[select2=true]').each(function() {
-                        if($(this).parents('[new=true]').length === 0 ) {
+                    $('.' + parent + '-wrap select[select2=true]').each(function () {
+                        if ($(this).parents('[new=true]').length === 0) {
                             $(this).select2();
                         }
                     });
                 });
-                $(document).on('DOMNodeInserted', 'select[select2=true]', function () {
-                    $(this).select2();
-                });
-            })(jQuery,"<?php echo $parent;?>")
+            })(jQuery, "<?php echo $parent;?>")
         </script>
         <?php
     }
+
 
     /**
      * @param string $parent
@@ -1108,6 +1093,7 @@ class Option
         ?>
         <script type="application/javascript">
             (function () {
+
                 let lists = document.querySelectorAll('.<?php echo $parent; ?>-admin-nested-fields>.<?php echo $parent; ?>-admin-nested-fields');
                 for (let i = 0; i < lists.length; i++) {
                     let list = lists[i];
@@ -1129,6 +1115,30 @@ class Option
                         window.diazoxide.wordpress = {};
                         if (!window.diazoxide.wordpress.hasOwnProperty('option')) {
                             window.diazoxide.wordpress.option = {
+                                addNew: function (button) {
+                                    let last_key = parseInt(button.getAttribute('last-key')) + 1;
+                                    button.setAttribute('last-key', last_key);
+                                    let c = button.parentElement.parentElement.querySelector(':scope>[new]').cloneNode(true);
+                                    c.removeAttribute('new');
+                                    c.style.display = '';
+                                    c.classList.add('added');
+                                    let e = c.querySelectorAll('[name]');
+
+                                    for (let i = 0; i < e.length; i++) {
+                                        e[i].disabled = false;
+                                        e[i].name = (e[i].name).replace('{{LAST_KEY}}', last_key);
+                                    }
+                                    button.parentElement.parentElement.insertBefore(c, button.parentElement);
+
+                                    setTimeout(function () {
+                                        c.classList.remove('added');
+                                    }, 1000);
+
+                                    this.afterItemInsert(c);
+                                },
+                                afterItemInsert: function (item) {
+                                    this.select2Init(item);
+                                },
                                 removeItem: function (button) {
                                     if (confirm("Are you sure?")) {
                                         button.parentElement.parentElement.remove();
@@ -1156,6 +1166,15 @@ class Option
                                         button.setAttribute('title', 'Maximise');
                                         button.innerHTML = "&#9634;";
                                     }
+                                },
+                                select2Init(item) {
+                                    if (!window.hasOwnProperty('jQuery')) {
+                                        return;
+                                    }
+                                    jQuery(item).find('select[select2=true]').each(function () {
+                                        console.log(this);
+                                        jQuery(this).select2();
+                                    });
                                 }
                             };
                         }
