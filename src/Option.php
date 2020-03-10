@@ -1046,7 +1046,7 @@ class Option
                 }
             }
         );
-
+        self::printStyle($parent);
         ?>
         <div class="wrap <?php echo $parent; ?>-wrap">
             <h2><?php echo $title; ?></h2>
@@ -1059,7 +1059,6 @@ class Option
 
         <?php
         self::printSelect2Assets($parent);
-        self::printStyle($parent);
         self::printScript($parent);
     }
 
