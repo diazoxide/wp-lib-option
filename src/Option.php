@@ -792,7 +792,6 @@ class Option
                         $html .= self::_tagClose('select');
                     }
                 } elseif ($method == self::METHOD_MULTIPLE) {
-
                     if (is_array($value)) {
                         foreach ($value as $key => $_value) {
                             if (!empty($_value)) {
@@ -834,7 +833,6 @@ class Option
 
                     $html .= self::addNewButton();
                 } elseif ($method != self::METHOD_MULTIPLE) {
-
                     if (in_array($markup, [self::MARKUP_TEXT, self::MARKUP_NUMBER])) {
                         $html .= self::_tagOpen(
                             'input',
@@ -899,7 +897,6 @@ class Option
      */
     public static function getFormData($parent, $method = 'post')
     {
-
         if ($method == 'post') {
             $nonce_field = $_POST[self::getNonceFieldName($parent)] ?? null;
             $fields = wp_verify_nonce($nonce_field, $parent)
@@ -914,6 +911,7 @@ class Option
         if ($fields !== null) {
             $fields = self::decodeKeys($fields);
         }
+
         return $fields;
     }
 
@@ -1026,7 +1024,7 @@ class Option
 
         static::arrayWalkWithRoute(
             $options,
-            function ($key, $item, $route) use (&$_fields,$parent) {
+            function ($key, $item, $route) use (&$_fields, $parent) {
                 if ($item instanceof Option) {
                     array_pop($route);
                     /*$label = $item->getParam('label', $item->getName());
@@ -1069,7 +1067,6 @@ class Option
 
     private static function printSelect2Assets($parent)
     {
-
         if (!self::$select2_loaded) {
             self::$select2_loaded = true;
             ?>
@@ -1207,12 +1204,13 @@ class Option
      *
      * @return array
      */
-    public static function expandOptions(array $options)
+    public static function expandOptions(array $options, ?string $parent = null)
     {
         array_walk_recursive(
             $options,
-            function (&$item, $key) {
+            function (&$item, $key) use ($parent) {
                 if ($item instanceof self) {
+                    $item->setParam('parent', $parent);
                     $item = $item->getValue();
                 }
             }
