@@ -167,6 +167,15 @@ class Option
     }
 
     /**
+     * @param string $key
+     * @param $value
+     */
+    public function setParam(string $key, $value): void
+    {
+        $this->_params[$key] = $value;
+    }
+
+    /**
      * @return string
      */
     public function getField(): string
@@ -1017,7 +1026,7 @@ class Option
 
         static::arrayWalkWithRoute(
             $options,
-            function ($key, $item, $route) use (&$_fields) {
+            function ($key, $item, $route) use (&$_fields,$parent) {
                 if ($item instanceof Option) {
                     array_pop($route);
                     /*$label = $item->getParam('label', $item->getName());
@@ -1027,6 +1036,7 @@ class Option
                         $description = call_user_func($description, $key, $item, $route);
                     }*/
 
+                    $item->setParam('parent', $parent);
                     $field = $item->getField();
                     $html = '<div class="section">' . $field . '</div>';
                     $temp = &$_fields;

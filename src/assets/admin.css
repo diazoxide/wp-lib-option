@@ -3,6 +3,14 @@
     max-width: 900px;
 }
 
+.__PARENT_SLUG__-wrap .select2-container {
+    width: 100% !important;
+}
+
+.__PARENT_SLUG__-wrap .select2-search--dropdown .select2-search__field {
+    width: 98%;
+}
+
 ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group {
     position: relative;
 }
