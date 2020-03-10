@@ -1054,7 +1054,6 @@ class Option
             <h2><?php echo $title; ?></h2>
             <form method="post" action="">
                 <?php self::printArrayList($_fields, $parent); ?>
-                <input type="hidden" name="<?php echo $parent; ?>-form" value="1">
                 <?php wp_nonce_field($parent, self::getNonceFieldName($parent)); ?>
                 <?php submit_button(); ?>
             </form>
