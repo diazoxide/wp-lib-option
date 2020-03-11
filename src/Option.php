@@ -406,7 +406,7 @@ class Option
     {
         return self::_tag(
             'button',
-            '-',
+            '',
             [
                 'class' => 'item-button minimise',
                 'onclick' => 'diazoxide.wordpress.option.minimiseItem(this)',
@@ -560,7 +560,8 @@ class Option
                                     self::_group($_html),
                                     self::_itemButtons()
                                 ]
-                            )
+                            ),
+                            ['minimised'=>'true']
                         );
                     }
                 } elseif ($field != null && !empty($field)) {
@@ -668,7 +669,7 @@ class Option
                                 $__html .= $template_description;
 
                                 $html .= self::_group(
-                                    $__html . self::_itemButtons()
+                                    $__html . self::_itemButtons(),['minimised'=>'true']
 
                                 );
                             }
@@ -807,7 +808,7 @@ class Option
                                             $disabled_str,
                                             $readonly_str,
                                         ]
-                                    ) . self::_itemButtons()
+                                    ) . self::_itemButtons(['duplicate','remove'])
                                 );
                             }
                         }
@@ -1068,6 +1069,10 @@ class Option
     {
         if (!self::$select2_loaded) {
             self::$select2_loaded = true;
+
+            wp_enqueue_script( 'jquery' );
+            wp_enqueue_script( 'jquery-ui-sortable' );
+
             ?>
             <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet"/>
             <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
@@ -1081,6 +1086,9 @@ class Option
                     $('.' + parent + '-wrap select[select2=true]').each(function () {
                         if ($(this).parents('[new=true]').length === 0) {
                             $(this).select2();
+                            $("ul.select2-selection__rendered").sortable({
+                                containment: 'parent'
+                            });
                         }
                     });
                 });
@@ -1162,14 +1170,14 @@ class Option
                                 },
                                 minimiseItem: function (button) {
                                     let item = button.parentElement.parentElement;
-                                    if (item.classList.contains('minimised')) {
-                                        item.classList.remove('minimised');
+                                    if (item.hasAttribute('minimised') && item.getAttribute('minimised') === 'true') {
+                                        item.setAttribute('minimised','false');
                                         button.setAttribute('title', 'Minimise');
-                                        button.innerHTML = "-";
+                                        button.classList.remove('minimised');
                                     } else {
-                                        item.classList.add('minimised');
+                                        item.setAttribute('minimised','true');
                                         button.setAttribute('title', 'Maximise');
-                                        button.innerHTML = "&#9634;";
+                                        button.classList.add('minimised');
                                     }
                                 },
                                 select2Init(item) {
@@ -1200,6 +1208,8 @@ class Option
 
     /**
      * @param array $options
+     *
+     * @param string|null $parent
      *
      * @return array
      */

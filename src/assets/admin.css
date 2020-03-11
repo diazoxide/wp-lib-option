@@ -94,6 +94,20 @@ ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group > .key {
     border: solid 2px #0073aa;
 }
 
+ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group .buttons button{
+    vertical-align: top;
+}
+
+ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group > .buttons button.minimise:before{
+    content:"―";
+    color:#fff;
+}
+
+ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group[minimised=true] > .buttons button.minimise:before{
+    content:"\20DE";
+    color:#fff;
+}
+
 ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group .buttons {
     position: absolute;
     top: 0;
@@ -101,17 +115,17 @@ ul.__PARENT_SLUG__-admin-nested-fields .section > .group .group .buttons {
     margin-right: 3px;
 }
 
-ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group.minimised > :not(.buttons):not(:first-child) {
+ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group[minimised=true] > :not(.buttons):not(:first-child) {
     display: none;
 }
 
-ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group.minimised > .buttons button {
-    background: #000;
-    height: 35px;
+ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group[minimised=true] > .buttons button {
+    background: #005780;
+    height: 30px;
     width: 35px;
 }
 
-ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group.minimised {
+ul.__PARENT_SLUG__-admin-nested-fields .section > .group > .group[minimised=true] {
     padding: 0 120px 0 0;
 }
 
