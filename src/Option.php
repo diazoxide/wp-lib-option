@@ -561,7 +561,7 @@ class Option
                                     self::_itemButtons()
                                 ]
                             ),
-                            ['minimised'=>'true']
+                            ['minimised'=>'false']
                         );
                     }
                 } elseif ($field != null && !empty($field)) {
@@ -669,7 +669,7 @@ class Option
                                 $__html .= $template_description;
 
                                 $html .= self::_group(
-                                    $__html . self::_itemButtons(),['minimised'=>'true']
+                                    $__html . self::_itemButtons(),['minimised'=>'false']
 
                                 );
                             }
