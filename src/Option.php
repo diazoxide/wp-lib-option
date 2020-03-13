@@ -24,6 +24,7 @@ class Option
     const METHOD_MULTIPLE = 'multiple';
 
     private $_params = [];
+    private static $select2_loaded;
 
     public function __construct($_name, $_default = null, $_params = [])
     {
@@ -457,6 +458,33 @@ class Option
         );
     }
 
+    private static function sortSelectValues(array &$values,array $value){
+        uksort($values,function($a,$b)use($value){
+            // echo $a.PHP_EOL;
+
+            $a_i = array_search($a,$value);
+            $b_i = array_search($b,$value);
+
+            if($a_i===false){
+                return 0;
+            }
+
+            if($b_i===false){
+                return 1;
+            } else{
+                $index = $a_i - $b_i;
+
+                if($index > 0){
+                    return 1;
+                } else{
+                    return -1;
+                }
+
+            }
+
+        });
+    }
+
     /**
      * @param array $params
      *
@@ -561,7 +589,7 @@ class Option
                                     self::_itemButtons()
                                 ]
                             ),
-                            ['minimised'=>'false']
+                            ['minimised' => 'false']
                         );
                     }
                 } elseif ($field != null && !empty($field)) {
@@ -669,7 +697,7 @@ class Option
                                 $__html .= $template_description;
 
                                 $html .= self::_group(
-                                    $__html . self::_itemButtons(),['minimised'=>'false']
+                                    $__html . self::_itemButtons(), ['minimised' => 'false']
 
                                 );
                             }
@@ -721,13 +749,11 @@ class Option
                                 $readonly_str
                             ]
                         );
-                        /* $html .= self::_tag(
-                             'option',
-                             '-- Select --',
-                             ['disabled' => true, 'selected' => true]
-                         );*/
                         $open_tag_select = true;
                     }
+                    $value = is_array($value) ? $value : [$value];
+
+                    self::sortSelectValues($values,$value);
 
                     foreach ($values as $key => $_value) {
                         if ($markup == null || $markup == self::MARKUP_SELECT) {
@@ -736,10 +762,7 @@ class Option
                                 $_value,
                                 [
                                     'value' => $key,
-                                    (($key == $value) || (is_array($value) && in_array(
-                                                $key,
-                                                $value
-                                            ))) ? 'selected' : ''
+                                    (($key == $value) || in_array($key, $value)) ? 'selected' : ''
                                 ]
                             );
                         } elseif ($markup == self::MARKUP_CHECKBOX) {
@@ -754,10 +777,7 @@ class Option
                                                 'name' => $name . ($method == self::METHOD_MULTIPLE ? '[]' : ''),
                                                 'value' => $key,
                                                 'data' => $data,
-                                                (($key == $value) || (is_array($value) && in_array(
-                                                            $key,
-                                                            $value
-                                                        ))) ? 'checked' : '',
+                                                (($key == $value) || in_array($key, $value)) ? 'checked' : '',
                                                 $disabled_str,
                                                 $readonly_str,
                                             ]
@@ -774,10 +794,7 @@ class Option
                                                 'type' => 'radio',
                                                 'name' => $name,
                                                 'value' => $key,
-                                                (($key == $value) || (is_array($value) && in_array(
-                                                            $key,
-                                                            $value
-                                                        ))) ? 'checked' : '',
+                                                (($key == $value) || in_array($key, $value)) ? 'checked' : '',
                                                 'data' => $data,
                                                 $disabled_str,
                                                 $readonly_str,
@@ -808,7 +825,7 @@ class Option
                                             $disabled_str,
                                             $readonly_str,
                                         ]
-                                    ) . self::_itemButtons(['duplicate','remove'])
+                                    ) . self::_itemButtons(['duplicate', 'remove'])
                                 );
                             }
                         }
@@ -988,7 +1005,6 @@ class Option
         }
     }
 
-
     /**
      * @param $parent
      * @param $options
@@ -999,6 +1015,7 @@ class Option
         $form_data = Option::getFormData($parent);
 
         if ($form_data) {
+
             foreach ($form_data as $key => $field) {
                 self::setOption($key, $parent, $field);
             }
@@ -1063,139 +1080,25 @@ class Option
         self::printScript($parent);
     }
 
-    private static $select2_loaded;
-
     private static function printSelect2Assets($parent)
     {
         if (!self::$select2_loaded) {
             self::$select2_loaded = true;
-
-            wp_enqueue_script( 'jquery' );
-            wp_enqueue_script( 'jquery-ui-sortable' );
-
+            wp_enqueue_script('jquery');
+            wp_enqueue_script('jquery-ui-sortable');
             ?>
             <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet"/>
             <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
             <?php
         }
-        ?>
-
-        <script>
-            (function ($, parent) {
-                $(document).ready(function () {
-                    $('.' + parent + '-wrap select[select2=true]').each(function () {
-                        if ($(this).parents('[new=true]').length === 0) {
-                            $(this).select2();
-                            $("ul.select2-selection__rendered").sortable({
-                                containment: 'parent'
-                            });
-                        }
-                    });
-                });
-            })(jQuery, "<?php echo $parent;?>")
-        </script>
-        <?php
     }
-
 
     /**
      * @param string $parent
      */
     private static function printScript($parent = ''): void
     {
-        ?>
-        <script type="application/javascript">
-            (function () {
-
-                let lists = document.querySelectorAll('.<?php echo $parent; ?>-admin-nested-fields>.<?php echo $parent; ?>-admin-nested-fields');
-                for (let i = 0; i < lists.length; i++) {
-                    let list = lists[i];
-                    let label = list.previousSibling;
-                    label.addEventListener("click", function () {
-                        if (this.nextSibling.offsetParent === null) {
-                            this.nextSibling.style.display = "block";
-                            this.classList.add('open');
-                        } else {
-                            this.nextSibling.style.display = "none";
-                            this.classList.remove('open');
-                        }
-                    });
-                }
-
-                if (!window.hasOwnProperty('diazoxide')) {
-                    window.diazoxide = {};
-                    if (!window.diazoxide.hasOwnProperty()) {
-                        window.diazoxide.wordpress = {};
-                        if (!window.diazoxide.wordpress.hasOwnProperty('option')) {
-                            window.diazoxide.wordpress.option = {
-                                addNew: function (button) {
-                                    let last_key = parseInt(button.getAttribute('last-key')) + 1;
-                                    button.setAttribute('last-key', last_key);
-                                    let c = button.parentElement.parentElement.querySelector(':scope>[new]').cloneNode(true);
-                                    c.removeAttribute('new');
-                                    c.style.display = '';
-                                    c.classList.add('added');
-                                    let e = c.querySelectorAll('[name]');
-
-                                    for (let i = 0; i < e.length; i++) {
-                                        e[i].disabled = false;
-                                        e[i].name = (e[i].name).replace('{{LAST_KEY}}', last_key);
-                                    }
-                                    button.parentElement.parentElement.insertBefore(c, button.parentElement);
-
-                                    setTimeout(function () {
-                                        c.classList.remove('added');
-                                    }, 1000);
-
-                                    this.afterItemInsert(c);
-                                },
-                                afterItemInsert: function (item) {
-                                    this.select2Init(item);
-                                },
-                                removeItem: function (button) {
-                                    if (confirm("Are you sure?")) {
-                                        button.parentElement.parentElement.remove();
-                                    }
-                                },
-                                duplicateItem: function (button) {
-                                    let item = button.parentElement.parentElement;
-                                    let clone = item.cloneNode(true);
-                                    clone.classList.add('clone');
-                                    item.classList.add('cloned');
-                                    setTimeout(function () {
-                                        clone.classList.remove('clone');
-                                        item.classList.remove('cloned');
-                                    }, 1000);
-                                    item.parentElement.insertBefore(clone, item);
-                                },
-                                minimiseItem: function (button) {
-                                    let item = button.parentElement.parentElement;
-                                    if (item.hasAttribute('minimised') && item.getAttribute('minimised') === 'true') {
-                                        item.setAttribute('minimised','false');
-                                        button.setAttribute('title', 'Minimise');
-                                        button.classList.remove('minimised');
-                                    } else {
-                                        item.setAttribute('minimised','true');
-                                        button.setAttribute('title', 'Maximise');
-                                        button.classList.add('minimised');
-                                    }
-                                },
-                                select2Init(item) {
-                                    if (!window.hasOwnProperty('jQuery')) {
-                                        return;
-                                    }
-                                    jQuery(item).find('select[select2=true]').each(function () {
-                                        console.log(this);
-                                        jQuery(this).select2();
-                                    });
-                                }
-                            };
-                        }
-                    }
-                }
-            })();
-        </script>
-        <?php
+        echo '<script type="application/javascript">let wp_lib_option_parent = "' . $parent . '";' . file_get_contents(__DIR__ . '/assets/script.js') . '</script>';
     }
 
     private static function printStyle($parent = '')
