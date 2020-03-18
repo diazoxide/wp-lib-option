@@ -458,25 +458,26 @@ class Option
         );
     }
 
-    private static function sortSelectValues(array &$values,array $value){
-        uksort($values,function($a,$b)use($value){
+    private static function sortSelectValues(array &$values, array $value)
+    {
+        uksort($values, function ($a, $b) use ($value) {
             // echo $a.PHP_EOL;
 
-            $a_i = array_search($a,$value);
-            $b_i = array_search($b,$value);
+            $a_i = array_search($a, $value);
+            $b_i = array_search($b, $value);
 
-            if($a_i===false){
+            if ($a_i === false) {
                 return 0;
             }
 
-            if($b_i===false){
+            if ($b_i === false) {
                 return 1;
-            } else{
+            } else {
                 $index = $a_i - $b_i;
 
-                if($index > 0){
+                if ($index > 0) {
                     return 1;
-                } else{
+                } else {
                     return -1;
                 }
 
@@ -501,6 +502,7 @@ class Option
         $method = $params['method'] ?? null;
         $values = $params['values'] ?? [];
         $markup = $params['markup'] ?? null;
+
         /**
          * Automatically select markup type when it missing
          * */
@@ -753,7 +755,7 @@ class Option
                     }
                     $value = is_array($value) ? $value : [$value];
 
-                    self::sortSelectValues($values,$value);
+                    self::sortSelectValues($values, $value);
 
                     foreach ($values as $key => $_value) {
                         if ($markup == null || $markup == self::MARKUP_SELECT) {
@@ -966,7 +968,7 @@ class Option
     {
         $parent = $parent ?? 'Option';
 
-        echo '<ul class="' . $parent . '-admin-nested-fields">';
+        echo '<ul class="wp-lib-option-nested-fields ' . $parent . '-nested-fields">';
 
         foreach ($array as $k => $v) {
             if (is_array($v)) {
@@ -1045,13 +1047,6 @@ class Option
             function ($key, $item, $route) use (&$_fields, $parent) {
                 if ($item instanceof Option) {
                     array_pop($route);
-                    /*$label = $item->getParam('label', $item->getName());
-                    $description = $item->getParam('description', null);
-
-                    if (is_callable($description)) {
-                        $description = call_user_func($description, $key, $item, $route);
-                    }*/
-
                     $item->setParam('parent', $parent);
                     $field = $item->getField();
                     $html = '<div class="section">' . $field . '</div>';
@@ -1066,7 +1061,7 @@ class Option
         );
         self::printStyle($parent);
         ?>
-        <div class="wrap <?php echo $parent; ?>-wrap">
+        <div class="wrap wp-lib-option-wrap <?php echo $parent; ?>-wrap">
             <h2><?php echo $title; ?></h2>
             <form method="post" action="">
                 <?php self::printArrayList($_fields, $parent); ?>
@@ -1076,11 +1071,11 @@ class Option
         </div>
 
         <?php
-        self::printSelect2Assets($parent);
-        self::printScript($parent);
+        self::printSelect2Assets();
+        self::printScript();
     }
 
-    private static function printSelect2Assets($parent)
+    private static function printSelect2Assets()
     {
         if (!self::$select2_loaded) {
             self::$select2_loaded = true;
@@ -1096,16 +1091,14 @@ class Option
     /**
      * @param string $parent
      */
-    private static function printScript($parent = ''): void
+    private static function printScript(): void
     {
-        echo '<script type="application/javascript">let wp_lib_option_parent = "' . $parent . '";' . file_get_contents(__DIR__ . '/assets/script.js') . '</script>';
+        echo '<script type="application/javascript">' . file_get_contents(__DIR__ . '/assets/script.js') . '</script>';
     }
 
     private static function printStyle($parent = '')
     {
         $str = file_get_contents(__DIR__ . '/assets/admin.css');
-        $str = str_replace("__PARENT_SLUG__", $parent, $str);
-
         echo '<style type="text/css">' . $str . '</style>';
     }
 

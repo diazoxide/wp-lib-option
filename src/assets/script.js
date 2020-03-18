@@ -1,8 +1,8 @@
-(function (parent) {
+(function () {
     document.addEventListener("DOMContentLoaded", function (event) {
-        window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName(parent + '-wrap')[0]);
+        window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
     });
-    let lists = document.querySelectorAll('.' + parent + '-admin-nested-fields>.' + parent + '-admin-nested-fields');
+    let lists = document.querySelectorAll('.wp-lib-option-nested-fields > .wp-lib-option-nested-fields');
     for (let i = 0; i < lists.length; i++) {
         let list = lists[i];
         let label = list.previousSibling;
@@ -132,4 +132,4 @@
             }
         }
     }
-})(wp_lib_option_parent);
+})();
