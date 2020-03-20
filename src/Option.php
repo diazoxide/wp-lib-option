@@ -1,8 +1,6 @@
 <?php
 
-
 namespace diazoxide\wp\lib\option;
-
 
 class Option
 {
@@ -139,6 +137,10 @@ class Option
     }
 
     /**
+     * @see getParam
+     * @see setParam
+     * @see setParams
+     *
      * @return array
      */
     public function getParams(): array
@@ -146,12 +148,25 @@ class Option
         return $this->params;
     }
 
+    /**
+     * @see getParams
+     * @see setParams
+     * @see setParam
+     *
+     * @param $param
+     * @param null $default
+     * @return mixed|null
+     */
     public function getParam($param, $default = null)
     {
         return $this->params[$param] ?? $default;
     }
 
     /**
+     * @see setParam
+     * @see getParam
+     * @see getParams
+     *
      * @param array $params
      */
     public function setParams(array $params): void
@@ -160,6 +175,10 @@ class Option
     }
 
     /**
+     * @see setParams
+     * @see getParam
+     * @see getParams
+     *
      * @param string $key
      * @param $value
      */
@@ -169,6 +188,8 @@ class Option
     }
 
     /**
+     * @uses printField
+     *
      * @return string
      */
     public function getField(): string
@@ -200,7 +221,7 @@ class Option
      *
      * @return string
      */
-    private static function _encodeKey($key): string
+    private static function encodeKey($key): string
     {
         return "{{encode_key}}" . base64_encode($key);
     }
@@ -210,7 +231,7 @@ class Option
      *
      * @return false|string|string[]|null
      */
-    private static function _maybeDecodeKey($str)
+    private static function maybeDecodeKey($str)
     {
         if (strpos($str, '{{encode_key}}') === 0) {
             $str = preg_replace('/^{{encode_key}}/', '', $str);
@@ -226,7 +247,7 @@ class Option
      *
      * @return bool|string
      */
-    private static function _maybeBoolean($str)
+    private static function maybeBoolean($str)
     {
         if ($str == '{{boolean_true}}') {
             return true;
@@ -245,7 +266,7 @@ class Option
      *
      * @return string
      */
-    private static function _getAttrsString($data, ?string $parent = null): string
+    private static function getAttrsString($data, ?string $parent = null): string
     {
         return implode(
             ' ',
@@ -260,7 +281,7 @@ class Option
 
                         return $k . '="' . $v . '"';
                     } elseif (is_array($v)) {
-                        return self::_getAttrsString($v, $k);
+                        return self::getAttrsString($v, $k);
                     } elseif (empty($v)) {
                         $k = ($parent ? $parent . '-' : '') . $k;
 
@@ -283,10 +304,10 @@ class Option
      *
      * @return string
      */
-    private static function _tagOpen(string $tag, ?array $attrs = null): string
+    private static function tagOpen(string $tag, ?array $attrs = null): string
     {
         if ($attrs !== null) {
-            $attrs = self::_getAttrsString($attrs);
+            $attrs = self::getAttrsString($attrs);
         }
 
         return sprintf(
@@ -301,7 +322,7 @@ class Option
      *
      * @return string
      */
-    private static function _tagClose(string $tag): string
+    private static function tagClose(string $tag): string
     {
         return sprintf('</%s>', $tag);
     }
@@ -313,11 +334,11 @@ class Option
      *
      * @return string
      */
-    private static function _tag(string $tag, ?string $content = '', ?array $attrs = []): string
+    private static function tag(string $tag, ?string $content = '', ?array $attrs = []): string
     {
-        $html = self::_tagOpen($tag, $attrs);
+        $html = self::tagOpen($tag, $attrs);
         $html .= $content;
-        $html .= self::_tagClose($tag);
+        $html .= self::tagClose($tag);
 
         return $html;
     }
@@ -328,11 +349,11 @@ class Option
      *
      * @return string
      */
-    private static function _group(string $content, array $attrs = []): string
+    private static function group(string $content, array $attrs = []): string
     {
-        $html = self::_tagOpen('div', ['class' => 'group'] + $attrs);
+        $html = self::tagOpen('div', ['class' => 'group'] + $attrs);
         $html .= $content;
-        $html .= self::_tagClose('div');
+        $html .= self::tagClose('div');
 
         return $html;
     }
@@ -342,19 +363,19 @@ class Option
      *
      * @return string
      */
-    private static function _itemButtons(?array $buttons = null): string
+    private static function itemButtons(?array $buttons = null): string
     {
-        $html = self::_tagOpen('div', ['class' => 'buttons']);
+        $html = self::tagOpen('div', ['class' => 'buttons']);
 
         if ($buttons == null) {
             $buttons = ['duplicate', 'minimise', 'remove'];
         }
         foreach ($buttons as $button) {
-            $fn_name = "_" . $button . 'Button';
+            $fn_name = $button . 'Button';
             $html .= call_user_func([self::class, $fn_name]);
         }
 
-        $html .= self::_tagClose('div');
+        $html .= self::tagClose('div');
 
         return $html;
     }
@@ -362,9 +383,9 @@ class Option
     /**
      * @return string
      */
-    private static function _removeButton(): string
+    private static function removeButton(): string
     {
-        return self::_tag(
+        return self::tag(
             'button',
             'X',
             [
@@ -379,9 +400,9 @@ class Option
     /**
      * @return string
      */
-    private static function _minimiseButton(): string
+    private static function minimiseButton(): string
     {
-        return self::_tag(
+        return self::tag(
             'button',
             '',
             [
@@ -396,9 +417,9 @@ class Option
     /**
      * @return string
      */
-    private static function _duplicateButton(): string
+    private static function duplicateButton(): string
     {
-        return self::_tag(
+        return self::tag(
             'button',
             '&#65291;',
             [
@@ -407,7 +428,6 @@ class Option
                 'onclick' => 'diazoxide.wordpress.option.duplicateItem(this)',
                 'title' => 'Duplicate item'
             ]
-
         );
     }
 
@@ -418,8 +438,8 @@ class Option
      */
     private static function addNewButton(?int $last_key = 0): string
     {
-        return self::_group(
-            self::_tag(
+        return self::group(
+            self::tag(
                 'button',
                 '+ Add new',
                 [
@@ -429,7 +449,6 @@ class Option
                     'onclick' => 'diazoxide.wordpress.option.addNew(this)',
                     'title' => 'Add new item'
                 ]
-
             )
         );
     }
@@ -460,9 +479,7 @@ class Option
                 } else {
                     return -1;
                 }
-
             }
-
         });
     }
 
@@ -521,12 +538,12 @@ class Option
 
         switch ($type) {
             case self::TYPE_BOOL:
-                $html .= self::_tagOpen(
+                $html .= self::tagOpen(
                     'input',
                     ['value' => '{{boolean_false}}', 'type' => 'hidden', 'name' => $name]
                 );
 
-                $html .= self::_tagOpen(
+                $html .= self::tagOpen(
                     'input',
                     $input_attrs + [
                         'class' => implode(' ', [$type, $method]),
@@ -550,15 +567,15 @@ class Option
                         foreach ($template as $_key => $_field) {
                             $_field['value'] = $_value[$_key] ?? null;
                             $_field['data']['name'] = $name . '[{{encode_key}}]' . '[' . $_key . ']';
-                            $_field['name'] = $name . '[' . self::_encodeKey($key) . ']' . '[' . $_key . ']';
+                            $_field['name'] = $name . '[' . self::encodeKey($key) . ']' . '[' . $_key . ']';
                             $_html .= self::printField($_field);
                         }
 
-                        $html .= self::_group(
+                        $html .= self::group(
                             implode(
                                 '',
                                 [
-                                    self::_tagOpen(
+                                    self::tagOpen(
                                         'input',
                                         [
                                             'class' => 'key full',
@@ -568,8 +585,8 @@ class Option
                                             'onchange' => $on_change
                                         ]
                                     ),
-                                    self::_group($_html),
-                                    self::_itemButtons()
+                                    self::group($_html),
+                                    self::itemButtons()
                                 ]
                             ),
                             ['minimised' => 'false']
@@ -581,13 +598,13 @@ class Option
                             $_field = $field;
                             $_field['value'] = $_value;
                             $_field['data']['name'] = $name . '[{{encode_key}}]';
-                            $_field['name'] = $name . '[' . self::_encodeKey($key) . ']';
-                            $html .= self::_group(
+                            $_field['name'] = $name . '[' . self::encodeKey($key) . ']';
+                            $html .= self::group(
                                 implode(
                                     '',
                                     [
 
-                                        self::_tagOpen(
+                                        self::tagOpen(
                                             'input',
                                             [
                                                 'class' => 'key full',
@@ -598,7 +615,7 @@ class Option
                                             ]
                                         ),
                                         self::printField($_field),
-                                        self::_itemButtons()
+                                        self::itemButtons()
                                     ]
                                 )
                             );
@@ -620,11 +637,11 @@ class Option
                     $_html .= self::printField($field);
                 }
 
-                $html .= self::_group(
+                $html .= self::group(
                     implode(
                         '',
                         [
-                            self::_tagOpen(
+                            self::tagOpen(
                                 'input',
                                 [
                                     'class' => 'key full',
@@ -633,8 +650,8 @@ class Option
                                     'onchange' => $on_change
                                 ]
                             ),
-                            self::_group($_html),
-                            self::_itemButtons(['duplicate', 'remove'])
+                            self::group($_html),
+                            self::itemButtons(['duplicate', 'remove'])
 
                         ]
                     ),
@@ -679,9 +696,9 @@ class Option
                                 ) : '';
                                 $__html .= $template_description;
 
-                                $html .= self::_group(
-                                    $__html . self::_itemButtons(), ['minimised' => 'false']
-
+                                $html .= self::group(
+                                    $__html . self::itemButtons(),
+                                    ['minimised' => 'false']
                                 );
                             }
                         }
@@ -705,8 +722,8 @@ class Option
                         ) : '';
                         $__html .= $template_description;
 
-                        $html .= self::_group(
-                            $__html . self::_itemButtons(['remove']),
+                        $html .= self::group(
+                            $__html . self::itemButtons(['remove']),
                             ['new' => 'true', 'style' => 'display:none']
                         );
 
@@ -717,7 +734,7 @@ class Option
             default:
                 if (!empty($values)) {
                     if ($markup == null || $markup == self::MARKUP_SELECT) {
-                        $html .= self::_tagOpen(
+                        $html .= self::tagOpen(
                             'select',
                             $input_attrs + [
                                 'class' => implode(
@@ -740,7 +757,7 @@ class Option
 
                     foreach ($values as $key => $_value) {
                         if ($markup == null || $markup == self::MARKUP_SELECT) {
-                            $html .= self::_tag(
+                            $html .= self::tag(
                                 'option',
                                 $_value,
                                 [
@@ -750,10 +767,10 @@ class Option
                             );
                         } elseif ($markup == self::MARKUP_CHECKBOX) {
                             if ($method == self::METHOD_MULTIPLE) {
-                                $html .= self::_group(
-                                    self::_tag(
+                                $html .= self::group(
+                                    self::tag(
                                         'label',
-                                        self::_tagOpen(
+                                        self::tagOpen(
                                             'input',
                                             [
                                                 'type' => 'checkbox',
@@ -768,10 +785,10 @@ class Option
                                     )
                                 );
                             } else {
-                                $html .= self::_group(
-                                    self::_tag(
+                                $html .= self::group(
+                                    self::tag(
                                         'label',
-                                        self::_tagOpen(
+                                        self::tagOpen(
                                             'input',
                                             [
                                                 'type' => 'radio',
@@ -790,14 +807,14 @@ class Option
                     }
 
                     if (isset($open_tag_select)) {
-                        $html .= self::_tagClose('select');
+                        $html .= self::tagClose('select');
                     }
                 } elseif ($method == self::METHOD_MULTIPLE) {
                     if (is_array($value)) {
                         foreach ($value as $key => $_value) {
                             if (!empty($_value)) {
-                                $html .= self::_group(
-                                    self::_tagOpen(
+                                $html .= self::group(
+                                    self::tagOpen(
                                         'input',
                                         $input_attrs + [
                                             'name' => $name . '[]',
@@ -808,14 +825,14 @@ class Option
                                             $disabled_str,
                                             $readonly_str,
                                         ]
-                                    ) . self::_itemButtons(['duplicate', 'remove'])
+                                    ) . self::itemButtons(['duplicate', 'remove'])
                                 );
                             }
                         }
                     }
 
-                    $html .= self::_group(
-                        self::_tagOpen(
+                    $html .= self::group(
+                        self::tagOpen(
                             'input',
                             $input_attrs + [
                                 'name' => $name . '[]',
@@ -824,7 +841,7 @@ class Option
                                 'placeholder' => $label,
                                 'disabled'
                             ]
-                        ) . self::_itemButtons(['remove']),
+                        ) . self::itemButtons(['remove']),
                         [
                             'style' => 'display:none',
                             'new' => 'true',
@@ -835,7 +852,7 @@ class Option
                     $html .= self::addNewButton();
                 } elseif ($method != self::METHOD_MULTIPLE) {
                     if (in_array($markup, [self::MARKUP_TEXT, self::MARKUP_NUMBER])) {
-                        $html .= self::_tagOpen(
+                        $html .= self::tagOpen(
                             'input',
                             [
                                 'class' => 'full',
@@ -849,7 +866,7 @@ class Option
                             ]
                         );
                     } elseif ($markup == self::MARKUP_TEXTAREA) {
-                        $html .= self::_tagOpen(
+                        $html .= self::tagOpen(
                             'textarea',
                             [
                                 'class' => 'full',
@@ -862,24 +879,24 @@ class Option
                             ]
                         );
                         $html .= $value;
-                        $html .= self::_tagClose('textarea');
+                        $html .= self::tagClose('textarea');
                     }
                 } else {
-                    $html .= self::_group("Not handled!");
+                    $html .= self::group("Not handled!");
                 }
                 break;
         }
 
         $main_params['class'] = $main_params['class'] ?? 'group';
 
-        $html = self::_tag('div', $html, $main_params);
+        $html = self::tag('div', $html, $main_params);
 
         if (!empty($label)) {
-            $html = self::_tag('div', $label, ['class' => 'label']) . $html;
+            $html = self::tag('div', $label, ['class' => 'label']) . $html;
         }
 
         if (!empty($description)) {
-            $html .= self::_tag('div', $description, ['class' => 'description']);
+            $html .= self::tag('div', $description, ['class' => 'description']);
         }
 
         return $html;
@@ -930,13 +947,13 @@ class Option
     {
         $return = array();
         foreach ($input as $key => $value) {
-            $key = self::_maybeDecodeKey($key);
+            $key = self::maybeDecodeKey($key);
 
             if (is_array($value)) {
                 $value = self::decodeKeys($value);
             } elseif (is_string($value)) {
                 $value = stripslashes($value);
-                $value = self::_maybeBoolean($value);
+                $value = self::maybeBoolean($value);
             }
             $return[$key] = $value;
         }
@@ -980,8 +997,7 @@ class Option
         array &$arr,
         callable $callback,
         array $route = []
-    ): void
-    {
+    ): void {
         foreach ($arr as $key => &$val) {
             $_route = $route;
             $_route[] = $key;
@@ -1007,7 +1023,6 @@ class Option
         $form_data = Option::getFormData($parent);
 
         if ($form_data) {
-
             foreach ($form_data as $key => $field) {
                 self::setOption($key, $parent, $field);
             }
@@ -1102,7 +1117,10 @@ class Option
     {
         if (!self::$assets_loaded) {
             self::printSelect2Assets();
-            echo '<script type="application/javascript">' . file_get_contents(__DIR__ . '/assets/script.js') . '</script>';
+            echo sprintf(
+                "<script type=\"application/javascript\">%s</script>",
+                file_get_contents(__DIR__ . '/assets/script.js')
+            );
         }
     }
 
