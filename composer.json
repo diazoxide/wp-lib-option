@@ -2,7 +2,13 @@
   "name": "diazoxide/wp-lib-option",
   "description": "WordPress Option",
   "keywords": [
-
+    "wordpress",
+    "admin",
+    "interface",
+    "ui",
+    "dynamic",
+    "form",
+    "generator"
   ],
   "license": [
     "GPL-3.0-or-later"
@@ -15,11 +21,15 @@
     "ext-json": "*"
   },
   "require-dev": {
+    "squizlabs/php_codesniffer": "*"
   },
   "autoload": {
     "psr-4": {
       "diazoxide\\wp\\lib\\option\\": "src/"
     }
+  },
+  "scripts": {
+    "style": "phpcs --standard=PSR12"
   },
   "repositories": [
     {
