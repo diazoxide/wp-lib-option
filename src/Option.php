@@ -6,63 +6,46 @@ namespace diazoxide\wp\lib\option;
 
 class Option
 {
-    private $_name;
-    private $_default;
+    public const TYPE_BOOL = 'bool';
+    public const TYPE_TEXT = 'text';
+    public const TYPE_OBJECT = 'object';
+    public const TYPE_GROUP = 'group';
 
-    const TYPE_BOOL = 'bool';
-    const TYPE_TEXT = 'text';
-    const TYPE_OBJECT = 'object';
-    const TYPE_GROUP = 'group';
+    public const MARKUP_CHECKBOX = 'checkbox';
+    public const MARKUP_TEXT = 'text';
+    public const MARKUP_TEXTAREA = 'textarea';
+    public const MARKUP_NUMBER = 'number';
+    public const MARKUP_SELECT = 'select';
 
-    const MARKUP_CHECKBOX = 'checkbox';
-    const MARKUP_TEXT = 'text';
-    const MARKUP_TEXTAREA = 'textarea';
-    const MARKUP_NUMBER = 'number';
-    const MARKUP_SELECT = 'select';
+    public const METHOD_SINGLE = 'single';
+    public const METHOD_MULTIPLE = 'multiple';
 
-    const METHOD_SINGLE = 'single';
-    const METHOD_MULTIPLE = 'multiple';
+    private $params = [];
 
-    private $_params = [];
-    private static $select2_loaded;
+    /**
+     * Determine assets loaded status
+     *
+     * @var bool
+     * */
+    private static $assets_loaded;
 
-    public function __construct($_name, $_default = null, $_params = [])
+    /**
+     * Option constructor.
+     * @param null $_name
+     * @param null $_default
+     * @param array $_params
+     */
+    public function __construct($_name = null, $_default = null, $_params = [])
     {
-        $this->setName($_name);
-        $this->setDefault($_default);
+        $_params['name'] = $_name;
+        $_params['default'] = $_default;
         $this->setParams($_params);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getName()
+    private static function log($log, $file = 'ylog.log')
     {
-        return $this->_name;
-    }
-
-    /**
-     * @param mixed $name
-     */
-    public function setName($name): void
-    {
-        $this->_name = $name;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDefault()
-    {
-        return $this->_default;
-    }
-
-    /**
-     * @param mixed $default
-     */
-    public function setDefault($default): void
-    {
-        $this->_default = $default;
+        $f = $_SERVER['DOCUMENT_ROOT'] . '/logs/' . $file;
+        file_put_contents($f, PHP_EOL . json_encode([$log]), FILE_APPEND);
     }
 
     /**
@@ -70,7 +53,11 @@ class Option
      */
     public function getValue()
     {
-        return self::getOption($this->getName(), $this->getParam('parent', null), $this->getDefault());
+        return self::getOption(
+            $this->getParam('name', null),
+            $this->getParam('parent', null),
+            $this->getParam('default', null)
+        );
     }
 
     /**
@@ -95,7 +82,7 @@ class Option
      *
      * @return array|mixed|void
      */
-    public static function getOption($option, $parent = null, $default = null)
+    public static function getOption(string $option, $parent = null, $default = null)
     {
         $name = self::getOptionName($option, $parent);
 
@@ -109,7 +96,12 @@ class Option
         );
     }
 
-    public static function getOptionFilterName($option, $parent)
+    /**
+     * @param $option
+     * @param $parent
+     * @return string
+     */
+    public static function getOptionFilterName($option, $parent): string
     {
         $name = self::getOptionName($option, $parent);
 
@@ -123,7 +115,7 @@ class Option
      *
      * @return bool
      */
-    public static function isOptionConstant($option, $parent = null)
+    public static function isOptionConstant($option, $parent = null): bool
     {
         return defined(self::getOptionName($option, $parent));
     }
@@ -151,12 +143,12 @@ class Option
      */
     public function getParams(): array
     {
-        return $this->_params;
+        return $this->params;
     }
 
     public function getParam($param, $default = null)
     {
-        return $this->_params[$param] ?? $default;
+        return $this->params[$param] ?? $default;
     }
 
     /**
@@ -164,7 +156,7 @@ class Option
      */
     public function setParams(array $params): void
     {
-        $this->_params = $params;
+        $this->params = $params;
     }
 
     /**
@@ -173,7 +165,7 @@ class Option
      */
     public function setParam(string $key, $value): void
     {
-        $this->_params[$key] = $value;
+        $this->params[$key] = $value;
     }
 
     /**
@@ -181,13 +173,13 @@ class Option
      */
     public function getField(): string
     {
-        return self::_getField(
+        return self::printField(
             [
                 'main_params' => $this->getParam('main_params', false),
-                'name' => $this->getName(),
+                'name' => $this->getParam('name', false),
                 'value' => $this->getValue(),
                 'type' => $this->getParam('type', null),
-                'label' => $this->getParam('label', $this->getName()),
+                'label' => $this->getParam('label', $this->getParam('name', null)),
                 'description' => $this->getParam('description', null),
                 'parent' => $this->getParam('parent', null),
                 'method' => $this->getParam('method', null),
@@ -244,21 +236,6 @@ class Option
 
         return $str;
     }
-
-    /*private static function _getDataString(array $data): string
-    {
-        return implode(' ', array_map(
-            function ($k, $v) {
-                if (is_string($v)) {
-                    $v = htmlspecialchars($v);
-                }
-
-                return 'data-' . $k . '="' . $v . '"';
-            },
-            array_keys($data), $data
-        ));
-    }*/
-
 
     /**
      * Array to html attributes string
@@ -360,7 +337,6 @@ class Option
         return $html;
     }
 
-
     /**
      * @param array|null $buttons
      *
@@ -458,6 +434,10 @@ class Option
         );
     }
 
+    /**
+     * @param array $values
+     * @param array $value
+     */
     private static function sortSelectValues(array &$values, array $value)
     {
         uksort($values, function ($a, $b) use ($value) {
@@ -491,9 +471,12 @@ class Option
      *
      * @return string
      */
-    private static function _getField($params = []): string
+    private static function printField($params = []): string
     {
         $main_params = $params['main_params'] ?? [];
+
+        $value = $params['value'] ?? null;
+        $name = $params['name'] ?? null;
 
         $parent = $params['parent'] ?? null;
         $description = $params['description'] ?? null;
@@ -514,8 +497,6 @@ class Option
         $template_params = $params['template_params'] ?? [];
         $field = $params['field'] ?? null;
 
-        $value = $params['value'] ?? null;
-        $name = $params['name'] ?? null;
 
         $input_attrs = $params['input_attrs'] ?? [];
 
@@ -570,7 +551,7 @@ class Option
                             $_field['value'] = $_value[$_key] ?? null;
                             $_field['data']['name'] = $name . '[{{encode_key}}]' . '[' . $_key . ']';
                             $_field['name'] = $name . '[' . self::_encodeKey($key) . ']' . '[' . $_key . ']';
-                            $_html .= self::_getField($_field);
+                            $_html .= self::printField($_field);
                         }
 
                         $html .= self::_group(
@@ -616,7 +597,7 @@ class Option
                                                 'onchange' => $on_change
                                             ]
                                         ),
-                                        self::_getField($_field),
+                                        self::printField($_field),
                                         self::_itemButtons()
                                     ]
                                 )
@@ -631,12 +612,12 @@ class Option
                     foreach ($template as $key => $_field) {
                         $_field['name'] = $name . '[{{encode_key}}]' . '[' . $key . ']';
                         $_field['disabled'] = true;
-                        $_html .= self::_getField($_field);
+                        $_html .= self::printField($_field);
                     }
                 } elseif ($field != null && !empty($field)) {
                     $field['name'] = $name . '[{{encode_key}}]';
                     $field['disabled'] = true;
-                    $_html .= self::_getField($field);
+                    $_html .= self::printField($field);
                 }
 
                 $html .= self::_group(
@@ -671,7 +652,7 @@ class Option
                         foreach ($template as $key => $_field) {
                             $_field['name'] = $name . '[' . $key . ']';
                             $_field['value'] = $value[$key] ?? null;
-                            $html .= self::_getField($_field);
+                            $html .= self::printField($_field);
                         }
                     } elseif ($method == self::METHOD_MULTIPLE) {
                         $last_key = 1;
@@ -684,7 +665,7 @@ class Option
                                     $_field = $template[$_key];
                                     $_field['name'] = $name . '[' . $key . ']' . '[' . $_key . ']';
                                     $_field['value'] = $_value[$_key] ?? '';
-                                    $__html .= self::_getField($_field);
+                                    $__html .= self::printField($_field);
                                 }
 
                                 $template_description = $template_params['description'] ?? null;
@@ -710,7 +691,7 @@ class Option
                         foreach ($template as $key => $_field) {
                             $_field['name'] = $name . '[{{LAST_KEY}}]' . '[' . $key . ']';
                             $_field['disabled'] = true;
-                            $__html .= self::_getField($_field);
+                            $__html .= self::printField($_field);
                         }
 
                         $template_description = $template_params['description'] ?? null;
@@ -898,13 +879,18 @@ class Option
         }
 
         if (!empty($description)) {
-            $html .= self::_tag('div', $description, ['class' => 'description']);;
+            $html .= self::_tag('div', $description, ['class' => 'description']);
         }
 
         return $html;
     }
 
-    private static function getNonceFieldName($parent)
+    /**
+     * @param $parent
+     *
+     * @return string
+     */
+    private static function getNonceFieldName($parent): string
     {
         return $parent . '-save-form';
     }
@@ -1008,9 +994,13 @@ class Option
     }
 
     /**
+     * Print Form for options array
+     *
      * @param $parent
      * @param $options
      * @param array|null $params
+     * @see expandOptions
+     *
      */
     public static function printForm($parent, $options, ?array $params = []): void
     {
@@ -1042,15 +1032,28 @@ class Option
 
         $_fields = [];
 
+        /**
+         * Setting `parent` and `name` fields
+         * Then generating fields HTML
+         * */
         static::arrayWalkWithRoute(
             $options,
             function ($key, $item, $route) use (&$_fields, $parent) {
                 if ($item instanceof Option) {
                     array_pop($route);
-                    $item->setParam('parent', $parent);
+
+                    if ($item->getParam('parent') === null) {
+                        $item->setParam('parent', $parent);
+                    }
+
+                    if ($item->getParam('name') === null) {
+                        $item->setParam('name', implode('>', $route));
+                    }
+
                     $field = $item->getField();
                     $html = '<div class="section">' . $field . '</div>';
                     $temp = &$_fields;
+
                     foreach ($route as $key) {
                         $temp = &$temp[$key];
                     }
@@ -1059,7 +1062,9 @@ class Option
                 }
             }
         );
-        self::printStyle($parent);
+
+        self::printStyle();
+
         ?>
         <div class="wrap wp-lib-option-wrap <?php echo $parent; ?>-wrap">
             <h2><?php echo $title; ?></h2>
@@ -1071,51 +1076,67 @@ class Option
         </div>
 
         <?php
-        self::printSelect2Assets();
+
         self::printScript();
+
+        self::$assets_loaded = true;
     }
 
-    private static function printSelect2Assets()
+    /**
+     * @return void
+     */
+    private static function printSelect2Assets(): void
     {
-        if (!self::$select2_loaded) {
-            self::$select2_loaded = true;
-            wp_enqueue_script('jquery');
-            wp_enqueue_script('jquery-ui-sortable');
-            ?>
-            <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet"/>
-            <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-            <?php
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('jquery-ui-sortable');
+        ?>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet"/>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+        <?php
+    }
+
+    /**
+     * @return void
+     */
+    private static function printScript(): void
+    {
+        if (!self::$assets_loaded) {
+            self::printSelect2Assets();
+            echo '<script type="application/javascript">' . file_get_contents(__DIR__ . '/assets/script.js') . '</script>';
         }
     }
 
     /**
-     * @param string $parent
+     * @return void
      */
-    private static function printScript(): void
+    private static function printStyle(): void
     {
-        echo '<script type="application/javascript">' . file_get_contents(__DIR__ . '/assets/script.js') . '</script>';
-    }
-
-    private static function printStyle($parent = '')
-    {
-        $str = file_get_contents(__DIR__ . '/assets/admin.css');
-        echo '<style type="text/css">' . $str . '</style>';
+        if (!self::$assets_loaded) {
+            $str = file_get_contents(__DIR__ . '/assets/admin.css');
+            echo '<style type="text/css">' . $str . '</style>';
+        }
     }
 
     /**
      * @param array $options
-     *
      * @param string|null $parent
      *
      * @return array
+     * @see printForm
+     *
      */
     public static function expandOptions(array $options, ?string $parent = null)
     {
-        array_walk_recursive(
+        self::arrayWalkWithRoute(
             $options,
-            function (&$item, $key) use ($parent) {
+            function ($key, &$item, $route) use ($parent) {
                 if ($item instanceof self) {
-                    $item->setParam('parent', $parent);
+                    if ($item->getParam('name') == null) {
+                        $item->setParam('name', implode('>', $route));
+                    }
+                    if ($item->getParam('parent') == null) {
+                        $item->setParam('parent', $parent);
+                    }
                     $item = $item->getValue();
                 }
             }
