@@ -15,19 +15,22 @@ ul.wp-lib-option-nested-fields .section > .group .group {
     position: relative;
 }
 
-ul.wp-lib-option-nested-fields > ul.wp-lib-option-nested-fields > ul.wp-lib-option-nested-fields {
+ul.wp-lib-option-nested-fields > li {
+    margin-top: 15px
+}
+
+ul.wp-lib-option-nested-fields > ul.wp-lib-option-nested-fields {
     display: none;
 }
 
 ul.wp-lib-option-nested-fields {
+    background: #00000008;
     font-size: 0.90em;
 }
 
 ul.wp-lib-option-nested-fields ul.wp-lib-option-nested-fields {
     padding: 10px 0 10px 10px;
-}
-
-ul.wp-lib-option-nested-fields ul.wp-lib-option-nested-fields {
+    margin: 0 0 10px 0;
     border-left: solid 1px #dedede;
     border-bottom: solid 1px #dedede
 }
@@ -94,18 +97,18 @@ ul.wp-lib-option-nested-fields .section > .group > .group > .key {
     border: solid 2px #0073aa;
 }
 
-ul.wp-lib-option-nested-fields .section > .group .group .buttons button{
+ul.wp-lib-option-nested-fields .section > .group .group .buttons button {
     vertical-align: top;
 }
 
-ul.wp-lib-option-nested-fields .section > .group > .group > .buttons button.minimise:before{
-    content:"―";
-    color:#fff;
+ul.wp-lib-option-nested-fields .section > .group > .group > .buttons button.minimise:before {
+    content: "―";
+    color: #fff;
 }
 
-ul.wp-lib-option-nested-fields .section > .group > .group[minimised=true] > .buttons button.minimise:before{
-    content:"\20DE";
-    color:#fff;
+ul.wp-lib-option-nested-fields .section > .group > .group[minimised=true] > .buttons button.minimise:before {
+    content: "\20DE";
+    color: #fff;
 }
 
 ul.wp-lib-option-nested-fields .section > .group .group .buttons {
