@@ -18,6 +18,11 @@ class Option
     public const METHOD_SINGLE = 'single';
     public const METHOD_MULTIPLE = 'multiple';
 
+    /**
+     * Option Params
+     *
+     * @var array
+     * */
     private $params = [];
 
     /**
@@ -29,6 +34,7 @@ class Option
 
     /**
      * Option constructor.
+     *
      * @param null $_name
      * @param null $_default
      * @param array $_params
@@ -40,13 +46,9 @@ class Option
         $this->setParams($_params);
     }
 
-    private static function log($log, $file = 'ylog.log')
-    {
-        $f = $_SERVER['DOCUMENT_ROOT'] . '/logs/' . $file;
-        file_put_contents($f, PHP_EOL . json_encode([$log]), FILE_APPEND);
-    }
-
     /**
+     * Get Option value
+     *
      * @return array|mixed|void
      */
     public function getValue()
@@ -59,6 +61,8 @@ class Option
     }
 
     /**
+     * Generate option name by option name and parent name
+     *
      * @param $option
      * @param null $parent
      *
@@ -74,6 +78,8 @@ class Option
     }
 
     /**
+     * Get single option value
+     *
      * @param string $option
      * @param null $parent
      * @param null $default
@@ -95,6 +101,9 @@ class Option
     }
 
     /**
+     * Get option filter name
+     * To define value of option programmatically
+     *
      * @param $option
      * @param $parent
      * @return string
@@ -107,6 +116,8 @@ class Option
     }
 
     /**
+     * If option declared by constant
+     *
      * @param $option
      *
      * @param null $parent
@@ -119,6 +130,8 @@ class Option
     }
 
     /**
+     * Set single option
+     *
      * @param $option
      * @param null $parent
      * @param $value
@@ -137,6 +150,8 @@ class Option
     }
 
     /**
+     * Get all params
+     *
      * @see getParam
      * @see setParam
      * @see setParams
@@ -149,6 +164,8 @@ class Option
     }
 
     /**
+     * Get single parameter of option
+     *
      * @see getParams
      * @see setParams
      * @see setParam
@@ -188,13 +205,15 @@ class Option
     }
 
     /**
-     * @uses printField
+     * Get option form field
      *
      * @return string
+     *@uses createField
+     *
      */
     public function getField(): string
     {
-        return self::printField(
+        return self::createField(
             [
                 'main_params' => $this->getParam('main_params', false),
                 'name' => $this->getParam('name', false),
@@ -217,6 +236,8 @@ class Option
     }
 
     /**
+     * Encode key of form field
+     *
      * @param $key
      *
      * @return string
@@ -227,6 +248,8 @@ class Option
     }
 
     /**
+     * Check and decode form field key
+     *
      * @param $str
      *
      * @return false|string|string[]|null
@@ -243,6 +266,9 @@ class Option
     }
 
     /**
+     * Check if form field is boolean and return
+     * Real boolean value
+     *
      * @param $str
      *
      * @return bool|string
@@ -299,6 +325,8 @@ class Option
     }
 
     /**
+     * Open HTML Tag
+     *
      * @param string $tag
      * @param array|null $attrs
      *
@@ -318,6 +346,8 @@ class Option
     }
 
     /**
+     * Close HTML tag
+     *
      * @param string $tag
      *
      * @return string
@@ -328,6 +358,8 @@ class Option
     }
 
     /**
+     * Print HTML Tag
+     *
      * @param string $tag
      * @param string|null $content
      * @param array|null $attrs
@@ -344,6 +376,8 @@ class Option
     }
 
     /**
+     * Create group HTML tag
+     *
      * @param string $content
      * @param array $attrs
      *
@@ -359,6 +393,8 @@ class Option
     }
 
     /**
+     * Get form item buttons
+     *
      * @param array|null $buttons
      *
      * @return string
@@ -381,6 +417,8 @@ class Option
     }
 
     /**
+     * Remove button markup
+     *
      * @return string
      */
     private static function removeButton(): string
@@ -398,6 +436,8 @@ class Option
     }
 
     /**
+     * Minimise button markup
+     *
      * @return string
      */
     private static function minimiseButton(): string
@@ -415,6 +455,8 @@ class Option
     }
 
     /**
+     * Duplicate button markup
+     *
      * @return string
      */
     private static function duplicateButton(): string
@@ -432,6 +474,8 @@ class Option
     }
 
     /**
+     * Add new button markup
+     *
      * @param int|null $last_key
      *
      * @return string
@@ -454,14 +498,14 @@ class Option
     }
 
     /**
+     * Normalize `<select>` options values order
+     *
      * @param array $values
      * @param array $value
      */
     private static function sortSelectValues(array &$values, array $value)
     {
         uksort($values, function ($a, $b) use ($value) {
-            // echo $a.PHP_EOL;
-
             $a_i = array_search($a, $value);
             $b_i = array_search($b, $value);
 
@@ -484,11 +528,13 @@ class Option
     }
 
     /**
+     * Create field markup static method
+     *
      * @param array $params
      *
      * @return string
      */
-    private static function printField($params = []): string
+    private static function createField($params = []): string
     {
         $main_params = $params['main_params'] ?? [];
 
@@ -568,7 +614,7 @@ class Option
                             $_field['value'] = $_value[$_key] ?? null;
                             $_field['data']['name'] = $name . '[{{encode_key}}]' . '[' . $_key . ']';
                             $_field['name'] = $name . '[' . self::encodeKey($key) . ']' . '[' . $_key . ']';
-                            $_html .= self::printField($_field);
+                            $_html .= self::createField($_field);
                         }
 
                         $html .= self::group(
@@ -614,7 +660,7 @@ class Option
                                                 'onchange' => $on_change
                                             ]
                                         ),
-                                        self::printField($_field),
+                                        self::createField($_field),
                                         self::itemButtons()
                                     ]
                                 )
@@ -629,12 +675,12 @@ class Option
                     foreach ($template as $key => $_field) {
                         $_field['name'] = $name . '[{{encode_key}}]' . '[' . $key . ']';
                         $_field['disabled'] = true;
-                        $_html .= self::printField($_field);
+                        $_html .= self::createField($_field);
                     }
                 } elseif ($field != null && !empty($field)) {
                     $field['name'] = $name . '[{{encode_key}}]';
                     $field['disabled'] = true;
-                    $_html .= self::printField($field);
+                    $_html .= self::createField($field);
                 }
 
                 $html .= self::group(
@@ -669,7 +715,7 @@ class Option
                         foreach ($template as $key => $_field) {
                             $_field['name'] = $name . '[' . $key . ']';
                             $_field['value'] = $value[$key] ?? null;
-                            $html .= self::printField($_field);
+                            $html .= self::createField($_field);
                         }
                     } elseif ($method == self::METHOD_MULTIPLE) {
                         $last_key = 1;
@@ -682,7 +728,7 @@ class Option
                                     $_field = $template[$_key];
                                     $_field['name'] = $name . '[' . $key . ']' . '[' . $_key . ']';
                                     $_field['value'] = $_value[$_key] ?? '';
-                                    $__html .= self::printField($_field);
+                                    $__html .= self::createField($_field);
                                 }
 
                                 $template_description = $template_params['description'] ?? null;
@@ -708,7 +754,7 @@ class Option
                         foreach ($template as $key => $_field) {
                             $_field['name'] = $name . '[{{LAST_KEY}}]' . '[' . $key . ']';
                             $_field['disabled'] = true;
-                            $__html .= self::printField($_field);
+                            $__html .= self::createField($_field);
                         }
 
                         $template_description = $template_params['description'] ?? null;
@@ -903,6 +949,8 @@ class Option
     }
 
     /**
+     * Dynamically get nonce field name by parent
+     *
      * @param $parent
      *
      * @return string
@@ -913,6 +961,8 @@ class Option
     }
 
     /**
+     * Get form data from request
+     *
      * @param $parent
      * @param string $method
      *
@@ -939,6 +989,8 @@ class Option
     }
 
     /**
+     * Decode form keys
+     *
      * @param array $input
      *
      * @return array
@@ -962,6 +1014,8 @@ class Option
     }
 
     /**
+     * Print form nested elements
+     *
      * @param $array
      * @param null $parent
      *
@@ -989,6 +1043,8 @@ class Option
     }
 
     /**
+     * Array walk with route
+     *
      * @param array $arr
      * @param callable $callback
      * @param array $route
@@ -1098,6 +1154,9 @@ class Option
     }
 
     /**
+     * Print Select2 assets
+     * From CDN
+     *
      * @return void
      */
     private static function printSelect2Assets(): void
@@ -1111,6 +1170,8 @@ class Option
     }
 
     /**
+     * Print inline scripts
+     *
      * @return void
      */
     private static function printScript(): void
@@ -1125,6 +1186,8 @@ class Option
     }
 
     /**
+     * Print inline style
+     *
      * @return void
      */
     private static function printStyle(): void
@@ -1136,6 +1199,8 @@ class Option
     }
 
     /**
+     * Retrieve array with options and return values
+     *
      * @param array $options
      * @param string|null $parent
      *
@@ -1143,7 +1208,7 @@ class Option
      * @see printForm
      *
      */
-    public static function expandOptions(array $options, ?string $parent = null)
+    public static function expandOptions(array $options, ?string $parent = null): array
     {
         self::arrayWalkWithRoute(
             $options,
