@@ -28,6 +28,10 @@ ul.wp-lib-option-nested-fields {
     font-size: 0.90em;
 }
 
+ul.wp-lib-option-nested-fields > li > .section {
+    padding: 5px;
+}
+
 ul.wp-lib-option-nested-fields ul.wp-lib-option-nested-fields {
     padding: 10px 0 10px 10px;
     margin: 0 0 10px 0;
