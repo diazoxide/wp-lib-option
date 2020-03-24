@@ -152,11 +152,11 @@ class Option
     /**
      * Get all params
      *
-     * @see getParam
+     * @return array
      * @see setParam
      * @see setParams
      *
-     * @return array
+     * @see getParam
      */
     public function getParams(): array
     {
@@ -166,13 +166,13 @@ class Option
     /**
      * Get single parameter of option
      *
+     * @param $param
+     * @param null $default
+     * @return mixed|null
      * @see getParams
      * @see setParams
      * @see setParam
      *
-     * @param $param
-     * @param null $default
-     * @return mixed|null
      */
     public function getParam($param, $default = null)
     {
@@ -180,11 +180,11 @@ class Option
     }
 
     /**
-     * @see setParam
+     * @param array $params
      * @see getParam
      * @see getParams
      *
-     * @param array $params
+     * @see setParam
      */
     public function setParams(array $params): void
     {
@@ -192,12 +192,12 @@ class Option
     }
 
     /**
-     * @see setParams
-     * @see getParam
-     * @see getParams
-     *
      * @param string $key
      * @param $value
+     * @see getParams
+     *
+     * @see setParams
+     * @see getParam
      */
     public function setParam(string $key, $value): void
     {
@@ -208,7 +208,7 @@ class Option
      * Get option form field
      *
      * @return string
-     *@uses createField
+     * @uses createField
      *
      */
     public function getField(): string
@@ -219,14 +219,27 @@ class Option
                 'name' => $this->getParam('name', false),
                 'value' => $this->getValue(),
                 'type' => $this->getParam('type', null),
+
+                /**
+                 * Label
+                 * */
                 'label' => $this->getParam('label', $this->getParam('name', null)),
+                'label_params' => $this->getParam('label_params', null),
+
+                /**
+                 * Description
+                 * */
                 'description' => $this->getParam('description', null),
+                'description_params' => $this->getParam('description_params', null),
+
                 'parent' => $this->getParam('parent', null),
                 'method' => $this->getParam('method', null),
                 'values' => $this->getParam('values', []),
                 'markup' => $this->getParam('markup', null),
+
                 'template' => $this->getParam('template', null),
                 'template_params' => $this->getParam('template_params', null),
+
                 'field' => $this->getParam('field', null),
                 'data' => $this->getParam('data', null),
                 'disabled' => $this->getParam('disabled', false),
@@ -505,26 +518,38 @@ class Option
      */
     private static function sortSelectValues(array &$values, array $value)
     {
-        uksort($values, function ($a, $b) use ($value) {
-            $a_i = array_search($a, $value);
-            $b_i = array_search($b, $value);
+        uksort(
+            $values,
+            function ($a, $b) use ($value) {
+                $a_i = array_search($a, $value);
+                $b_i = array_search($b, $value);
 
-            if ($a_i === false) {
-                return 0;
-            }
+                if ($a_i === false) {
+                    return 0;
+                }
 
-            if ($b_i === false) {
-                return 1;
-            } else {
-                $index = $a_i - $b_i;
-
-                if ($index > 0) {
+                if ($b_i === false) {
                     return 1;
                 } else {
-                    return -1;
+                    $index = $a_i - $b_i;
+
+                    if ($index > 0) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
                 }
             }
-        });
+        );
+    }
+
+    private static function addHtmlClass(&$attr, $class)
+    {
+        $class = is_array($class) ? implode(' ', $class) : $class;
+        if (!empty($attr)) {
+            $attr .= ' ';
+        }
+        $attr .= $class;
     }
 
     /**
@@ -542,8 +567,21 @@ class Option
         $name = $params['name'] ?? null;
 
         $parent = $params['parent'] ?? null;
-        $description = $params['description'] ?? null;
+
+        /**
+         * Determine Label
+         * */
         $label = $params['label'] ?? null;
+        $label_params = $params['label_params'] ?? null;
+        self::addHtmlClass($label_params['class'], 'label');
+
+        /**
+         * Determine Description
+         * */
+        $description = $params['description'] ?? null;
+        $description_params = $params['description_params'] ?? null;
+        self::addHtmlClass($description_params['class'], 'description');
+
         $type = $params['type'] ?? null;
         $method = $params['method'] ?? null;
         $values = $params['values'] ?? [];
@@ -562,6 +600,8 @@ class Option
 
 
         $input_attrs = $params['input_attrs'] ?? [];
+        self::addHtmlClass($input_attrs['class'], [$type,$method]);
+
 
         if ($parent != null) {
             $name = $parent . '[' . $name . ']';
@@ -592,7 +632,6 @@ class Option
                 $html .= self::tagOpen(
                     'input',
                     $input_attrs + [
-                        'class' => implode(' ', [$type, $method]),
                         'value' => '{{boolean_true}}',
                         'type' => 'checkbox',
                         'name' => $name,
@@ -780,13 +819,10 @@ class Option
             default:
                 if (!empty($values)) {
                     if ($markup == null || $markup == self::MARKUP_SELECT) {
+                        self::addHtmlClass($input_attrs['class'], 'full');
                         $html .= self::tagOpen(
                             'select',
                             $input_attrs + [
-                                'class' => implode(
-                                    ' ',
-                                    [$type, $method, 'full']
-                                ),
                                 'select2' => 'true',
                                 'name' => $name . ($method == self::METHOD_MULTIPLE ? '[]' : ''),
                                 $method == self::METHOD_MULTIPLE ? 'multiple' : '',
@@ -856,6 +892,7 @@ class Option
                         $html .= self::tagClose('select');
                     }
                 } elseif ($method == self::METHOD_MULTIPLE) {
+                    self::addHtmlClass($input_attrs['class'], 'full');
                     if (is_array($value)) {
                         foreach ($value as $key => $_value) {
                             if (!empty($_value)) {
@@ -864,7 +901,6 @@ class Option
                                         'input',
                                         $input_attrs + [
                                             'name' => $name . '[]',
-                                            'class' => 'full',
                                             'type' => $markup,
                                             'placeholder' => $label,
                                             'value' => $_value,
@@ -876,13 +912,11 @@ class Option
                             }
                         }
                     }
-
                     $html .= self::group(
                         self::tagOpen(
                             'input',
                             $input_attrs + [
                                 'name' => $name . '[]',
-                                'class' => 'full',
                                 'type' => $markup,
                                 'placeholder' => $label,
                                 'disabled'
@@ -938,11 +972,11 @@ class Option
         $html = self::tag('div', $html, $main_params);
 
         if (!empty($label)) {
-            $html = self::tag('div', $label, ['class' => 'label']) . $html;
+            $html = self::tag('div', $label, $label_params) . $html;
         }
 
         if (!empty($description)) {
-            $html .= self::tag('div', $description, ['class' => 'description']);
+            $html .= self::tag('div', $description, $description_params);
         }
 
         return $html;
