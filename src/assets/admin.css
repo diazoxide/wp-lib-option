@@ -28,6 +28,11 @@ ul.wp-lib-option-nested-fields {
     font-size: 0.90em;
 }
 
+ul.wp-lib-option-nested-fields .section > .group > .group:hover {
+    outline: solid 5px #ffffff;
+    background: #fff
+}
+
 ul.wp-lib-option-nested-fields > li > .section {
     padding: 5px;
 }
@@ -46,6 +51,7 @@ ul.wp-lib-option-nested-fields .group button {
 ul.wp-lib-option-nested-fields .label {
     color: #007cba;
     font-weight: normal;
+    cursor: default;
     margin-bottom: 3px;
 }
 
