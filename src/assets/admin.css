@@ -44,6 +44,12 @@ ul.wp-lib-option-nested-fields ul.wp-lib-option-nested-fields {
     border-bottom: solid 1px #dedede
 }
 
+ul.wp-lib-option-nested-fields > ul.wp-lib-option-nested-fields.include-section {
+    display: block;
+    padding: 0;
+    background: unset;
+}
+
 ul.wp-lib-option-nested-fields .group button {
     margin: 0;
 }

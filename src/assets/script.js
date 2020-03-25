@@ -16,6 +16,17 @@
             }
         });
     }
+
+
+    let sections = document.querySelectorAll('ul.wp-lib-option-nested-fields>li>.section');
+    for (let i = 0; i < sections.length; i++) {
+        let section = sections[i];
+        
+        section.parentNode.parentNode.classList.add('include-section');
+        section.parentNode.parentNode.previousSibling.style.display = "none";
+    }
+    
+    
     if (!window.hasOwnProperty('diazoxide')) {
         window.diazoxide = {};
         if (!window.diazoxide.hasOwnProperty()) {
