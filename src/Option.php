@@ -220,6 +220,8 @@ class Option
                 'value' => $this->getValue(),
                 'type' => $this->getParam('type', null),
 
+                'debug_data' => $this->getParam('debug_data', null),
+
                 /**
                  * Label
                  * */
@@ -568,6 +570,8 @@ class Option
 
         $parent = $params['parent'] ?? null;
 
+        $debug_data = $params['debug_data'] ?? null;
+
         /**
          * Determine Label
          * */
@@ -600,7 +604,7 @@ class Option
 
 
         $input_attrs = $params['input_attrs'] ?? [];
-        self::addHtmlClass($input_attrs['class'], [$type,$method]);
+        self::addHtmlClass($input_attrs['class'], [$type, $method]);
 
 
         if ($parent != null) {
@@ -621,6 +625,10 @@ class Option
         }
 
         $html = '';
+
+        if (!empty($debug_data)) {
+            $html .= '<!--' . var_export($debug_data, true) . '-->';
+        }
 
         switch ($type) {
             case self::TYPE_BOOL:
@@ -1145,7 +1153,7 @@ class Option
             $options,
             function ($key, $item, $route) use (&$_fields, $parent) {
                 if ($item instanceof Option) {
-                    array_pop($route);
+                    $item->setParam('debug_data', [$route]);
 
                     if ($item->getParam('parent') === null) {
                         $item->setParam('parent', $parent);
