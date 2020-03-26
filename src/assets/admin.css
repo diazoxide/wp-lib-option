@@ -25,7 +25,7 @@ ul.wp-lib-option-nested-fields > ul.wp-lib-option-nested-fields {
 
 ul.wp-lib-option-nested-fields {
     background: #00000008;
-    font-size: 0.90em;
+    font-size: 0.95em;
 }
 
 ul.wp-lib-option-nested-fields .section > .group > .group:hover {
@@ -35,6 +35,29 @@ ul.wp-lib-option-nested-fields .section > .group > .group:hover {
 
 ul.wp-lib-option-nested-fields > li > .section {
     padding: 5px;
+}
+
+ul.wp-lib-option-nested-fields > .label.open {
+    background: #007cba;
+    color: #fff;
+    font-weight: bolder;
+}
+
+ul.wp-lib-option-nested-fields > ul.wp-lib-option-nested-fields.open {
+    display: block;
+}
+
+ul.wp-lib-option-nested-fields > .label:after {
+    content: "\00FF0B";
+    font-weight: bolder;
+    font-size: 15px;
+    float: right;
+    color: #007cba
+}
+
+ul.wp-lib-option-nested-fields > .open.label:after {
+    content: "\002212";
+    color: #fff
 }
 
 ul.wp-lib-option-nested-fields ul.wp-lib-option-nested-fields {
@@ -78,10 +101,11 @@ ul.wp-lib-option-nested-fields .description {
 }
 
 ul.wp-lib-option-nested-fields > .label {
-    background: #c4c4c4;
+    background: #ffffff;
     padding: 8px;
     color: #23282d;
     border-bottom: solid 1px #ddd;
+    box-shadow: 0px 0px 3px #c7c7c7;
     margin: 0;
     cursor: pointer;
 }

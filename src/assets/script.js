@@ -8,10 +8,12 @@
         let label = list.previousSibling;
         label.addEventListener("click", function () {
             if (this.nextSibling.offsetParent === null) {
-                this.nextSibling.style.display = "block";
+                //this.nextSibling.style.display = "block";
+                this.nextSibling.classList.add('open');
                 this.classList.add('open');
             } else {
-                this.nextSibling.style.display = "none";
+                //this.nextSibling.style.display = "none";
+                this.nextSibling.classList.remove('open');
                 this.classList.remove('open');
             }
         });
@@ -21,12 +23,12 @@
     let sections = document.querySelectorAll('ul.wp-lib-option-nested-fields>li>.section');
     for (let i = 0; i < sections.length; i++) {
         let section = sections[i];
-        
+
         section.parentNode.parentNode.classList.add('include-section');
         section.parentNode.parentNode.previousSibling.style.display = "none";
     }
-    
-    
+
+
     if (!window.hasOwnProperty('diazoxide')) {
         window.diazoxide = {};
         if (!window.diazoxide.hasOwnProperty()) {
