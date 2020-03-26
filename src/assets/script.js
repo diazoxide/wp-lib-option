@@ -2,28 +2,36 @@
     document.addEventListener("DOMContentLoaded", function (event) {
         window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
     });
+    
     let lists = document.querySelectorAll('.wp-lib-option-nested-fields > .wp-lib-option-nested-fields');
     for (let i = 0; i < lists.length; i++) {
         let list = lists[i];
         let label = list.previousSibling;
         label.addEventListener("click", function () {
             if (this.nextSibling.offsetParent === null) {
-                //this.nextSibling.style.display = "block";
                 this.nextSibling.classList.add('open');
                 this.classList.add('open');
             } else {
-                //this.nextSibling.style.display = "none";
                 this.nextSibling.classList.remove('open');
                 this.classList.remove('open');
             }
         });
     }
 
+    /**
+     * Expand all first fields
+     * */
+    let fields = document.querySelectorAll('ul.wp-lib-option-nested-fields>li.label:first-child');
+    for (let i = 0; i < fields.length; i++) {
+        fields[i].click();
+    }
 
+    /**
+    * Normalize sections
+    * */
     let sections = document.querySelectorAll('ul.wp-lib-option-nested-fields>li>.section');
     for (let i = 0; i < sections.length; i++) {
         let section = sections[i];
-
         section.parentNode.parentNode.classList.add('include-section');
         section.parentNode.parentNode.previousSibling.style.display = "none";
     }

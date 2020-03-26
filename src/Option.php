@@ -1182,6 +1182,10 @@ class Option
         <div class="wrap wp-lib-option-wrap <?php echo $parent; ?>-wrap">
             <h2><?php echo $title; ?></h2>
             <form method="post" action="">
+
+                <!--<div class="form-actions">
+                    <button class="expand">Expand all</button>
+                </div>-->
                 <?php self::printArrayList($_fields, $parent); ?>
                 <?php wp_nonce_field($parent, self::getNonceFieldName($parent)); ?>
                 <?php submit_button(); ?>
