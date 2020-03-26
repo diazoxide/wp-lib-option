@@ -1,4 +1,24 @@
 # WordPress options form dynamic fields creation library
+
+Create dynamic admin settings page with flexible configurations.
+
+## Methods
+* Single
+* Multiple
+
+## Types
+* Boolean
+* Text
+* Object
+* Group
+
+## Markup
+* Text
+* Checkbox
+* Select
+* Number
+* Textarea
+
 ![Screenshot_1](docs/Screenshot_1.png)
 
 # How to install
