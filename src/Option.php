@@ -68,7 +68,7 @@ class Option
      *
      * @return string
      */
-    public static function getOptionName($option, $parent = null)
+    public static function getOptionName($option, $parent = null): string
     {
         if ($parent !== null) {
             $option = $parent . '_' . $option;
@@ -138,7 +138,7 @@ class Option
      *
      * @return bool
      */
-    public static function setOption($option, $parent = null, $value = null)
+    public static function setOption($option, $parent = null, $value = null): bool
     {
         $option = self::getOptionName($option, $parent);
 
@@ -259,7 +259,7 @@ class Option
      */
     private static function encodeKey($key): string
     {
-        return "{{encode_key}}" . base64_encode($key);
+        return '{{encode_key}}' . base64_encode($key);
     }
 
     /**
@@ -290,9 +290,11 @@ class Option
      */
     private static function maybeBoolean($str)
     {
-        if ($str == '{{boolean_true}}') {
+        if ($str === '{{boolean_true}}') {
             return true;
-        } elseif ($str == '{{boolean_false}}') {
+        }
+
+        if ($str === '{{boolean_false}}') {
             return false;
         }
 
@@ -307,31 +309,35 @@ class Option
      *
      * @return string
      */
-    private static function getAttrsString($data, ?string $parent = null): string
+    private static function getAttrsString(array $data, ?string $parent = null): string
     {
         return implode(
             ' ',
             array_map(
-                function ($k, $v) use ($parent) {
+                static function ($k, $v) use ($parent) {
                     if (is_string($v)) {
                         $v = htmlspecialchars($v);
-                        if ($parent == null && is_int($k)) {
+                        if ($parent === null && is_int($k)) {
                             return $v;
                         }
                         $k = ($parent ? $parent . '-' : '') . $k;
 
                         return $k . '="' . $v . '"';
-                    } elseif (is_array($v)) {
+                    }
+
+                    if (is_array($v)) {
                         return self::getAttrsString($v, $k);
-                    } elseif (empty($v)) {
+                    }
+
+                    if (empty($v)) {
                         $k = ($parent ? $parent . '-' : '') . $k;
 
                         return $k . '=""';
-                    } else {
-                        $k = ($parent ? $parent . '-' : '') . $k;
-
-                        return $k . '="' . json_encode($v) . '"';
                     }
+
+                    $k = ($parent ? $parent . '-' : '') . $k;
+
+                    return $k . '="' . json_encode($v) . '"';
                 },
                 array_keys($data),
                 $data
@@ -350,13 +356,13 @@ class Option
     private static function tagOpen(string $tag, ?array $attrs = null): string
     {
         if ($attrs !== null) {
-            $attrs = self::getAttrsString($attrs);
+            $attrs_str = self::getAttrsString($attrs);
         }
 
         return sprintf(
             '<%s%s>',
             $tag,
-            !empty($attrs) ? ' ' . $attrs : ''
+            !empty($attrs_str) ? ' ' . $attrs_str : ''
         );
     }
 
@@ -418,7 +424,7 @@ class Option
     {
         $html = self::tagOpen('div', ['class' => 'buttons']);
 
-        if ($buttons == null) {
+        if ($buttons === null) {
             $buttons = ['duplicate', 'minimise', 'remove'];
         }
         foreach ($buttons as $button) {
@@ -518,13 +524,13 @@ class Option
      * @param array $values
      * @param array $value
      */
-    private static function sortSelectValues(array &$values, array $value)
+    private static function sortSelectValues(array &$values, array $value): void
     {
         uksort(
             $values,
-            function ($a, $b) use ($value) {
-                $a_i = array_search($a, $value);
-                $b_i = array_search($b, $value);
+            static function ($a, $b) use ($value) {
+                $a_i = array_search($a, $value, true);
+                $b_i = array_search($b, $value, true);
 
                 if ($a_i === false) {
                     return 0;
@@ -532,20 +538,24 @@ class Option
 
                 if ($b_i === false) {
                     return 1;
-                } else {
-                    $index = $a_i - $b_i;
-
-                    if ($index > 0) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
                 }
+
+                $index = $a_i - $b_i;
+
+                if ($index > 0) {
+                    return 1;
+                }
+
+                return -1;
             }
         );
     }
 
-    private static function addHtmlClass(&$attr, $class)
+    /**
+     * @param $attr
+     * @param $class
+     */
+    private static function addHtmlClass(&$attr, $class): void
     {
         $class = is_array($class) ? implode(' ', $class) : $class;
         if (!empty($attr)) {
@@ -594,7 +604,7 @@ class Option
         /**
          * Automatically select markup type when it missing
          * */
-        if ($markup == null) {
+        if ($markup === null) {
             $markup = empty($values) ? self::MARKUP_TEXT : self::MARKUP_SELECT;
         }
 
@@ -607,21 +617,21 @@ class Option
         self::addHtmlClass($input_attrs['class'], [$type, $method]);
 
 
-        if ($parent != null) {
+        if ($parent !== null) {
             $name = $parent . '[' . $name . ']';
         }
 
         $disabled = $params['disabled'] ?? false;
-        $disabled_str = $disabled ? "disabled" : "";
+        $disabled_str = $disabled ? 'disabled' : '';
         $readonly = $params['readonly'] ?? false;
-        $readonly_str = $readonly ? "readonly" : "";
+        $readonly_str = $readonly ? 'readonly' : '';
 
         $data = $params['data'] ?? [];
         $data['name'] = $data['name'] ?? $name;
 
 
         if (is_callable($description)) {
-            $description = call_user_func($description, $params);
+            $description = $description($params);
         }
 
         $html = '';
@@ -653,7 +663,7 @@ class Option
             case self::TYPE_OBJECT:
                 $on_change = "var fields = this.parentElement.querySelectorAll('[name]'); for (var i = 0; i < fields.length; i++) { var field = fields[i]; if (this.value != null) { field.removeAttribute('disabled') }; var attr =  field.getAttribute('name'); attr = attr.replace(/{{encode_key}}.*?(?=\])/gm, '{{encode_key}}' + btoa(this.value)); fields[i].setAttribute('name', attr); }";
 
-                if ($template != null && !empty($template)) {
+                if ($template !== null && !empty($template)) {
                     foreach ($value as $key => $_value) {
                         $_html = '';
 
@@ -685,7 +695,7 @@ class Option
                             ['minimised' => 'false']
                         );
                     }
-                } elseif ($field != null && !empty($field)) {
+                } elseif ($field !== null && !empty($field)) {
                     if (!empty($value)) {
                         foreach ($value as $key => $_value) {
                             $_field = $field;
@@ -718,13 +728,13 @@ class Option
 
                 $_html = '';
 
-                if ($template != null && !empty($template)) {
+                if ($template !== null && !empty($template)) {
                     foreach ($template as $key => $_field) {
                         $_field['name'] = $name . '[{{encode_key}}]' . '[' . $key . ']';
                         $_field['disabled'] = true;
                         $_html .= self::createField($_field);
                     }
-                } elseif ($field != null && !empty($field)) {
+                } elseif ($field !== null && !empty($field)) {
                     $field['name'] = $name . '[{{encode_key}}]';
                     $field['disabled'] = true;
                     $_html .= self::createField($field);
@@ -758,15 +768,15 @@ class Option
                 if (!empty($template)) {
                     $html .= '';
 
-                    if ($method == self::METHOD_SINGLE) {
+                    if ($method === self::METHOD_SINGLE) {
                         foreach ($template as $key => $_field) {
                             $_field['name'] = $name . '[' . $key . ']';
                             $_field['value'] = $value[$key] ?? null;
                             $html .= self::createField($_field);
                         }
-                    } elseif ($method == self::METHOD_MULTIPLE) {
+                    } elseif ($method === self::METHOD_MULTIPLE) {
                         $last_key = 1;
-                        if ($value != null) {
+                        if ($value !== null) {
                             $last_key = count($value) + 1;
                             foreach ($value as $key => $_value) {
                                 $__html = '';
@@ -780,10 +790,10 @@ class Option
 
                                 $template_description = $template_params['description'] ?? null;
                                 if (is_callable($template_description)) {
-                                    $template_description = call_user_func($template_description, $key, $_value);
+                                    $template_description = $template_description($key, $_value);
                                 }
 
-                                $template_description = $template_description != null ? sprintf(
+                                $template_description = $template_description !== null ? sprintf(
                                     '<div class="description">%s</div>',
                                     $template_description
                                 ) : '';
@@ -806,10 +816,10 @@ class Option
 
                         $template_description = $template_params['description'] ?? null;
                         if (is_callable($template_description)) {
-                            $template_description = call_user_func($template_description, null, null);
+                            $template_description = $template_description(null, null);
                         }
 
-                        $template_description = $template_description != null ? sprintf(
+                        $template_description = $template_description !== null ? sprintf(
                             '<div class="description">%s</div>',
                             $template_description
                         ) : '';
@@ -826,14 +836,14 @@ class Option
                 break;
             default:
                 if (!empty($values)) {
-                    if ($markup == null || $markup == self::MARKUP_SELECT) {
+                    if ($markup === null || $markup === self::MARKUP_SELECT) {
                         self::addHtmlClass($input_attrs['class'], 'full');
                         $html .= self::tagOpen(
                             'select',
                             $input_attrs + [
                                 'select2' => 'true',
-                                'name' => $name . ($method == self::METHOD_MULTIPLE ? '[]' : ''),
-                                $method == self::METHOD_MULTIPLE ? 'multiple' : '',
+                                'name' => $name . ($method === self::METHOD_MULTIPLE ? '[]' : ''),
+                                $method === self::METHOD_MULTIPLE ? 'multiple' : '',
                                 'data' => $data,
                                 $disabled_str,
                                 $readonly_str
@@ -846,17 +856,17 @@ class Option
                     self::sortSelectValues($values, $value);
 
                     foreach ($values as $key => $_value) {
-                        if ($markup == null || $markup == self::MARKUP_SELECT) {
+                        if ($markup === null || $markup === self::MARKUP_SELECT) {
                             $html .= self::tag(
                                 'option',
                                 $_value,
                                 [
                                     'value' => $key,
-                                    (($key == $value) || in_array($key, $value)) ? 'selected' : ''
+                                    (($key === $value) || in_array($key, $value, true)) ? 'selected' : ''
                                 ]
                             );
-                        } elseif ($markup == self::MARKUP_CHECKBOX) {
-                            if ($method == self::METHOD_MULTIPLE) {
+                        } elseif ($markup === self::MARKUP_CHECKBOX) {
+                            if ($method === self::METHOD_MULTIPLE) {
                                 $html .= self::group(
                                     self::tag(
                                         'label',
@@ -864,10 +874,10 @@ class Option
                                             'input',
                                             [
                                                 'type' => 'checkbox',
-                                                'name' => $name . ($method == self::METHOD_MULTIPLE ? '[]' : ''),
+                                                'name' => $name . '[]',
                                                 'value' => $key,
                                                 'data' => $data,
-                                                (($key == $value) || in_array($key, $value)) ? 'checked' : '',
+                                                (($key === $value) || in_array($key, $value, true)) ? 'checked' : '',
                                                 $disabled_str,
                                                 $readonly_str,
                                             ]
@@ -884,7 +894,7 @@ class Option
                                                 'type' => 'radio',
                                                 'name' => $name,
                                                 'value' => $key,
-                                                (($key == $value) || in_array($key, $value)) ? 'checked' : '',
+                                                (($key === $value) || in_array($key, $value, true)) ? 'checked' : '',
                                                 'data' => $data,
                                                 $disabled_str,
                                                 $readonly_str,
@@ -899,7 +909,7 @@ class Option
                     if (isset($open_tag_select)) {
                         $html .= self::tagClose('select');
                     }
-                } elseif ($method == self::METHOD_MULTIPLE) {
+                } elseif ($method === self::METHOD_MULTIPLE) {
                     self::addHtmlClass($input_attrs['class'], 'full');
                     if (is_array($value)) {
                         foreach ($value as $key => $_value) {
@@ -938,8 +948,8 @@ class Option
                     );
 
                     $html .= self::addNewButton();
-                } elseif ($method != self::METHOD_MULTIPLE) {
-                    if (in_array($markup, [self::MARKUP_TEXT, self::MARKUP_NUMBER])) {
+                } elseif ($method !== self::METHOD_MULTIPLE) {
+                    if (in_array($markup, [self::MARKUP_TEXT, self::MARKUP_NUMBER], true)) {
                         $html .= self::tagOpen(
                             'input',
                             [
@@ -953,7 +963,7 @@ class Option
                                 $readonly_str
                             ]
                         );
-                    } elseif ($markup == self::MARKUP_TEXTAREA) {
+                    } elseif ($markup === self::MARKUP_TEXTAREA) {
                         $html .= self::tagOpen(
                             'textarea',
                             [
@@ -970,7 +980,7 @@ class Option
                         $html .= self::tagClose('textarea');
                     }
                 } else {
-                    $html .= self::group("Not handled!");
+                    $html .= self::group('Not handled!');
                 }
                 break;
         }
@@ -1012,11 +1022,11 @@ class Option
      */
     public static function getFormData($parent, $method = 'post')
     {
-        if ($method == 'post') {
+        if ($method === 'post') {
             $nonce_field = $_POST[self::getNonceFieldName($parent)] ?? null;
             $fields = wp_verify_nonce($nonce_field, $parent)
                 ? ($_POST[$parent] ?? null) : null;
-        } elseif ($method == 'get') {
+        } elseif ($method === 'get') {
             $nonce_field = $_POST[self::getNonceFieldName($parent)] ?? null;
             $fields = wp_verify_nonce($nonce_field, $parent)
                 ? ($_GET[$parent] ?? null) : null;
@@ -1073,15 +1083,15 @@ class Option
             if (is_array($v)) {
                 $label = str_replace('_', ' ', ucfirst($k));
 
-                echo '<li class="label">' . $label . "</li>";
+                echo '<li class="label">' . $label . '</li>';
                 self::printArrayList($v, $parent);
                 continue;
             }
 
-            echo "<li>" . $v . "</li>";
+            echo '<li>' . $v . '</li>';
         }
 
-        echo "</ul>";
+        echo '</ul>';
     }
 
     /**
@@ -1118,7 +1128,7 @@ class Option
      */
     public static function printForm($parent, $options, ?array $params = []): void
     {
-        $form_data = Option::getFormData($parent);
+        $form_data = self::getFormData($parent);
 
         if ($form_data) {
             foreach ($form_data as $key => $field) {
@@ -1127,7 +1137,7 @@ class Option
 
             $form_saved = $params['form_saved'] ?? null;
             if (is_callable($form_saved)) {
-                call_user_func($form_saved, $form_data);
+                $form_saved($form_data);
             }
 
             do_action('wp-lib-option/' . $parent . '/form-saved', $form_data);
@@ -1151,7 +1161,7 @@ class Option
          * */
         static::arrayWalkWithRoute(
             $options,
-            function ($key, $item, $route) use (&$_fields, $parent) {
+            static function ($key, $item, $route) use (&$_fields, $parent) {
                 if ($item instanceof Option) {
                     $item->setParam('debug_data', [$route]);
 
@@ -1167,8 +1177,8 @@ class Option
                     $html = '<div class="section">' . $field . '</div>';
                     $temp = &$_fields;
 
-                    foreach ($route as $key) {
-                        $temp = &$temp[$key];
+                    foreach ($route as $_key) {
+                        $temp = &$temp[$_key];
                     }
                     $temp[] = $html;
                     unset($temp);
@@ -1224,10 +1234,9 @@ class Option
     {
         if (!self::$assets_loaded) {
             self::printSelect2Assets();
-            echo sprintf(
-                "<script type=\"application/javascript\">%s</script>",
-                file_get_contents(__DIR__ . '/assets/script.js')
-            );
+            echo '<script type="application/javascript">' . file_get_contents(
+                __DIR__ . '/assets/script.js'
+            ) . '</script>';
         }
     }
 
@@ -1239,8 +1248,7 @@ class Option
     private static function printStyle(): void
     {
         if (!self::$assets_loaded) {
-            $str = file_get_contents(__DIR__ . '/assets/admin.css');
-            echo '<style type="text/css">' . $str . '</style>';
+            echo '<style type="text/css">' . file_get_contents(__DIR__ . '/assets/admin.css') . '</style>';
         }
     }
 
@@ -1249,21 +1257,19 @@ class Option
      *
      * @param array $options
      * @param string|null $parent
-     *
      * @return array
      * @see printForm
-     *
      */
     public static function expandOptions(array $options, ?string $parent = null): array
     {
         self::arrayWalkWithRoute(
             $options,
-            function ($key, &$item, $route) use ($parent) {
+            static function ($key, &$item, $route) use ($parent) {
                 if ($item instanceof self) {
-                    if ($item->getParam('name') == null) {
+                    if ($item->getParam('name') === null) {
                         $item->setParam('name', implode('>', $route));
                     }
-                    if ($item->getParam('parent') == null) {
+                    if ($item->getParam('parent') === null) {
                         $item->setParam('parent', $parent);
                     }
                     $item = $item->getValue();
