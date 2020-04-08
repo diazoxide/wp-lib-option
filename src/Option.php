@@ -1082,13 +1082,14 @@ class Option
 
         foreach ($array as $k => $v) {
             if (is_array($v)) {
-                $route .= empty($route) ? $k : '>' . $k;
+                $_route = $route;
+                $_route .= empty($_route) ? $k : '>' . $k;
 
                 $label = apply_filters('wp-lib-option/' . $parent . '/form-nested-label', $k);
                 $label = str_replace('_', ' ', ucfirst($label));
 
                 echo sprintf('<li route="%s" class="label">%s</li>', $route, $label);
-                self::printArrayList($v, $parent, $route);
+                self::printArrayList($v, $parent, $_route);
                 continue;
             }
 
