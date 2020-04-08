@@ -1089,7 +1089,7 @@ class Option
                 $label = str_replace('_', ' ', ucfirst($label));
 
                 echo sprintf('<li route="%s" class="label">%s</li>', $_route, $label);
-                self::printArrayList($v, $parent, $_route);
+                self::printArrayList($v, $parent, $route);
                 continue;
             }
 
