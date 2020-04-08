@@ -1081,10 +1081,10 @@ class Option
         echo '<ul class="wp-lib-option-nested-fields ' . $parent . '-nested-fields">';
 
         foreach ($array as $k => $v) {
-            if (is_array($v)) {
-                $_route = $route;
-                $_route .= empty($_route) ? $k : '>' . $k;
+            $_route = $route;
+            $_route .= empty($_route) ? $k : '>' . $k;
 
+            if (is_array($v)) {
                 $label = apply_filters('wp-lib-option/' . $parent . '/form-nested-label', $k, $_route, $parent);
                 $label = str_replace('_', ' ', ucfirst($label));
 
@@ -1093,7 +1093,9 @@ class Option
                 continue;
             }
 
-            echo '<li>' . $v . '</li>';
+            $content = apply_filters('wp-lib-option/' . $parent . '/form-nested-content', $v, $_route, $parent);
+
+            echo '<li>' . $content . '</li>';
         }
 
         echo '</ul>';
