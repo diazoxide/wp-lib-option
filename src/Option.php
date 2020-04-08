@@ -1073,7 +1073,40 @@ class Option
      *
      * @return void
      */
-    private static function printArrayList($array, $parent = null): void
+    private static function printArrayList($array, $parent = null, $route = ''): void
+    {
+        $parent = $parent ?? 'Option';
+
+
+        echo '<ul class="wp-lib-option-nested-fields ' . $parent . '-nested-fields">';
+
+        foreach ($array as $k => $v) {
+            if (is_array($v)) {
+                $route .= empty($route) ? $k : '>' . $k;
+
+                $label = apply_filters('wp-lib-option/' . $parent . '/form-nested-label', $k);
+                $label = str_replace('_', ' ', ucfirst($label));
+
+                echo sprintf('<li route="%s" class="label">%s</li>', $route, $label);
+                self::printArrayList($v, $parent, $route);
+                continue;
+            }
+
+            echo '<li>' . $v . '</li>';
+        }
+
+        echo '</ul>';
+    }
+
+    /**
+     * Print form nested elements
+     *
+     * @param $array
+     * @param null $parent
+     *
+     * @return void
+     */
+    private static function printArrayList2($array, $parent = null): void
     {
         $parent = $parent ?? 'Option';
 
@@ -1081,7 +1114,8 @@ class Option
 
         foreach ($array as $k => $v) {
             if (is_array($v)) {
-                $label = str_replace('_', ' ', ucfirst($k));
+                $label = apply_filters('wp-lib-option/' . $parent . '/form-nested-label', $k);
+                $label = str_replace('_', ' ', ucfirst($label));
 
                 echo '<li class="label">' . $label . '</li>';
                 self::printArrayList($v, $parent);
