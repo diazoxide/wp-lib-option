@@ -1080,6 +1080,9 @@ class Option
 
         echo '<ul class="wp-lib-option-nested-fields ' . $parent . '-nested-fields">';
 
+        $before = apply_filters('wp-lib-option/' . $parent . '/form-before-nested-fields', null, $route, $parent);
+        echo empty($before) ? '' : '<li class="before">' . $before . '</li>';
+
         foreach ($array as $k => $v) {
             $_route = $route;
             $_route .= empty($_route) ? $k : '>' . $k;
@@ -1097,6 +1100,9 @@ class Option
 
             echo '<li>' . $content . '</li>';
         }
+
+        $before = apply_filters('wp-lib-option/' . $parent . '/form-after-nested-fields', null, $route, $parent);
+        echo empty($before) ? '' : '<li class="after">' . $before . '</li>';
 
         echo '</ul>';
     }
