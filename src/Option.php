@@ -1088,7 +1088,7 @@ class Option
                 $label = apply_filters('wp-lib-option/' . $parent . '/form-nested-label', $k);
                 $label = str_replace('_', ' ', ucfirst($label));
 
-                echo sprintf('<li route="%s" class="label">%s</li>', $route, $label);
+                echo sprintf('<li route="%s" class="label">%s</li>', $_route, $label);
                 self::printArrayList($v, $parent, $_route);
                 continue;
             }
