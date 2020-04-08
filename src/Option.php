@@ -1100,36 +1100,6 @@ class Option
     }
 
     /**
-     * Print form nested elements
-     *
-     * @param $array
-     * @param null $parent
-     *
-     * @return void
-     */
-    private static function printArrayList2($array, $parent = null): void
-    {
-        $parent = $parent ?? 'Option';
-
-        echo '<ul class="wp-lib-option-nested-fields ' . $parent . '-nested-fields">';
-
-        foreach ($array as $k => $v) {
-            if (is_array($v)) {
-                $label = apply_filters('wp-lib-option/' . $parent . '/form-nested-label', $k);
-                $label = str_replace('_', ' ', ucfirst($label));
-
-                echo '<li class="label">' . $label . '</li>';
-                self::printArrayList($v, $parent);
-                continue;
-            }
-
-            echo '<li>' . $v . '</li>';
-        }
-
-        echo '</ul>';
-    }
-
-    /**
      * Array walk with route
      *
      * @param array $arr
