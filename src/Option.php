@@ -1085,7 +1085,7 @@ class Option
             $_route .= empty($_route) ? $k : '>' . $k;
 
             if (is_array($v)) {
-                $label = apply_filters('wp-lib-option/' . $parent . '/form-nested-label', $k, $_route, $parent);
+                $label = apply_filters('wp-lib-option/' . $parent . '/form-nested-label', $k, $route, $parent);
                 $label = str_replace('_', ' ', ucfirst($label));
 
                 echo sprintf('<li route="%s" class="label">%s</li>', $_route, $label);
@@ -1093,7 +1093,7 @@ class Option
                 continue;
             }
 
-            $content = apply_filters('wp-lib-option/' . $parent . '/form-nested-content', $v, $_route, $parent);
+            $content = apply_filters('wp-lib-option/' . $parent . '/form-nested-content', $v, $route, $parent);
 
             echo '<li>' . $content . '</li>';
         }
@@ -1242,8 +1242,8 @@ class Option
         if (!self::$assets_loaded) {
             self::printSelect2Assets();
             echo '<script type="application/javascript">' . file_get_contents(
-                __DIR__ . '/assets/script.js'
-            ) . '</script>';
+                    __DIR__ . '/assets/script.js'
+                ) . '</script>';
         }
     }
 
