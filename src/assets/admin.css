@@ -108,7 +108,7 @@ ul.wp-lib-option-nested-fields > .label {
     padding: 8px;
     color: #23282d;
     border-bottom: solid 1px #ddd;
-    box-shadow: 0px 0px 3px #c7c7c7;
+    box-shadow: 0 0 3px #c7c7c7;
     margin: 0;
     cursor: pointer;
 }

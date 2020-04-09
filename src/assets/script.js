@@ -2,7 +2,7 @@
     document.addEventListener("DOMContentLoaded", function (event) {
         window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
     });
-    
+
     let lists = document.querySelectorAll('.wp-lib-option-nested-fields > .wp-lib-option-nested-fields');
     for (let i = 0; i < lists.length; i++) {
         let list = lists[i];
@@ -27,8 +27,8 @@
     }
 
     /**
-    * Normalize sections
-    * */
+     * Normalize sections
+     * */
     let sections = document.querySelectorAll('ul.wp-lib-option-nested-fields>li>.section');
     for (let i = 0; i < sections.length; i++) {
         let section = sections[i];
@@ -103,7 +103,7 @@
                         let $ = jQuery;
                         let value = '';
                         $(_field).parent().find("ul.select2-selection__rendered").children("li[title]").each(function (i, obj) {
-                            var element = $(_field).children('option').filter(function () {
+                            let element = $(_field).children('option').filter(function () {
                                 return $(this).html() === obj.title
                             });
                             window.diazoxide.wordpress.option.select2MoveElementToEndOfParent(element)
@@ -129,7 +129,7 @@
                                 $(_field).select2().on("select2:select", function (evt) {
                                     let id = evt.params.data.id;
 
-                                    let element = $(this).children("option[value=" + id + "]");
+                                    let element = $(this).children("option[value='" + id + "']");
 
                                     window.diazoxide.wordpress.option.select2MoveElementToEndOfParent(element);
 
@@ -139,10 +139,8 @@
                                 ele.sortable({
                                     containment: 'parent',
                                     update: function () {
-
                                         window.diazoxide.wordpress.option.select2OrderSortedValues(_field);
-                                        console.log("" + $(_field).val())
-
+                                        //console.log("" + $(_field).val())
                                     }
                                 });
                             }
