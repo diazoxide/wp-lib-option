@@ -48,7 +48,7 @@
                         button.setAttribute('last-key', last_key);
                         let c = button.parentElement.parentElement.querySelector(':scope>[new]').cloneNode(true);
                         c.removeAttribute('new');
-                        c.style.display = '';
+                        c.classList.remove('hidden');
                         c.classList.add('added');
                         let e = c.querySelectorAll('[name]');
 
