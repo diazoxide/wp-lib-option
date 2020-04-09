@@ -406,7 +406,8 @@ class Option
      */
     private static function group(string $content, array $attrs = []): string
     {
-        $html = self::tagOpen('div', ['class' => 'group'] + $attrs);
+        self::addHtmlClass($attrs['class'], 'group');
+        $html = self::tagOpen('div', $attrs);
         $html .= $content;
         $html .= self::tagClose('div');
 
@@ -758,7 +759,7 @@ class Option
 
                         ]
                     ),
-                    ['new' => 'true', 'style' => 'display:none']
+                    ['new' => 'true', 'class' => 'hidden']
                 );
 
                 $html .= self::addNewButton();
@@ -766,7 +767,9 @@ class Option
                 break;
             case self::TYPE_GROUP:
                 if (!empty($template)) {
-                    $html .= '';
+                    $template_description = $template_params['description'] ?? null;
+                    $template_attrs = $template_params['attrs'] ?? [];
+                    $template_attrs['minimised'] = 'false';
 
                     if ($method === self::METHOD_SINGLE) {
                         foreach ($template as $key => $_field) {
@@ -788,20 +791,20 @@ class Option
                                     $__html .= self::createField($_field);
                                 }
 
-                                $template_description = $template_params['description'] ?? null;
                                 if (is_callable($template_description)) {
                                     $template_description = $template_description($key, $_value);
                                 }
 
-                                $template_description = $template_description !== null ? sprintf(
-                                    '<div class="description">%s</div>',
-                                    $template_description
+                                $__html .= $template_description !== null ? self::tag(
+                                    'div',
+                                    $template_description,
+                                    ['class' => 'description']
                                 ) : '';
-                                $__html .= $template_description;
 
                                 $html .= self::group(
-                                    $__html . self::itemButtons(),
-                                    ['minimised' => 'false']
+                                //Todo: Handle group duplication and minimise
+                                    $__html . self::itemButtons(['remove']),
+                                    $template_attrs
                                 );
                             }
                         }
@@ -814,20 +817,21 @@ class Option
                             $__html .= self::createField($_field);
                         }
 
-                        $template_description = $template_params['description'] ?? null;
                         if (is_callable($template_description)) {
                             $template_description = $template_description(null, null);
                         }
 
-                        $template_description = $template_description !== null ? sprintf(
-                            '<div class="description">%s</div>',
-                            $template_description
+                        $__html .= $template_description !== null ? self::tag(
+                            'div',
+                            $template_description,
+                            ['class' => 'description']
                         ) : '';
-                        $__html .= $template_description;
 
+                        $template_attrs['new'] = 'true';
+                        $template_attrs['class'] = 'hidden';
                         $html .= self::group(
                             $__html . self::itemButtons(['remove']),
-                            ['new' => 'true', 'style' => 'display:none']
+                            $template_attrs
                         );
 
                         $html .= self::addNewButton($last_key);
@@ -941,7 +945,7 @@ class Option
                             ]
                         ) . self::itemButtons(['remove']),
                         [
-                            'style' => 'display:none',
+                            'class' => 'hidden',
                             'new' => 'true',
                             'onclick' => "var e=this.querySelector('input[name]'); e.disabled = false; e.focus()"
                         ]
