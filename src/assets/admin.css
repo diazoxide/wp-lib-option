@@ -1,3 +1,6 @@
+.wp-lib-option-wrap .hidden{
+    display: none !important;
+}
 .wp-lib-option-wrap {
     font-size: 16px;
     max-width: 900px;
@@ -141,12 +144,12 @@ ul.wp-lib-option-nested-fields .section > .group .group .buttons button {
     vertical-align: top;
 }
 
-ul.wp-lib-option-nested-fields .section > .group > .group > .buttons button.minimise:before {
+ul.wp-lib-option-nested-fields .section .group > .buttons button.minimise:before {
     content: "―";
     color: #fff;
 }
 
-ul.wp-lib-option-nested-fields .section > .group > .group[minimised=true] > .buttons button.minimise:before {
+ul.wp-lib-option-nested-fields .section .group[minimised=true] > .buttons button.minimise:before {
     content: "\20DE";
     color: #fff;
 }
