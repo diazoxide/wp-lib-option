@@ -290,12 +290,29 @@ class Option
      */
     private static function maybeBoolean($str)
     {
-        if ($str === '{{boolean_true}}') {
+        if ($str === '{{{boolean_true}}}') {
             return true;
         }
 
-        if ($str === '{{boolean_false}}') {
+        if ($str === '{{{boolean_false}}}') {
             return false;
+        }
+
+        return $str;
+    }
+
+    /**
+     * Check if form field is boolean and return
+     * Real boolean value
+     *
+     * @param $str
+     *
+     * @return bool|string
+     */
+    private static function maybeNull($str)
+    {
+        if ($str === '{{{null}}}') {
+            return null;
         }
 
         return $str;
@@ -645,13 +662,13 @@ class Option
             case self::TYPE_BOOL:
                 $html .= self::tagOpen(
                     'input',
-                    ['value' => '{{boolean_false}}', 'type' => 'hidden', 'name' => $name]
+                    ['value' => '{{{boolean_false}}}', 'type' => 'hidden', 'name' => $name]
                 );
 
                 $html .= self::tagOpen(
                     'input',
                     $input_attrs + [
-                        'value' => '{{boolean_true}}',
+                        'value' => '{{{boolean_true}}}',
                         'type' => 'checkbox',
                         'name' => $name,
                         'data' => $data,
@@ -842,11 +859,28 @@ class Option
                 if (!empty($values)) {
                     if ($markup === null || $markup === self::MARKUP_SELECT) {
                         self::addHtmlClass($input_attrs['class'], 'full');
+
+                        $_name = $name . ($method === self::METHOD_MULTIPLE ? '[]' : '');
+                        /**
+                         * Handle empty null select value
+                         * TODO: handle for all select cases
+                         * */
+                        $html .= self::tagOpen(
+                            'input',
+                            [
+                                'type' => 'hidden',
+                                'data' => $data,
+                                $disabled_str,
+                                'name' => $_name,
+                                'value' => '{{{null}}}'
+                            ]
+                        );
+
                         $html .= self::tagOpen(
                             'select',
                             $input_attrs + [
                                 'select2' => 'true',
-                                'name' => $name . ($method === self::METHOD_MULTIPLE ? '[]' : ''),
+                                'name' => $_name,
                                 $method === self::METHOD_MULTIPLE ? 'multiple' : '',
                                 'data' => $data,
                                 $disabled_str,
@@ -1062,6 +1096,7 @@ class Option
             } elseif (is_string($value)) {
                 $value = stripslashes($value);
                 $value = self::maybeBoolean($value);
+                $value = self::maybeNull($value);
             }
             $return[$key] = $value;
         }
