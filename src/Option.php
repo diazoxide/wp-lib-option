@@ -218,6 +218,7 @@ class Option
                 'main_params' => $this->getParam('main_params', false),
                 'name' => $this->getParam('name', false),
                 'value' => $this->getValue(),
+                'default' => $this->getParam('default', null),
                 'type' => $this->getParam('type', null),
 
                 'debug_data' => $this->getParam('debug_data', null),
@@ -313,6 +314,23 @@ class Option
     {
         if ($str === '{{{null}}}') {
             return null;
+        }
+
+        return $str;
+    }
+
+    /**
+     * Check if form field is array and return
+     * Real array value
+     *
+     * @param $str
+     *
+     * @return array|string
+     */
+    private static function maybeArray($str)
+    {
+        if ($str === '{{{array}}}') {
+            return [];
         }
 
         return $str;
@@ -860,7 +878,6 @@ class Option
                     if ($markup === null || $markup === self::MARKUP_SELECT) {
                         self::addHtmlClass($input_attrs['class'], 'full');
 
-                        $_name = $name . ($method === self::METHOD_MULTIPLE ? '[]' : '');
                         /**
                          * Handle empty null select value
                          * TODO: handle for all select cases
@@ -871,8 +888,8 @@ class Option
                                 'type' => 'hidden',
                                 'data' => $data,
                                 $disabled_str,
-                                'name' => $_name,
-                                'value' => '{{{null}}}'
+                                'name' => $name,
+                                'value' => $method === self::METHOD_MULTIPLE ? '{{{array}}}' : '{{{null}}}'
                             ]
                         );
 
@@ -880,7 +897,7 @@ class Option
                             'select',
                             $input_attrs + [
                                 'select2' => 'true',
-                                'name' => $_name,
+                                'name' => $name . ($method === self::METHOD_MULTIPLE ? '[]' : ''),
                                 $method === self::METHOD_MULTIPLE ? 'multiple' : '',
                                 'data' => $data,
                                 $disabled_str,
@@ -1096,6 +1113,7 @@ class Option
             } elseif (is_string($value)) {
                 $value = stripslashes($value);
                 $value = self::maybeBoolean($value);
+                $value = self::maybeArray($value);
                 $value = self::maybeNull($value);
             }
             $return[$key] = $value;
