@@ -1024,6 +1024,7 @@ class Option
      *
      * @param $array
      * @param null $parent
+     * @param string $route
      *
      * @return void
      */
