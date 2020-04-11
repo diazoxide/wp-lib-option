@@ -2,6 +2,8 @@
 
 namespace diazoxide\wp\lib\option;
 
+use diazoxide\helpers\HTML;
+
 class Option
 {
     public const TYPE_BOOL = 'bool';
@@ -337,101 +339,6 @@ class Option
     }
 
     /**
-     * Array to html attributes string
-     *
-     * @param $data
-     * @param string|null $parent
-     *
-     * @return string
-     */
-    private static function getAttrsString(array $data, ?string $parent = null): string
-    {
-        return implode(
-            ' ',
-            array_map(
-                static function ($k, $v) use ($parent) {
-                    if (is_string($v)) {
-                        $v = htmlspecialchars($v);
-                        if ($parent === null && is_int($k)) {
-                            return $v;
-                        }
-                        $k = ($parent ? $parent . '-' : '') . $k;
-
-                        return $k . '="' . $v . '"';
-                    }
-
-                    if (is_array($v)) {
-                        return self::getAttrsString($v, $k);
-                    }
-
-                    if (empty($v)) {
-                        $k = ($parent ? $parent . '-' : '') . $k;
-
-                        return $k . '=""';
-                    }
-
-                    $k = ($parent ? $parent . '-' : '') . $k;
-
-                    return $k . '="' . json_encode($v) . '"';
-                },
-                array_keys($data),
-                $data
-            )
-        );
-    }
-
-    /**
-     * Open HTML Tag
-     *
-     * @param string $tag
-     * @param array|null $attrs
-     *
-     * @return string
-     */
-    private static function tagOpen(string $tag, ?array $attrs = null): string
-    {
-        if ($attrs !== null) {
-            $attrs_str = self::getAttrsString($attrs);
-        }
-
-        return sprintf(
-            '<%s%s>',
-            $tag,
-            !empty($attrs_str) ? ' ' . $attrs_str : ''
-        );
-    }
-
-    /**
-     * Close HTML tag
-     *
-     * @param string $tag
-     *
-     * @return string
-     */
-    private static function tagClose(string $tag): string
-    {
-        return sprintf('</%s>', $tag);
-    }
-
-    /**
-     * Print HTML Tag
-     *
-     * @param string $tag
-     * @param string|null $content
-     * @param array|null $attrs
-     *
-     * @return string
-     */
-    private static function tag(string $tag, ?string $content = '', ?array $attrs = []): string
-    {
-        $html = self::tagOpen($tag, $attrs);
-        $html .= $content;
-        $html .= self::tagClose($tag);
-
-        return $html;
-    }
-
-    /**
      * Create group HTML tag
      *
      * @param string $content
@@ -441,10 +348,10 @@ class Option
      */
     private static function group(string $content, array $attrs = []): string
     {
-        self::addHtmlClass($attrs['class'], 'group');
-        $html = self::tagOpen('div', $attrs);
+        HTML::addClass($attrs['class'], 'group');
+        $html = HTML::tagOpen('div', $attrs);
         $html .= $content;
-        $html .= self::tagClose('div');
+        $html .= HTML::tagClose('div');
 
         return $html;
     }
@@ -453,12 +360,15 @@ class Option
      * Get form item buttons
      *
      * @param array|null $buttons
+     * @uses removeButton
+     * @uses minimiseButton
+     * @uses duplicateButton
      *
      * @return string
      */
     private static function itemButtons(?array $buttons = null): string
     {
-        $html = self::tagOpen('div', ['class' => 'buttons']);
+        $html = HTML::tagOpen('div', ['class' => 'buttons']);
 
         if ($buttons === null) {
             $buttons = ['duplicate', 'minimise', 'remove'];
@@ -468,7 +378,7 @@ class Option
             $html .= call_user_func([self::class, $fn_name]);
         }
 
-        $html .= self::tagClose('div');
+        $html .= HTML::tagClose('div');
 
         return $html;
     }
@@ -480,7 +390,7 @@ class Option
      */
     private static function removeButton(): string
     {
-        return self::tag(
+        return HTML::tag(
             'button',
             'X',
             [
@@ -499,7 +409,7 @@ class Option
      */
     private static function minimiseButton(): string
     {
-        return self::tag(
+        return HTML::tag(
             'button',
             '',
             [
@@ -518,7 +428,7 @@ class Option
      */
     private static function duplicateButton(): string
     {
-        return self::tag(
+        return HTML::tag(
             'button',
             '&#65291;',
             [
@@ -540,7 +450,7 @@ class Option
     private static function addNewButton(?int $last_key = 0): string
     {
         return self::group(
-            self::tag(
+            HTML::tag(
                 'button',
                 '+ Add new',
                 [
@@ -588,19 +498,6 @@ class Option
     }
 
     /**
-     * @param $attr
-     * @param $class
-     */
-    private static function addHtmlClass(&$attr, $class): void
-    {
-        $class = is_array($class) ? implode(' ', $class) : $class;
-        if (!empty($attr)) {
-            $attr .= ' ';
-        }
-        $attr .= $class;
-    }
-
-    /**
      * Create field markup static method
      *
      * @param array $params
@@ -623,14 +520,14 @@ class Option
          * */
         $label = $params['label'] ?? null;
         $label_params = $params['label_params'] ?? null;
-        self::addHtmlClass($label_params['class'], 'label');
+        HTML::addClass($label_params['class'], 'label');
 
         /**
          * Determine Description
          * */
         $description = $params['description'] ?? null;
         $description_params = $params['description_params'] ?? null;
-        self::addHtmlClass($description_params['class'], 'description');
+        HTML::addClass($description_params['class'], 'description');
 
         $type = $params['type'] ?? null;
         $method = $params['method'] ?? null;
@@ -650,7 +547,7 @@ class Option
 
 
         $input_attrs = $params['input_attrs'] ?? [];
-        self::addHtmlClass($input_attrs['class'], [$type, $method]);
+        HTML::addClass($input_attrs['class'], [$type, $method]);
 
 
         if ($parent !== null) {
@@ -678,12 +575,12 @@ class Option
 
         switch ($type) {
             case self::TYPE_BOOL:
-                $html .= self::tagOpen(
+                $html .= HTML::tagOpen(
                     'input',
                     ['value' => '{{{boolean_false}}}', 'type' => 'hidden', 'name' => $name]
                 );
 
-                $html .= self::tagOpen(
+                $html .= HTML::tagOpen(
                     'input',
                     $input_attrs + [
                         'value' => '{{{boolean_true}}}',
@@ -714,7 +611,7 @@ class Option
                             implode(
                                 '',
                                 [
-                                    self::tagOpen(
+                                    HTML::tagOpen(
                                         'input',
                                         [
                                             'class' => 'key full',
@@ -743,7 +640,7 @@ class Option
                                     '',
                                     [
 
-                                        self::tagOpen(
+                                        HTML::tagOpen(
                                             'input',
                                             [
                                                 'class' => 'key full',
@@ -780,7 +677,7 @@ class Option
                     implode(
                         '',
                         [
-                            self::tagOpen(
+                            HTML::tagOpen(
                                 'input',
                                 [
                                     'class' => 'key full',
@@ -830,7 +727,7 @@ class Option
                                     $template_description = $template_description($key, $_value);
                                 }
 
-                                $__html .= $template_description !== null ? self::tag(
+                                $__html .= $template_description !== null ? HTML::tag(
                                     'div',
                                     $template_description,
                                     ['class' => 'description']
@@ -856,7 +753,7 @@ class Option
                             $template_description = $template_description(null, null);
                         }
 
-                        $__html .= $template_description !== null ? self::tag(
+                        $__html .= $template_description !== null ? HTML::tag(
                             'div',
                             $template_description,
                             ['class' => 'description']
@@ -876,13 +773,13 @@ class Option
             default:
                 if (!empty($values)) {
                     if ($markup === null || $markup === self::MARKUP_SELECT) {
-                        self::addHtmlClass($input_attrs['class'], 'full');
+                        HTML::addClass($input_attrs['class'], 'full');
 
                         /**
                          * Handle empty null select value
                          * TODO: handle for all select cases
                          * */
-                        $html .= self::tagOpen(
+                        $html .= HTML::tagOpen(
                             'input',
                             [
                                 'type' => 'hidden',
@@ -893,7 +790,7 @@ class Option
                             ]
                         );
 
-                        $html .= self::tagOpen(
+                        $html .= HTML::tagOpen(
                             'select',
                             $input_attrs + [
                                 'select2' => 'true',
@@ -912,7 +809,7 @@ class Option
 
                     foreach ($values as $key => $_value) {
                         if ($markup === null || $markup === self::MARKUP_SELECT) {
-                            $html .= self::tag(
+                            $html .= HTML::tag(
                                 'option',
                                 $_value,
                                 [
@@ -923,9 +820,9 @@ class Option
                         } elseif ($markup === self::MARKUP_CHECKBOX) {
                             if ($method === self::METHOD_MULTIPLE) {
                                 $html .= self::group(
-                                    self::tag(
+                                    HTML::tag(
                                         'label',
-                                        self::tagOpen(
+                                        HTML::tagOpen(
                                             'input',
                                             [
                                                 'type' => 'checkbox',
@@ -941,9 +838,9 @@ class Option
                                 );
                             } else {
                                 $html .= self::group(
-                                    self::tag(
+                                    HTML::tag(
                                         'label',
-                                        self::tagOpen(
+                                        HTML::tagOpen(
                                             'input',
                                             [
                                                 'type' => 'radio',
@@ -962,15 +859,15 @@ class Option
                     }
 
                     if (isset($open_tag_select)) {
-                        $html .= self::tagClose('select');
+                        $html .= HTML::tagClose('select');
                     }
                 } elseif ($method === self::METHOD_MULTIPLE) {
-                    self::addHtmlClass($input_attrs['class'], 'full');
+                    HTML::addClass($input_attrs['class'], 'full');
                     if (is_array($value)) {
                         foreach ($value as $key => $_value) {
                             if (!empty($_value)) {
                                 $html .= self::group(
-                                    self::tagOpen(
+                                    HTML::tagOpen(
                                         'input',
                                         $input_attrs + [
                                             'name' => $name . '[]',
@@ -986,7 +883,7 @@ class Option
                         }
                     }
                     $html .= self::group(
-                        self::tagOpen(
+                        HTML::tagOpen(
                             'input',
                             $input_attrs + [
                                 'name' => $name . '[]',
@@ -1005,7 +902,7 @@ class Option
                     $html .= self::addNewButton();
                 } elseif ($method !== self::METHOD_MULTIPLE) {
                     if (in_array($markup, [self::MARKUP_TEXT, self::MARKUP_NUMBER], true)) {
-                        $html .= self::tagOpen(
+                        $html .= HTML::tagOpen(
                             'input',
                             [
                                 'class' => 'full',
@@ -1019,7 +916,7 @@ class Option
                             ]
                         );
                     } elseif ($markup === self::MARKUP_TEXTAREA) {
-                        $html .= self::tagOpen(
+                        $html .= HTML::tagOpen(
                             'textarea',
                             [
                                 'class' => 'full',
@@ -1032,7 +929,7 @@ class Option
                             ]
                         );
                         $html .= $value;
-                        $html .= self::tagClose('textarea');
+                        $html .= HTML::tagClose('textarea');
                     }
                 } else {
                     $html .= self::group('Not handled!');
@@ -1042,14 +939,14 @@ class Option
 
         $main_params['class'] = $main_params['class'] ?? 'group';
 
-        $html = self::tag('div', $html, $main_params);
+        $html = HTML::tag('div', $html, $main_params);
 
         if (!empty($label)) {
-            $html = self::tag('div', $label, $label_params) . $html;
+            $html = HTML::tag('div', $label, $label_params) . $html;
         }
 
         if (!empty($description)) {
-            $html .= self::tag('div', $description, $description_params);
+            $html .= HTML::tag('div', $description, $description_params);
         }
 
         return $html;
