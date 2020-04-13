@@ -1,6 +1,7 @@
 (function () {
 
-    document.addEventListener("DOMContentLoaded", function (event) {
+    document.addEventListener("DOMContentLoaded", function () {
+
         window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
 
         let hash = decodeURI(window.location.hash.substr(1));
@@ -20,10 +21,7 @@
                 }
             }
         }
-
-
     });
-
 
     /**
      * Normalize sections
@@ -168,7 +166,7 @@
 
                                     $(this).trigger("change");
                                 });
-                                var ele = $(_field).parent().find("ul.select2-selection__rendered");
+                                let ele = $(_field).parent().find("ul.select2-selection__rendered");
                                 ele.sortable({
                                     containment: 'parent',
                                     update: function () {
