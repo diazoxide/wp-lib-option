@@ -1,7 +1,6 @@
 (function () {
 
     document.addEventListener("DOMContentLoaded", function (event) {
-        
         window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
 
         let hash = decodeURI(window.location.hash.substr(1));
@@ -16,9 +15,13 @@
              * */
             let fields = document.querySelectorAll('ul.wp-lib-option-nested-fields>li.label:first-child');
             for (let i = 0; i < fields.length; i++) {
-                window.diazoxide.wordpress.option.expandLabel(fields[i], false);
+                if(fields[i].offsetParent !== null) {
+                    window.diazoxide.wordpress.option.expandLabel(fields[i], false);
+                }
             }
         }
+
+
     });
 
 
