@@ -712,7 +712,8 @@ class Option
                     } elseif ($method === self::METHOD_MULTIPLE) {
                         $last_key = 1;
                         if ($value !== null) {
-                            $last_key = count($value) + 1;
+                            $value = array_values($value);
+                            $last_key = count($value) - 1;
                             foreach ($value as $key => $_value) {
                                 $__html = '';
 
