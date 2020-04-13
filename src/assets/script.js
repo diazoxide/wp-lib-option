@@ -1,15 +1,7 @@
 (function () {
 
     document.addEventListener("DOMContentLoaded", function (event) {
-        let lists = document.querySelectorAll('.wp-lib-option-nested-fields > .wp-lib-option-nested-fields');
-        for (let i = 0; i < lists.length; i++) {
-            let list = lists[i];
-            let label = list.previousSibling;
-            label.addEventListener("click", function () {
-                window.diazoxide.wordpress.option.expandLabel(this, true);
-            });
-        }
-
+        
         window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
 
         let hash = decodeURI(window.location.hash.substr(1));
@@ -27,8 +19,6 @@
                 window.diazoxide.wordpress.option.expandLabel(fields[i], false);
             }
         }
-
-
     });
 
 
@@ -53,25 +43,34 @@
                         window.location.href = "#" + h;
                     },
                     expandLabel: function (label, jump = true) {
+                        let parentLabel = label.parentElement.previousSibling;
+                        let route = '';
                         if (label.nextSibling.offsetParent === null) {
                             label.nextSibling.classList.add('open');
                             label.classList.add('open');
+                            route = label.getAttribute('route');
                             if (
-                                label.parentElement.previousSibling !== null &&
-                                label.parentElement.previousSibling.nodeType === 1 &&
-                                label.parentElement.previousSibling.classList.contains('label') &&
-                                !label.parentElement.previousSibling.classList.contains('open')
+                                parentLabel !== null &&
+                                parentLabel.nodeType === 1 &&
+                                parentLabel.classList.contains('label') &&
+                                !parentLabel.classList.contains('open')
                             ) {
-                                label.parentElement.previousSibling.click();
-                            }
-
-                            let route = label.getAttribute('route');
-                            if (jump) {
-                                window.diazoxide.wordpress.option.jump(route);
+                                parentLabel.click();
                             }
                         } else {
                             label.nextSibling.classList.remove('open');
                             label.classList.remove('open');
+
+                            if (
+                                parentLabel !== null &&
+                                parentLabel.nodeType === 1 &&
+                                parentLabel.classList.contains('label')
+                            ) {
+                                route = parentLabel.getAttribute('route');
+                            }
+                        }
+                        if (jump) {
+                            this.jump(route);
                         }
                     },
                     addNew: function (button) {
