@@ -33,7 +33,6 @@
         section.parentNode.parentNode.previousSibling.style.display = "none";
     }
 
-
     if (!window.hasOwnProperty('diazoxide')) {
         window.diazoxide = {};
         if (!window.diazoxide.hasOwnProperty('wordpress')) {
@@ -132,7 +131,6 @@
                             return;
                         }
                         let $ = window.jQuery;
-                        let value = '';
                         $(_field).parent().find("ul.select2-selection__rendered").children("li[title]").each(function (i, obj) {
                             let element = $(_field).children('option').filter(function () {
                                 return $(this).html() === obj.title
