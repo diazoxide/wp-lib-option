@@ -1,30 +1,36 @@
 (function () {
+
     document.addEventListener("DOMContentLoaded", function (event) {
+        let lists = document.querySelectorAll('.wp-lib-option-nested-fields > .wp-lib-option-nested-fields');
+        for (let i = 0; i < lists.length; i++) {
+            let list = lists[i];
+            let label = list.previousSibling;
+            label.addEventListener("click", function () {
+                window.diazoxide.wordpress.option.expandLabel(this, true);
+            });
+        }
+
         window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
+
+        let hash = decodeURI(window.location.hash.substr(1));
+        if (hash) {
+            let element = document.querySelector("[route='" + hash + "']");
+            if (element !== null) {
+                element.click();
+            }
+        } else {
+            /**
+             * Expand all first fields
+             * */
+            let fields = document.querySelectorAll('ul.wp-lib-option-nested-fields>li.label:first-child');
+            for (let i = 0; i < fields.length; i++) {
+                window.diazoxide.wordpress.option.expandLabel(fields[i], false);
+            }
+        }
+
+
     });
 
-    let lists = document.querySelectorAll('.wp-lib-option-nested-fields > .wp-lib-option-nested-fields');
-    for (let i = 0; i < lists.length; i++) {
-        let list = lists[i];
-        let label = list.previousSibling;
-        label.addEventListener("click", function () {
-            if (this.nextSibling.offsetParent === null) {
-                this.nextSibling.classList.add('open');
-                this.classList.add('open');
-            } else {
-                this.nextSibling.classList.remove('open');
-                this.classList.remove('open');
-            }
-        });
-    }
-
-    /**
-     * Expand all first fields
-     * */
-    let fields = document.querySelectorAll('ul.wp-lib-option-nested-fields>li.label:first-child');
-    for (let i = 0; i < fields.length; i++) {
-        fields[i].click();
-    }
 
     /**
      * Normalize sections
@@ -39,10 +45,35 @@
 
     if (!window.hasOwnProperty('diazoxide')) {
         window.diazoxide = {};
-        if (!window.diazoxide.hasOwnProperty()) {
+        if (!window.diazoxide.hasOwnProperty('wordpress')) {
             window.diazoxide.wordpress = {};
             if (!window.diazoxide.wordpress.hasOwnProperty('option')) {
                 window.diazoxide.wordpress.option = {
+                    jump: function (h) {
+                        window.location.href = "#" + h;
+                    },
+                    expandLabel: function (label, jump = true) {
+                        if (label.nextSibling.offsetParent === null) {
+                            label.nextSibling.classList.add('open');
+                            label.classList.add('open');
+                            if (
+                                label.parentElement.previousSibling !== null &&
+                                label.parentElement.previousSibling.nodeType === 1 &&
+                                label.parentElement.previousSibling.classList.contains('label') &&
+                                !label.parentElement.previousSibling.classList.contains('open')
+                            ) {
+                                label.parentElement.previousSibling.click();
+                            }
+
+                            let route = label.getAttribute('route');
+                            if (jump) {
+                                window.diazoxide.wordpress.option.jump(route);
+                            }
+                        } else {
+                            label.nextSibling.classList.remove('open');
+                            label.classList.remove('open');
+                        }
+                    },
                     addNew: function (button) {
                         let last_key = parseInt(button.getAttribute('last-key')) + 1;
                         button.setAttribute('last-key', last_key);
@@ -100,7 +131,7 @@
                         if (!window.hasOwnProperty('jQuery')) {
                             return;
                         }
-                        let $ = jQuery;
+                        let $ = window.jQuery;
                         let value = '';
                         $(_field).parent().find("ul.select2-selection__rendered").children("li[title]").each(function (i, obj) {
                             let element = $(_field).children('option').filter(function () {
@@ -111,7 +142,7 @@
                     },
 
                     select2MoveElementToEndOfParent: function (element) {
-                        var parent = element.parent();
+                        let parent = element.parent();
                         element.detach();
                         parent.append(element);
                     },
@@ -120,7 +151,7 @@
                         if (!window.hasOwnProperty('jQuery')) {
                             return;
                         }
-                        var $ = jQuery;
+                        let $ = window.jQuery;
 
                         $(item).find('select[select2=true]').each(function () {
                             if ($(this).parents('[new=true]').length === 0) {
