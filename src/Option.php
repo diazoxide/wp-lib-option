@@ -4,22 +4,13 @@ namespace diazoxide\wp\lib\option;
 
 use diazoxide\helpers\HTML;
 
-class Option
+/**
+ * Class Option
+ *
+ * @author Aaron Yordanyan
+ * */
+class Option implements interfaces\Option
 {
-    public const TYPE_BOOL = 'bool';
-    public const TYPE_TEXT = 'text';
-    public const TYPE_OBJECT = 'object';
-    public const TYPE_GROUP = 'group';
-
-    public const MARKUP_CHECKBOX = 'checkbox';
-    public const MARKUP_TEXT = 'text';
-    public const MARKUP_TEXTAREA = 'textarea';
-    public const MARKUP_NUMBER = 'number';
-    public const MARKUP_SELECT = 'select';
-
-    public const METHOD_SINGLE = 'single';
-    public const METHOD_MULTIPLE = 'multiple';
-
     /**
      * Option Params
      *
@@ -51,7 +42,7 @@ class Option
     /**
      * Get Option value
      *
-     * @return array|mixed|void
+     * @return mixed
      */
     public function getValue()
     {
@@ -65,12 +56,12 @@ class Option
     /**
      * Generate option name by option name and parent name
      *
-     * @param $option
-     * @param null $parent
+     * @param string $option
+     * @param string|null $parent
      *
      * @return string
      */
-    public static function getOptionName($option, $parent = null): string
+    public static function getOptionName(string $option, ?string $parent = null): string
     {
         if ($parent !== null) {
             $option = $parent . '_' . $option;
@@ -86,7 +77,7 @@ class Option
      * @param null $parent
      * @param null $default
      *
-     * @return array|mixed|void
+     * @return mixed
      */
     public static function getOption(string $option, $parent = null, $default = null)
     {
@@ -110,7 +101,7 @@ class Option
      * @param $parent
      * @return string
      */
-    public static function getOptionFilterName($option, $parent): string
+    public static function getOptionFilterName(string $option, ?string $parent = null): string
     {
         $name = self::getOptionName($option, $parent);
 
@@ -120,13 +111,12 @@ class Option
     /**
      * If option declared by constant
      *
-     * @param $option
-     *
-     * @param null $parent
+     * @param string $option
+     * @param string|null $parent
      *
      * @return bool
      */
-    public static function isOptionConstant($option, $parent = null): bool
+    public static function isOptionConstant(string $option, ?string $parent = null): bool
     {
         return defined(self::getOptionName($option, $parent));
     }
@@ -134,13 +124,13 @@ class Option
     /**
      * Set single option
      *
-     * @param $option
-     * @param null $parent
+     * @param string $option
+     * @param string|null $parent
      * @param $value
      *
      * @return bool
      */
-    public static function setOption($option, $parent = null, $value = null): bool
+    public static function setOption(string $option, ?string $parent = null, $value = null): bool
     {
         $option = self::getOptionName($option, $parent);
 
@@ -174,7 +164,6 @@ class Option
      * @see getParams
      * @see setParams
      * @see setParam
-     *
      */
     public function getParam($param, $default = null)
     {
@@ -211,7 +200,6 @@ class Option
      *
      * @return string
      * @uses createField
-     *
      */
     public function getField(): string
     {
@@ -222,29 +210,26 @@ class Option
                 'value' => $this->getValue(),
                 'default' => $this->getParam('default', null),
                 'type' => $this->getParam('type', null),
-
                 'debug_data' => $this->getParam('debug_data', null),
-
                 /**
                  * Label
                  * */
                 'label' => $this->getParam('label', $this->getParam('name', null)),
                 'label_params' => $this->getParam('label_params', null),
-
                 /**
                  * Description
                  * */
                 'description' => $this->getParam('description', null),
                 'description_params' => $this->getParam('description_params', null),
-
+                /**
+                 *
+                 * */
                 'parent' => $this->getParam('parent', null),
                 'method' => $this->getParam('method', null),
                 'values' => $this->getParam('values', []),
                 'markup' => $this->getParam('markup', null),
-
                 'template' => $this->getParam('template', null),
                 'template_params' => $this->getParam('template_params', null),
-
                 'field' => $this->getParam('field', null),
                 'data' => $this->getParam('data', null),
                 'disabled' => $this->getParam('disabled', false),
@@ -276,7 +261,6 @@ class Option
     {
         if (strpos($str, '{{encode_key}}') === 0) {
             $str = preg_replace('/^{{encode_key}}/', '', $str);
-
             return base64_decode($str);
         }
 
@@ -360,11 +344,11 @@ class Option
      * Get form item buttons
      *
      * @param array|null $buttons
-     * @uses removeButton
+     * @return string
      * @uses minimiseButton
      * @uses duplicateButton
      *
-     * @return string
+     * @uses removeButton
      */
     private static function itemButtons(?array $buttons = null): string
     {
@@ -1047,7 +1031,11 @@ class Option
                 $label = apply_filters('wp-lib-option/' . $parent . '/form-nested-label', $k, $route, $parent);
                 $label = str_replace('_', ' ', ucfirst($label));
 
-                echo sprintf('<li route="%s" onclick="window.diazoxide.wordpress.option.expandLabel(this, true)" class="label">%s</li>', $_route, $label);
+                echo sprintf(
+                    '<li route="%s" onclick="window.diazoxide.wordpress.option.expandLabel(this, true)" class="label">%s</li>',
+                    $_route,
+                    $label
+                );
                 self::printArrayList($v, $parent, $_route);
                 continue;
             }
