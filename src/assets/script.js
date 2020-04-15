@@ -16,8 +16,8 @@
              * */
             let fields = document.querySelectorAll('ul.wp-lib-option-nested-fields>li.label:first-child');
             for (let i = 0; i < fields.length; i++) {
-                if(fields[i].offsetParent !== null) {
-                    window.diazoxide.wordpress.option.expandLabel(fields[i], false);
+                if (fields[i].offsetParent !== null) {
+                    window.diazoxide.wordpress.option.toggleLabel(fields[i], false);
                 }
             }
         }
@@ -39,10 +39,55 @@
             window.diazoxide.wordpress = {};
             if (!window.diazoxide.wordpress.hasOwnProperty('option')) {
                 window.diazoxide.wordpress.option = {
+                    formSubmit: function (form) {
+                        let _this = this;
+                        if (form.dataset.ajax_submit === 'true') {
+
+                            let data = new FormData(form);
+                            let xhr = new XMLHttpRequest();
+                            xhr.onload = function (data) {
+                                _this.formSetStatus(form, 'saved');
+                            };
+
+                            xhr.open("POST", window.location.href);
+
+                            _this.formSetStatus(form, 'saving');
+
+                            xhr.send(data);
+                            return false;
+                        }
+                        form.submit();
+                        return false;
+                    },
+                    formChange: function (form) {
+                        if (form.dataset.auto_submit === 'true') {
+                            this.formSetStatus(form, 'saving');
+                            this.formSubmit(form);
+                        } else {
+                            this.formSetStatus(form, 'unsaved');
+                        }
+                    },
+                    formSetStatus(form, status) {
+                        form.dataset.status = status;
+                        let form_status = form.querySelector('.form-status');
+                        if (form_status !== null) {
+                            let statuses = form_status.querySelectorAll('span');
+
+                            for (let i = 0; i < statuses.length; i++) {
+                                statuses[i].classList.add('hidden');
+                            }
+
+                            status = form_status.querySelector('.' + status);
+
+                            if (status !== null) {
+                                status.classList.remove('hidden');
+                            }
+                        }
+                    },
                     jump: function (h) {
                         window.location.href = "#" + h;
                     },
-                    expandLabel: function (label, jump = true) {
+                    toggleLabel: function (label, jump = true) {
                         let parentLabel = label.parentElement.previousSibling;
                         let route = '';
                         if (label.nextSibling.offsetParent === null) {
@@ -74,6 +119,8 @@
                         }
                     },
                     addNew: function (button) {
+                        let form = button.closest('form');
+
                         let last_key = parseInt(button.getAttribute('last-key')) + 1;
                         button.setAttribute('last-key', last_key);
                         let c = button.parentElement.parentElement.querySelector(':scope>[new]').cloneNode(true);
@@ -88,6 +135,8 @@
                         }
                         button.parentElement.parentElement.insertBefore(c, button.parentElement);
 
+                        form.onchange();
+
                         setTimeout(function () {
                             c.classList.remove('added');
                         }, 1000);
@@ -97,10 +146,25 @@
                     afterItemInsert: function (item) {
                         this.select2Init(item);
                     },
-
+                    collapseAll: function (button) {
+                        let labels = button.closest('form').querySelectorAll('ul.wp-lib-option-nested-fields > .label.open');
+                        for (let i = 0; i < labels.length; i++) {
+                            this.toggleLabel(labels[i],false);
+                        }
+                    },
+                    expandAll: function (button) {
+                        let labels = button.closest('form').querySelectorAll('ul.wp-lib-option-nested-fields > .label:not(.open)');
+                        for (let i = 0; i < labels.length; i++) {
+                            this.toggleLabel(labels[i],false);
+                        }
+                    },
                     removeItem: function (button) {
                         if (confirm("Are you sure?")) {
+                            let form = button.closest('form');
                             button.parentElement.parentElement.remove();
+                            if (form !== null) {
+                                form.onchange();
+                            }
                         }
                     },
                     duplicateItem: function (button) {
