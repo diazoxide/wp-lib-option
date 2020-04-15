@@ -1,9 +1,63 @@
-.wp-lib-option-wrap .hidden{
+.wp-lib-option-wrap .hidden {
     display: none !important;
 }
+
 .wp-lib-option-wrap {
     font-size: 16px;
     max-width: 900px;
+}
+
+.wp-lib-option-wrap > form {
+    margin-top: 20px;
+}
+.wp-lib-option-wrap > form .form-head{
+    z-index: 2;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    text-align:right;
+
+}
+
+body.admin-bar .wp-lib-option-wrap > form .form-head {
+    top: 32px;
+    padding: 10px 0;
+}
+
+.wp-lib-option-wrap > form > .form-head > .form-status {
+    box-sizing: border-box;
+    padding: 0;
+}
+
+.wp-lib-option-wrap > form >.form-head > .form-status span {
+    padding: 8px 0;
+    display: inline-block;
+    background: #d0d0d0;
+    font-weight: bold;
+    margin-left: 30px;
+    width: 200px;
+    max-width: 100%;
+    text-align: center;
+}
+
+.wp-lib-option-wrap > form > .form-head > .form-status .saved {
+    background: #008a00;
+    color: #f2fff2;
+}
+
+.wp-lib-option-wrap > form >.form-head> .form-status .saving {
+    background: #007cba;
+    color: #ecf9ff
+}
+
+.wp-lib-option-wrap > form .form-head > div {
+    display:inline-block;
+    vertical-align: middle;
+}
+
+.wp-lib-option-wrap > form .form-head >.form-status .unsaved {
+    background: #dc3232;
+    color: #ffe6e6;
 }
 
 .wp-lib-option-wrap .select2-container {
@@ -29,6 +83,7 @@ ul.wp-lib-option-nested-fields > ul.wp-lib-option-nested-fields {
 ul.wp-lib-option-nested-fields {
     background: #00000008;
     font-size: 0.95em;
+    margin-top: 0;
 }
 
 ul.wp-lib-option-nested-fields .section > .group > .group:hover {
@@ -44,6 +99,14 @@ ul.wp-lib-option-nested-fields > .label.open {
     background: #007cba;
     color: #fff;
     font-weight: bolder;
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 1;
+}
+
+body.admin-bar ul.wp-lib-option-nested-fields > .label.open {
+    top: 32px;
 }
 
 ul.wp-lib-option-nested-fields > ul.wp-lib-option-nested-fields.open {
