@@ -1195,24 +1195,6 @@ class Option implements interfaces\Option
                 ],
                 ['class' => 'form-head']
             );
-            //
-            //            echo HTML::tag(
-            //                'div',
-            //                [
-            //                    ['span', 'Saving...', ['class' => 'saving hidden']],
-            //                    ['span', 'Saved', ['class' => 'saved hidden']],
-            //                    ['span', 'Failed', ['class' => 'failed hidden']],
-            //                    ['span', 'Unsaved', ['class' => 'unsaved hidden']],
-            //                ],
-            //                ['class' => 'form-status']
-            //            );
-            //            echo HTML::tag(
-            //                'div',
-            //                [
-            //                    ['a', 'Expand all', ['class' => 'button button-primary expand']],
-            //                ],
-            //                ['class' => 'form-actions']
-            //            );
             ?>
 
             <!--<div class="form-actions">
