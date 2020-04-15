@@ -87,7 +87,7 @@
                     jump: function (h) {
                         window.location.href = "#" + h;
                     },
-                    toggleLabel: function (label, jump = true) {
+                    toggleLabel: function (label, jump = true, toggle_parent = false) {
                         let parentLabel = label.parentElement.previousSibling;
                         let route = '';
                         if (label.nextSibling.offsetParent === null) {
@@ -95,12 +95,13 @@
                             label.classList.add('open');
                             route = label.getAttribute('route');
                             if (
+                                toggle_parent &&
                                 parentLabel !== null &&
                                 parentLabel.nodeType === 1 &&
                                 parentLabel.classList.contains('label') &&
                                 !parentLabel.classList.contains('open')
                             ) {
-                                parentLabel.click();
+                                this.toggleLabel(parentLabel, jump, toggle_parent);
                             }
                         } else {
                             label.nextSibling.classList.remove('open');
@@ -149,13 +150,13 @@
                     collapseAll: function (button) {
                         let labels = button.closest('form').querySelectorAll('ul.wp-lib-option-nested-fields > .label.open');
                         for (let i = 0; i < labels.length; i++) {
-                            this.toggleLabel(labels[i],false);
+                            this.toggleLabel(labels[i],false,false);
                         }
                     },
                     expandAll: function (button) {
                         let labels = button.closest('form').querySelectorAll('ul.wp-lib-option-nested-fields > .label:not(.open)');
                         for (let i = 0; i < labels.length; i++) {
-                            this.toggleLabel(labels[i],false);
+                            this.toggleLabel(labels[i],false,false);
                         }
                     },
                     removeItem: function (button) {
