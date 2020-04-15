@@ -563,6 +563,20 @@ class Option implements interfaces\Option
             $html .= '<!--' . var_export($debug_data, true) . '-->';
         }
 
+        /**
+         * Fix empty values issue
+         * */
+        $html .= HTML::tagOpen(
+            'input',
+            [
+                'type' => 'hidden',
+                'data' => $data,
+                $disabled_str,
+                'name' => $name,
+                'value' => $method === self::METHOD_MULTIPLE ? '{{{array}}}' : '{{{null}}}'
+            ]
+        );
+
         switch ($type) {
             case self::TYPE_BOOL:
                 $html .= HTML::tagOpen(
@@ -766,21 +780,6 @@ class Option implements interfaces\Option
                 if (!empty($values)) {
                     if ($markup === null || $markup === self::MARKUP_SELECT) {
                         HTML::addClass($input_attrs['class'], 'full');
-
-                        /**
-                         * Handle empty null select value
-                         * TODO: handle for all select cases
-                         * */
-                        $html .= HTML::tagOpen(
-                            'input',
-                            [
-                                'type' => 'hidden',
-                                'data' => $data,
-                                $disabled_str,
-                                'name' => $name,
-                                'value' => $method === self::METHOD_MULTIPLE ? '{{{array}}}' : '{{{null}}}'
-                            ]
-                        );
 
                         $html .= HTML::tagOpen(
                             'select',
