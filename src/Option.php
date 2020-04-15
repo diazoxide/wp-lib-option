@@ -235,6 +235,7 @@ class Option implements interfaces\Option
                 'data' => $this->getParam('data', null),
                 'disabled' => $this->getParam('disabled', false),
                 'readonly' => $this->getParam('readonly', false),
+                'required' => $this->getParam('required', false),
             ]
         );
     }
@@ -541,6 +542,10 @@ class Option implements interfaces\Option
 
         $disabled = $params['disabled'] ?? false;
         $disabled_str = $disabled ? 'disabled' : '';
+
+        $required = $params['required'] ?? false;
+        $required_str = $required ? 'required' : '';
+
         $readonly = $params['readonly'] ?? false;
         $readonly_str = $readonly ? 'readonly' : '';
 
@@ -574,7 +579,8 @@ class Option implements interfaces\Option
                         'data' => $data,
                         $value ? 'checked' : '',
                         $readonly_str,
-                        $disabled_str
+                        $disabled_str,
+                        $required_str
                     ]
                 );
                 break;
@@ -784,7 +790,8 @@ class Option implements interfaces\Option
                                 $method === self::METHOD_MULTIPLE ? 'multiple' : '',
                                 'data' => $data,
                                 $disabled_str,
-                                $readonly_str
+                                $readonly_str,
+                                $required_str
                             ]
                         );
                         $open_tag_select = true;
@@ -818,6 +825,7 @@ class Option implements interfaces\Option
                                                 (($key === $value) || in_array($key, $value, true)) ? 'checked' : '',
                                                 $disabled_str,
                                                 $readonly_str,
+                                                $required_str
                                             ]
                                         ) . $_value
                                     )
@@ -836,6 +844,7 @@ class Option implements interfaces\Option
                                                 'data' => $data,
                                                 $disabled_str,
                                                 $readonly_str,
+                                                $required_str
                                             ]
                                         ) . $_value
                                     )
@@ -862,6 +871,7 @@ class Option implements interfaces\Option
                                             'value' => $_value,
                                             $disabled_str,
                                             $readonly_str,
+                                            $required_str
                                         ]
                                     ) . self::itemButtons(['duplicate', 'remove'])
                                 );
@@ -898,7 +908,8 @@ class Option implements interfaces\Option
                                 'value' => $value,
                                 'data' => $data,
                                 $disabled_str,
-                                $readonly_str
+                                $readonly_str,
+                                $required_str
                             ]
                         );
                     } elseif ($markup === self::MARKUP_TEXTAREA) {
@@ -911,7 +922,8 @@ class Option implements interfaces\Option
                                 'name' => $name,
                                 'data' => $data,
                                 $disabled_str,
-                                $readonly_str
+                                $readonly_str,
+                                $required_str
                             ]
                         );
                         $html .= $value;
