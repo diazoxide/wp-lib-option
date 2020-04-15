@@ -1138,75 +1138,72 @@ class Option implements interfaces\Option
 
         self::printStyle();
 
-        ?>
-        <div class="wrap wp-lib-option-wrap <?php echo $parent; ?>-wrap">
-            <h2><?php echo $title; ?></h2>
-            <?php echo HTML::tagOpen(
-                'form',
-                [
-                    'method' => 'post',
-                    'action' => '',
-                    'onsubmit' => 'return window.diazoxide.wordpress.option.formSubmit(this)',
-                    'onchange' => 'return window.diazoxide.wordpress.option.formChange(this)',
-                    'data' => [
-                        'ajax_submit' => $params['ajax_submit'] ?? true,
-                        'auto_submit' => $params['auto_submit'] ?? false
-                    ]
+        echo HTML::tagOpen('div', ['class' => 'wrap wp-lib-option-wrap ' . $parent . '-wrap']);
+
+        echo HTML::tag('h2', $title);
+
+        echo HTML::tagOpen(
+            'form',
+            [
+                'method' => 'post',
+                'action' => '',
+                'onsubmit' => 'return window.diazoxide.wordpress.option.formSubmit(this)',
+                'onchange' => 'return window.diazoxide.wordpress.option.formChange(this)',
+                'data' => [
+                    'ajax_submit' => $params['ajax_submit'] ?? true,
+                    'auto_submit' => $params['auto_submit'] ?? false
                 ]
-            ); ?>
+            ]
+        );
 
-
-            <?php
-            echo HTML::tag(
-                'div',
+        echo HTML::tag(
+            'div',
+            [
                 [
+                    'div',
                     [
-                        'div',
                         [
+                            'a',
+                            '&#8853; Expand all',
                             [
-                                'a',
-                                '&#8853; Expand all',
-                                [
-                                    'onclick' => 'window.diazoxide.wordpress.option.expandAll(this)',
-                                    'class' => 'button button-default expand'
-                                ]
-                            ],
-                            [
-                                'a',
-                                '&#8854; Collapse all',
-                                [
-                                    'onclick' => 'window.diazoxide.wordpress.option.collapseAll(this)',
-                                    'class' => 'button button-default expand'
-                                ]
-                            ],
+                                'onclick' => 'window.diazoxide.wordpress.option.expandAll(this)',
+                                'class' => 'button button-default expand'
+                            ]
                         ],
-                        ['class' => 'form-actions']
-                    ],
-                    [
-                        'div',
                         [
-                            ['span', 'Saving...', ['class' => 'saving hidden']],
-                            ['span', 'Saved', ['class' => 'saved hidden']],
-                            ['span', 'Failed', ['class' => 'failed hidden']],
-                            ['span', 'Unsaved', ['class' => 'unsaved hidden']],
+                            'a',
+                            '&#8854; Collapse all',
+                            [
+                                'onclick' => 'window.diazoxide.wordpress.option.collapseAll(this)',
+                                'class' => 'button button-default expand'
+                            ]
                         ],
-                        ['class' => 'form-status']
                     ],
+                    ['class' => 'form-actions']
                 ],
-                ['class' => 'form-head']
-            );
-            ?>
+                [
+                    'div',
+                    [
+                        ['span', 'Saving...', ['class' => 'saving hidden']],
+                        ['span', 'Saved', ['class' => 'saved hidden']],
+                        ['span', 'Failed', ['class' => 'failed hidden']],
+                        ['span', 'Unsaved', ['class' => 'unsaved hidden']],
+                    ],
+                    ['class' => 'form-status']
+                ],
+            ],
+            ['class' => 'form-head']
+        );
 
-            <!--<div class="form-actions">
-                <button class="expand">Expand all</button>
-            </div>-->
-            <?php self::printArrayList($_fields, $parent); ?>
-            <?php wp_nonce_field($parent, self::getNonceFieldName($parent)); ?>
-            <?php submit_button(); ?>
-            <?php echo HTML::tagClose('form'); ?>
-        </div>
+        self::printArrayList($_fields, $parent);
 
-        <?php
+        wp_nonce_field($parent, self::getNonceFieldName($parent));
+
+        submit_button();
+
+        echo HTML::tagClose('form');
+
+        echo HTML::tagClose('div');
 
         self::printScript();
 
