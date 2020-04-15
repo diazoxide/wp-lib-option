@@ -2,6 +2,7 @@
 
 namespace diazoxide\wp\lib\option;
 
+use diazoxide\helpers\Environment;
 use diazoxide\helpers\HTML;
 
 /**
@@ -953,23 +954,15 @@ class Option implements interfaces\Option
      * Get form data from request
      *
      * @param $parent
-     * @param string $method
      *
-     * @return array|mixed|null
+     * @return array|null
      */
-    public static function getFormData($parent, $method = 'post')
+    public static function getFormData(?string $parent = null): ?array
     {
-        if ($method === 'post') {
-            $nonce_field = $_POST[self::getNonceFieldName($parent)] ?? null;
-            $fields = wp_verify_nonce($nonce_field, $parent)
-                ? ($_POST[$parent] ?? null) : null;
-        } elseif ($method === 'get') {
-            $nonce_field = $_POST[self::getNonceFieldName($parent)] ?? null;
-            $fields = wp_verify_nonce($nonce_field, $parent)
-                ? ($_GET[$parent] ?? null) : null;
-        } else {
-            $fields = null;
-        }
+        $nonce_field = Environment::post(self::getNonceFieldName($parent));
+
+        $fields = wp_verify_nonce($nonce_field, $parent) ? Environment::post($parent) : null;
+
         if ($fields !== null) {
             $fields = self::decodeKeys($fields);
         }
@@ -1032,7 +1025,7 @@ class Option implements interfaces\Option
                 $label = str_replace('_', ' ', ucfirst($label));
 
                 echo sprintf(
-                    '<li route="%s" onclick="window.diazoxide.wordpress.option.expandLabel(this, true)" class="label">%s</li>',
+                    '<li route="%s" onclick="window.diazoxide.wordpress.option.toggleLabel(this, true)" class="label">%s</li>',
                     $_route,
                     $label
                 );
@@ -1148,15 +1141,87 @@ class Option implements interfaces\Option
         ?>
         <div class="wrap wp-lib-option-wrap <?php echo $parent; ?>-wrap">
             <h2><?php echo $title; ?></h2>
-            <form method="post" action="">
+            <?php echo HTML::tagOpen(
+                'form',
+                [
+                    'method' => 'post',
+                    'action' => '',
+                    'onsubmit' => 'return window.diazoxide.wordpress.option.formSubmit(this)',
+                    'onchange' => 'return window.diazoxide.wordpress.option.formChange(this)',
+                    'data' => [
+                        'ajax_submit' => $params['ajax_submit'] ?? true,
+                        'auto_submit' => $params['auto_submit'] ?? false
+                    ]
+                ]
+            ); ?>
 
-                <!--<div class="form-actions">
-                    <button class="expand">Expand all</button>
-                </div>-->
-                <?php self::printArrayList($_fields, $parent); ?>
-                <?php wp_nonce_field($parent, self::getNonceFieldName($parent)); ?>
-                <?php submit_button(); ?>
-            </form>
+
+            <?php
+            echo HTML::tag(
+                'div',
+                [
+                    [
+                        'div',
+                        [
+                            [
+                                'a',
+                                '&#8853; Expand all',
+                                [
+                                    'onclick' => 'window.diazoxide.wordpress.option.expandAll(this)',
+                                    'class' => 'button button-default expand'
+                                ]
+                            ],
+                            [
+                                'a',
+                                '&#8854; Collapse all',
+                                [
+                                    'onclick' => 'window.diazoxide.wordpress.option.collapseAll(this)',
+                                    'class' => 'button button-default expand'
+                                ]
+                            ],
+                        ],
+                        ['class' => 'form-actions']
+                    ],
+                    [
+                        'div',
+                        [
+                            ['span', 'Saving...', ['class' => 'saving hidden']],
+                            ['span', 'Saved', ['class' => 'saved hidden']],
+                            ['span', 'Failed', ['class' => 'failed hidden']],
+                            ['span', 'Unsaved', ['class' => 'unsaved hidden']],
+                        ],
+                        ['class' => 'form-status']
+                    ],
+                ],
+                ['class' => 'form-head']
+            );
+            //
+            //            echo HTML::tag(
+            //                'div',
+            //                [
+            //                    ['span', 'Saving...', ['class' => 'saving hidden']],
+            //                    ['span', 'Saved', ['class' => 'saved hidden']],
+            //                    ['span', 'Failed', ['class' => 'failed hidden']],
+            //                    ['span', 'Unsaved', ['class' => 'unsaved hidden']],
+            //                ],
+            //                ['class' => 'form-status']
+            //            );
+            //            echo HTML::tag(
+            //                'div',
+            //                [
+            //                    ['a', 'Expand all', ['class' => 'button button-primary expand']],
+            //                ],
+            //                ['class' => 'form-actions']
+            //            );
+            ?>
+
+            <!--<div class="form-actions">
+                <button class="expand">Expand all</button>
+            </div>-->
+            <?php self::printArrayList($_fields, $parent); ?>
+            <?php wp_nonce_field($parent, self::getNonceFieldName($parent)); ?>
+            <?php submit_button(); ?>
+            <?php echo HTML::tagClose('form'); ?>
         </div>
 
         <?php
