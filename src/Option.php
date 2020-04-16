@@ -279,11 +279,11 @@ class Option implements interfaces\Option
      */
     private static function maybeBoolean($str)
     {
-        if ($str === '{{{boolean_true}}}') {
+        if ($str === self::MASK_BOOL_TRUE) {
             return true;
         }
 
-        if ($str === '{{{boolean_false}}}') {
+        if ($str === self::MASK_BOOL_FALSE) {
             return false;
         }
 
@@ -300,7 +300,7 @@ class Option implements interfaces\Option
      */
     private static function maybeNull($str)
     {
-        if ($str === '{{{null}}}') {
+        if ($str === self::MASK_NULL) {
             return null;
         }
 
@@ -317,7 +317,7 @@ class Option implements interfaces\Option
      */
     private static function maybeArray($str)
     {
-        if ($str === '{{{array}}}') {
+        if ($str === self::MASK_ARRAY) {
             return [];
         }
 
@@ -570,10 +570,10 @@ class Option implements interfaces\Option
             'input',
             [
                 'type' => 'hidden',
-                'data' => $data,
+                //'data' => $data,
                 $disabled_str,
                 'name' => $name,
-                'value' => $method === self::METHOD_MULTIPLE ? '{{{array}}}' : '{{{null}}}'
+                'value' => $method === self::METHOD_MULTIPLE ? self::MASK_ARRAY : self::MASK_NULL
             ]
         );
 
@@ -581,13 +581,13 @@ class Option implements interfaces\Option
             case self::TYPE_BOOL:
                 $html .= HTML::tagOpen(
                     'input',
-                    ['value' => '{{{boolean_false}}}', 'type' => 'hidden', 'name' => $name]
+                    ['value' => self::MASK_BOOL_FALSE, 'type' => 'hidden', 'name' => $name]
                 );
 
                 $html .= HTML::tagOpen(
                     'input',
                     $input_attrs + [
-                        'value' => '{{{boolean_true}}}',
+                        'value' => self::MASK_BOOL_TRUE,
                         'type' => 'checkbox',
                         'name' => $name,
                         'data' => $data,

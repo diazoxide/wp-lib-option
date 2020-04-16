@@ -20,5 +20,10 @@ interface Option
 
     public const METHOD_SINGLE = 'single';
     public const METHOD_MULTIPLE = 'multiple';
+
+    public const MASK_NULL = '{~0~}';
+    public const MASK_ARRAY = '{~1~}';
+    public const MASK_BOOL_TRUE = '{~2~}';
+    public const MASK_BOOL_FALSE = '{~3~}';
     
 }
