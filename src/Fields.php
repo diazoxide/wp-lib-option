@@ -94,7 +94,6 @@ class Fields
             'input',
             [
                 'type' => 'hidden',
-                //'data' => $data,
                 $disabled_str,
                 'name' => $name,
                 'value' => $method === Option::METHOD_MULTIPLE ? Option::MASK_ARRAY : Option::MASK_NULL
@@ -132,7 +131,7 @@ class Fields
                         foreach ($template as $_key => $_field) {
                             $_field['value'] = $_value[$_key] ?? null;
                             $_field['data']['name'] = $name . '[{{encode_key}}]' . '[' . $_key . ']';
-                            $_field['name'] = $name . '[' . Option::encodeKey($key) . ']' . '[' . $_key . ']';
+                            $_field['name'] = $name . '[' . self::encodeKey($key) . ']' . '[' . $_key . ']';
                             $_html .= self::createField($_field);
                         }
 
@@ -163,7 +162,7 @@ class Fields
                             $_field = $field;
                             $_field['value'] = $_value;
                             $_field['data']['name'] = $name . '[{{encode_key}}]';
-                            $_field['name'] = $name . '[' . Option::encodeKey($key) . ']';
+                            $_field['name'] = $name . '[' . self::encodeKey($key) . ']';
                             $html .= self::group(
                                 implode(
                                     '',
@@ -631,5 +630,116 @@ class Fields
                 ]
             )
         );
+    }
+
+    /**
+     * Encode key of form field
+     *
+     * @param $key
+     *
+     * @return string
+     */
+    public static function encodeKey($key): string
+    {
+        return '{{encode_key}}' . base64_encode($key);
+    }
+
+    /**
+     * Check and decode form field key
+     *
+     * @param $str
+     *
+     * @return false|string|string[]|null
+     */
+    private static function maybeDecodeKey($str)
+    {
+        if (strpos($str, '{{encode_key}}') === 0) {
+            $str = preg_replace('/^{{encode_key}}/', '', $str);
+            return base64_decode($str);
+        }
+
+        return $str;
+    }
+
+    /**
+     * Check if form field is boolean and return
+     * Real boolean value
+     *
+     * @param $str
+     *
+     * @return bool|string
+     */
+    private static function maybeBoolean($str)
+    {
+        if ($str === Option::MASK_BOOL_TRUE) {
+            return true;
+        }
+
+        if ($str === Option::MASK_BOOL_FALSE) {
+            return false;
+        }
+
+        return $str;
+    }
+
+    /**
+     * Check if form field is boolean and return
+     * Real boolean value
+     *
+     * @param $str
+     *
+     * @return bool|string
+     */
+    private static function maybeNull($str)
+    {
+        if ($str === Option::MASK_NULL) {
+            return null;
+        }
+
+        return $str;
+    }
+
+    /**
+     * Check if form field is array and return
+     * Real array value
+     *
+     * @param $str
+     *
+     * @return array|string
+     */
+    private static function maybeArray($str)
+    {
+        if ($str === Option::MASK_ARRAY) {
+            return [];
+        }
+
+        return $str;
+    }
+
+    /**
+     * Decode form keys
+     *
+     * @param array $input
+     *
+     * @return array
+     */
+    public static function decodeKeys(array $input): array
+    {
+        $return = array();
+        foreach ($input as $key => $value) {
+            $key = self::maybeDecodeKey($key);
+
+            if (is_array($value)) {
+                $value = self::decodeKeys($value);
+            } elseif (is_string($value)) {
+                $value = stripslashes($value);
+                $value = self::maybeBoolean($value);
+                $value = self::maybeArray($value);
+                $value = self::maybeNull($value);
+            }
+            $return[$key] = $value;
+        }
+
+        return $return;
     }
 }

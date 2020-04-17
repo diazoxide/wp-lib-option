@@ -47,7 +47,7 @@ class Option implements interfaces\Option
      */
     public function getValue()
     {
-        return Option::getOption(
+        return self::getOption(
             $this->getParam('name', null),
             $this->getParam('parent', null),
             $this->getParam('default', null)
@@ -82,14 +82,14 @@ class Option implements interfaces\Option
      */
     public static function getOption(string $option, $parent = null, $default = null)
     {
-        $name = Option::getOptionName($option, $parent);
+        $name = self::getOptionName($option, $parent);
 
-        if (Option::isOptionConstant($option)) {
+        if (self::isOptionConstant($option)) {
             return constant($name);
         }
 
         return apply_filters(
-            Option::getOptionFilterName($option, $parent),
+            self::getOptionFilterName($option, $parent),
             get_option($name, $default)
         );
     }
@@ -104,7 +104,7 @@ class Option implements interfaces\Option
      */
     public static function getOptionFilterName(string $option, ?string $parent = null): string
     {
-        $name = Option::getOptionName($option, $parent);
+        $name = self::getOptionName($option, $parent);
 
         return 'option_value_' . $name;
     }
@@ -119,7 +119,7 @@ class Option implements interfaces\Option
      */
     public static function isOptionConstant(string $option, ?string $parent = null): bool
     {
-        return defined(Option::getOptionName($option, $parent));
+        return defined(self::getOptionName($option, $parent));
     }
 
     /**
@@ -133,7 +133,7 @@ class Option implements interfaces\Option
      */
     public static function setOption(string $option, ?string $parent = null, $value = null): bool
     {
-        $option = Option::getOptionName($option, $parent);
+        $option = self::getOptionName($option, $parent);
 
         if (update_option($option, $value)) {
             return true;
@@ -240,90 +240,6 @@ class Option implements interfaces\Option
         );
     }
 
-    /**
-     * Encode key of form field
-     *
-     * @param $key
-     *
-     * @return string
-     */
-    private static function encodeKey($key): string
-    {
-        return '{{encode_key}}' . base64_encode($key);
-    }
-
-    /**
-     * Check and decode form field key
-     *
-     * @param $str
-     *
-     * @return false|string|string[]|null
-     */
-    private static function maybeDecodeKey($str)
-    {
-        if (strpos($str, '{{encode_key}}') === 0) {
-            $str = preg_replace('/^{{encode_key}}/', '', $str);
-            return base64_decode($str);
-        }
-
-        return $str;
-    }
-
-    /**
-     * Check if form field is boolean and return
-     * Real boolean value
-     *
-     * @param $str
-     *
-     * @return bool|string
-     */
-    private static function maybeBoolean($str)
-    {
-        if ($str === Option::MASK_BOOL_TRUE) {
-            return true;
-        }
-
-        if ($str === Option::MASK_BOOL_FALSE) {
-            return false;
-        }
-
-        return $str;
-    }
-
-    /**
-     * Check if form field is boolean and return
-     * Real boolean value
-     *
-     * @param $str
-     *
-     * @return bool|string
-     */
-    private static function maybeNull($str)
-    {
-        if ($str === Option::MASK_NULL) {
-            return null;
-        }
-
-        return $str;
-    }
-
-    /**
-     * Check if form field is array and return
-     * Real array value
-     *
-     * @param $str
-     *
-     * @return array|string
-     */
-    private static function maybeArray($str)
-    {
-        if ($str === Option::MASK_ARRAY) {
-            return [];
-        }
-
-        return $str;
-    }
-
 
 
     /**
@@ -347,42 +263,15 @@ class Option implements interfaces\Option
      */
     public static function getFormData(?string $parent = null): ?array
     {
-        $nonce_field = Environment::post(Option::getNonceFieldName($parent));
+        $nonce_field = Environment::post(self::getNonceFieldName($parent));
 
         $fields = wp_verify_nonce($nonce_field, $parent) ? Environment::post($parent) : null;
 
         if ($fields !== null) {
-            $fields = Option::decodeKeys($fields);
+            $fields = Fields::decodeKeys($fields);
         }
 
         return $fields;
-    }
-
-    /**
-     * Decode form keys
-     *
-     * @param array $input
-     *
-     * @return array
-     */
-    public static function decodeKeys(array $input): array
-    {
-        $return = array();
-        foreach ($input as $key => $value) {
-            $key = Option::maybeDecodeKey($key);
-
-            if (is_array($value)) {
-                $value = Option::decodeKeys($value);
-            } elseif (is_string($value)) {
-                $value = stripslashes($value);
-                $value = Option::maybeBoolean($value);
-                $value = Option::maybeArray($value);
-                $value = Option::maybeNull($value);
-            }
-            $return[$key] = $value;
-        }
-
-        return $return;
     }
 
     /**
@@ -417,7 +306,7 @@ class Option implements interfaces\Option
                     $_route,
                     $label
                 );
-                Option::printArrayList($v, $parent, $_route);
+                self::printArrayList($v, $parent, $_route);
                 continue;
             }
 
@@ -448,7 +337,7 @@ class Option implements interfaces\Option
             $_route = $route;
             $_route[] = $key;
             if (is_array($val)) {
-                Option::arrayWalkWithRoute($val, $callback, $_route);
+                self::arrayWalkWithRoute($val, $callback, $_route);
             } else {
                 call_user_func_array($callback, [$key, &$val, $_route]);
             }
@@ -461,11 +350,11 @@ class Option implements interfaces\Option
      */
     private static function initFormSubmit($parent, ?array $params): void
     {
-        $form_data = Option::getFormData($parent);
+        $form_data = self::getFormData($parent);
 
         if ($form_data) {
             foreach ($form_data as $key => $field) {
-                Option::setOption($key, $parent, $field);
+                self::setOption($key, $parent, $field);
             }
 
             $form_saved = $params['form_saved'] ?? null;
@@ -498,7 +387,7 @@ class Option implements interfaces\Option
      */
     public static function printForm($parent, $options, ?array $params = []): void
     {
-        Option::initFormSubmit($parent, $params);
+        self::initFormSubmit($parent, $params);
 
         $title = $params['title'] ?? 'Configuration';
 
@@ -535,7 +424,7 @@ class Option implements interfaces\Option
             }
         );
 
-        Option::printStyle();
+        self::printStyle();
 
         $wrap_params = $params['wrap_params'] ?? [];
 
@@ -565,11 +454,11 @@ class Option implements interfaces\Option
             ]
         );
 
-        Option::printFormHead($form_head_params);
+        self::printFormHead($form_head_params);
 
-        Option::printArrayList($_fields, $parent);
+        self::printArrayList($_fields, $parent);
 
-        wp_nonce_field($parent, Option::getNonceFieldName($parent));
+        wp_nonce_field($parent, self::getNonceFieldName($parent));
 
         submit_button();
 
@@ -577,9 +466,9 @@ class Option implements interfaces\Option
 
         echo HTML::tagClose('div');
 
-        Option::printScript();
+        self::printScript();
 
-        Option::$assets_loaded = true;
+        self::$assets_loaded = true;
     }
 
     /**
@@ -652,8 +541,8 @@ class Option implements interfaces\Option
      */
     private static function printScript(): void
     {
-        if (!Option::$assets_loaded) {
-            Option::printSelect2Assets();
+        if (!self::$assets_loaded) {
+            self::printSelect2Assets();
             echo '<script type="application/javascript">' . file_get_contents(
                     __DIR__ . '/assets/script.js'
                 ) . '</script>';
@@ -667,7 +556,7 @@ class Option implements interfaces\Option
      */
     private static function printStyle(): void
     {
-        if (!Option::$assets_loaded) {
+        if (!self::$assets_loaded) {
             echo '<style type="text/css">' . file_get_contents(__DIR__ . '/assets/admin.css') . '</style>';
         }
     }
@@ -682,7 +571,7 @@ class Option implements interfaces\Option
      */
     public static function expandOptions(array $options, ?string $parent = null): array
     {
-        Option::arrayWalkWithRoute(
+        self::arrayWalkWithRoute(
             $options,
             static function ($key, &$item, $route) use ($parent) {
                 if ($item instanceof self) {
