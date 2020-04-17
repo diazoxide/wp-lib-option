@@ -4,6 +4,7 @@ namespace diazoxide\wp\lib\option;
 
 use diazoxide\helpers\Environment;
 use diazoxide\helpers\HTML;
+use diazoxide\helpers\URL;
 
 /**
  * Class Option
@@ -390,6 +391,14 @@ class Option implements interfaces\Option
 
         $title = $params['title'] ?? 'Configuration';
 
+        $wrap_params = $params['wrap_params'] ?? [];
+
+        $title_params = $params['title_params'] ?? [];
+
+        $form_params = $params['form_params'] ?? [];
+
+        $form_head_params = $params['form_head_params'] ?? [];
+
         $_fields = [];
 
         /**
@@ -424,14 +433,6 @@ class Option implements interfaces\Option
         );
 
         self::printStyle();
-
-        $wrap_params = $params['wrap_params'] ?? [];
-
-        $title_params = $params['title_params'] ?? [];
-
-        $form_params = $params['form_params'] ?? [];
-
-        $form_head_params = $params['form_head_params'] ?? [];
 
         HTML::addClass($wrap_params['class'], ['wrap wp-lib-option-wrap', $parent . '-wrap']);
 
@@ -475,6 +476,7 @@ class Option implements interfaces\Option
      */
     private static function printFormHead($form_head_params): void
     {
+
         HTML::addClass($form_head_params['class'], ['form-head']);
 
         echo HTML::tag(
@@ -499,6 +501,15 @@ class Option implements interfaces\Option
                                 'class' => 'button button-default expand'
                             ]
                         ],
+                        [
+                            'a',
+                            'Export data',
+                            [
+                                'href' => wp_nonce_url(URL::getCurrent(false), 'export', 'wp-lib-option'),
+                                'class' => 'button button-primary export'
+                            ]
+                        ],
+
                     ],
                     ['class' => 'form-actions']
                 ],
