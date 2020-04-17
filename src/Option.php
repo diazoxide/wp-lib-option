@@ -241,7 +241,6 @@ class Option implements interfaces\Option
     }
 
 
-
     /**
      * Dynamically get nonce field name by parent
      *
@@ -586,6 +585,6 @@ class Option implements interfaces\Option
             }
         );
 
-        return $options;
+        return apply_filters('wp-lib-option/' . $parent . '/expanded-option', $options);
     }
 }
