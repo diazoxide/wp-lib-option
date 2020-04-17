@@ -1,4 +1,4 @@
-.wp-lib-option-wrap [col]{
+.wp-lib-option-wrap [col] {
     display: grid;
 }
 
@@ -124,14 +124,18 @@ ul.wp-lib-option-nested-fields > li > .section {
     padding: 5px;
 }
 
-ul.wp-lib-option-nested-fields > .label.open {
-    background: #007cba;
-    color: #fff;
-    font-weight: bolder;
+ul.wp-lib-option-nested-fields > .label {
     position: sticky;
     position: -webkit-sticky;
     top: 0;
     z-index: 1;
+}
+
+ul.wp-lib-option-nested-fields > .label.open {
+    background: #007cba;
+    color: #fff;
+    font-weight: bolder;
+
 }
 
 body.admin-bar ul.wp-lib-option-nested-fields > .label.open {
