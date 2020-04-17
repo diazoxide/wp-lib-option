@@ -1,3 +1,27 @@
+.wp-lib-option-wrap [col]{
+    display: grid;
+}
+
+.wp-lib-option-wrap [col='5'] {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.wp-lib-option-wrap [col='4'] {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.wp-lib-option-wrap [col='3'] {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.wp-lib-option-wrap [col='2'] {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.wp-lib-option-wrap [col='1'] {
+    grid-template-columns: repeat(2, 1fr);
+}
+
 .wp-lib-option-wrap .hidden {
     display: none !important;
 }
@@ -280,6 +304,7 @@ ul.wp-lib-option-nested-fields .section .group.cloned {
 ul.wp-lib-option-nested-fields .section > .group > .group > * > * {
     margin-top: 1px;
 }
+
 
 /* Mobile Styles */
 @media only screen and (max-width: 400px) {
