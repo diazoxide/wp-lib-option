@@ -1079,15 +1079,10 @@ class Option implements interfaces\Option
     }
 
     /**
-     * Print Form for options array
-     *
      * @param $parent
-     * @param $options
-     * @param array|null $params
-     * @see expandOptions
-     *
+     * @param $params
      */
-    public static function printForm($parent, $options, ?array $params = []): void
+    private static function initFormSubmit($parent, ?array $params): void
     {
         $form_data = self::getFormData($parent);
 
@@ -1105,12 +1100,28 @@ class Option implements interfaces\Option
 
             $success_message = $params['on_save_success_message'] ?? 'Settings saved!';
 
-            ?>
-            <div class="notice notice-success is-dismissible">
-                <p><?php echo $success_message; ?></p>
-            </div>
-            <?php
+            echo HTML::tag(
+                'div',
+                [
+                    ['p', $success_message]
+                ],
+                ['class' => 'notice notice-success is-dismissible']
+            );
         }
+    }
+
+    /**
+     * Print Form for options array
+     *
+     * @param $parent
+     * @param $options
+     * @param array|null $params
+     * @see expandOptions
+     *
+     */
+    public static function printForm($parent, $options, ?array $params = []): void
+    {
+        self::initFormSubmit($parent, $params);
 
         $title = $params['title'] ?? 'Configuration';
 
@@ -1118,7 +1129,7 @@ class Option implements interfaces\Option
 
         /**
          * Setting `parent` and `name` fields
-         * Then generating fields HTML
+         * Then generate fields HTML
          * */
         static::arrayWalkWithRoute(
             $options,
@@ -1149,13 +1160,23 @@ class Option implements interfaces\Option
 
         self::printStyle();
 
-        echo HTML::tagOpen('div', ['class' => 'wrap wp-lib-option-wrap ' . $parent . '-wrap']);
+        $wrap_params = $params['wrap_params'] ?? [];
 
-        echo HTML::tag('h2', $title);
+        $title_params = $params['title_params'] ?? [];
+
+        $form_params = $params['form_params'] ?? [];
+
+        $form_head_params = $params['form_head_params'] ?? [];
+
+        HTML::addClass($wrap_params['class'], ['wrap wp-lib-option-wrap', $parent . '-wrap']);
+
+        echo HTML::tagOpen('div', $wrap_params);
+
+        echo HTML::tag('h2', $title, $title_params);
 
         echo HTML::tagOpen(
             'form',
-            [
+            $form_params + [
                 'method' => 'post',
                 'action' => '',
                 'onsubmit' => 'return window.diazoxide.wordpress.option.formSubmit(this)',
@@ -1166,6 +1187,30 @@ class Option implements interfaces\Option
                 ]
             ]
         );
+
+        self::printFormHead($form_head_params);
+
+        self::printArrayList($_fields, $parent);
+
+        wp_nonce_field($parent, self::getNonceFieldName($parent));
+
+        submit_button();
+
+        echo HTML::tagClose('form');
+
+        echo HTML::tagClose('div');
+
+        self::printScript();
+
+        self::$assets_loaded = true;
+    }
+
+    /**
+     * @param $form_head_params
+     */
+    private static function printFormHead($form_head_params): void
+    {
+        HTML::addClass($form_head_params['class'], ['form-head']);
 
         echo HTML::tag(
             'div',
@@ -1203,22 +1248,8 @@ class Option implements interfaces\Option
                     ['class' => 'form-status']
                 ],
             ],
-            ['class' => 'form-head']
+            $form_head_params
         );
-
-        self::printArrayList($_fields, $parent);
-
-        wp_nonce_field($parent, self::getNonceFieldName($parent));
-
-        submit_button();
-
-        echo HTML::tagClose('form');
-
-        echo HTML::tagClose('div');
-
-        self::printScript();
-
-        self::$assets_loaded = true;
     }
 
     /**
