@@ -3,23 +3,23 @@
 }
 
 .wp-lib-option-wrap [col='5'] {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, 1fr) !important;
 }
 
 .wp-lib-option-wrap [col='4'] {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr) !important;
 }
 
 .wp-lib-option-wrap [col='3'] {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr) !important;
 }
 
 .wp-lib-option-wrap [col='2'] {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
 }
 
 .wp-lib-option-wrap [col='1'] {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr) !important;
 }
 
 .wp-lib-option-wrap .hidden {
