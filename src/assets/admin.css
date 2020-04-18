@@ -46,7 +46,7 @@
 
 body.admin-bar .wp-lib-option-wrap > form .form-head {
     top: 32px;
-    padding: 10px 0;
+    padding: 0 0 10px;
 }
 
 .wp-lib-option-wrap > form > .form-head > .form-status {
@@ -132,7 +132,7 @@ ul.wp-lib-option-nested-fields > .label {
 }
 
 ul.wp-lib-option-nested-fields > .label.open {
-    background: #007cba;
+    background: #23282d;
     color: #fff;
     font-weight: bolder;
 
