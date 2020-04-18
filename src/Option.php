@@ -56,6 +56,21 @@ class Option implements interfaces\Option
     }
 
     /**
+     * Get Option value
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    public function setValue($value)
+    {
+        return self::setOption(
+            $this->getParam('name', null),
+            $this->getParam('parent', null),
+            $value
+        );
+    }
+
+    /**
      * Generate option name by option name and parent name
      *
      * @param string $option
@@ -401,13 +416,25 @@ class Option implements interfaces\Option
 
         $_fields = [];
 
+        $is_export = wp_verify_nonce(Environment::get($parent), 'export');
+
+        $exported_data = $is_export ? [] : null;
+
+        $is_import_submit = !$is_export && wp_verify_nonce(Environment::post($parent), 'import-submit');
+
+        $imported_data = $is_import_submit ? Environment::post('data') : null;
+        $imported_data = $imported_data === null ? null : base64_decode($imported_data);
+        $imported_data = $imported_data === null ? null : unserialize($imported_data, [self::class]);
+
+        $is_import = $imported_data === null && wp_verify_nonce(Environment::get($parent), 'import');
+
         /**
          * Setting `parent` and `name` fields
          * Then generate fields HTML
          * */
         static::arrayWalkWithRoute(
             $options,
-            static function ($key, $item, $route) use (&$_fields, $parent) {
+            static function ($key, $item, $route) use (&$_fields, $parent, &$exported_data, $imported_data) {
                 if ($item instanceof Option) {
                     $item->setParam('debug_data', [$route]);
 
@@ -417,6 +444,21 @@ class Option implements interfaces\Option
 
                     if ($item->getParam('name') === null) {
                         $item->setParam('name', implode('>', $route));
+                    }
+
+                    if ($exported_data !== null) {
+                        $exported_data[$item->getParam('name')] =
+                            [
+                                md5(serialize($item)),
+                                $item->getValue()
+                            ];
+                    }
+
+                    if ($imported_data !== null) {
+                        $imported = $imported_data[$item->getParam('name')];
+                        if (($imported[0] ?? null) === md5(serialize($item))) {
+                            $item->setValue($imported[1] ?? null);
+                        }
                     }
 
                     $field = $item->getField();
@@ -440,6 +482,51 @@ class Option implements interfaces\Option
 
         echo HTML::tag('h2', $title, $title_params);
 
+        if ($imported_data !== null) {
+            echo HTML::tag('h3', 'Your data successfully imported.');
+        }
+
+        if ($is_export) {
+            $exported_data = serialize($exported_data);
+            $exported_data = base64_encode($exported_data);
+
+            echo HTML::tag('h4', 'Your export data is ready to download');
+
+            echo HTML::tag(
+                'a',
+                'Click to download',
+                [
+                    'download' => $parent . '-' . time() . '-export.dat',
+                    'href' => 'data:application/octet-stream;charset=utf-8;base64,' . base64_encode($exported_data),
+                    'class' => 'button button-primary'
+                ]
+            );
+        }
+
+        if ($is_import) {
+            echo HTML::tagOpen('form', ['method' => 'post', 'action' => '']);
+            wp_nonce_field('import-submit', $parent);
+            echo HTML::tag(
+                'div',
+                [
+                    ['p', 'Import your exported data. Just paste here your downloaded file content.'],
+                    [
+                        'div',
+                        [
+                            [
+                                'textarea',
+                                '',
+                                ['placeholder' => 'Paste here', 'name' => 'data', 'cols' => '55', 'rows' => '6']
+                            ]
+                        ]
+                    ],
+                    ['button', 'Import', ['type' => 'submit', 'class' => 'button button-primary']]
+                ]
+            );
+
+            echo HTML::tagClose('form');
+        }
+
         echo HTML::tagOpen(
             'form',
             $form_params + [
@@ -454,7 +541,7 @@ class Option implements interfaces\Option
             ]
         );
 
-        self::printFormHead($form_head_params);
+        self::printFormHead($parent, $form_head_params);
 
         self::printArrayList($_fields, $parent);
 
@@ -472,11 +559,11 @@ class Option implements interfaces\Option
     }
 
     /**
-     * @param $form_head_params
+     * @param string $parent
+     * @param array $form_head_params
      */
-    private static function printFormHead($form_head_params): void
+    private static function printFormHead(string $parent, array $form_head_params): void
     {
-
         HTML::addClass($form_head_params['class'], ['form-head']);
 
         echo HTML::tag(
@@ -505,7 +592,23 @@ class Option implements interfaces\Option
                             'a',
                             'Export data',
                             [
-                                'href' => wp_nonce_url(URL::getCurrent(false), 'export', 'wp-lib-option'),
+                                'href' => URL::addQueryVars(
+                                    URL::getCurrent(),
+                                    $parent,
+                                    wp_create_nonce('export')
+                                ),
+                                'class' => 'button button-primary export'
+                            ]
+                        ],
+                        [
+                            'a',
+                            'Import data',
+                            [
+                                'href' => URL::addQueryVars(
+                                    URL::getCurrent(),
+                                    $parent,
+                                    wp_create_nonce('import')
+                                ),
                                 'class' => 'button button-primary export'
                             ]
                         ],
