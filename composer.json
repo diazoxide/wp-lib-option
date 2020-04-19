@@ -19,8 +19,7 @@
     "php": ">=7.2",
     "ext-mbstring": "*",
     "ext-json": "*",
-    "diazoxide/php-helpers": "dev-master",
-    "yiisoft/html": "dev-master"
+    "diazoxide/php-helpers": "dev-master"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "*"
