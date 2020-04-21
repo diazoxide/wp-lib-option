@@ -46,7 +46,7 @@
 
 body.admin-bar .wp-lib-option-wrap > form .form-head {
     top: 32px;
-    padding: 0 0 10px;
+    padding: 2px 0 10px;
 }
 
 .wp-lib-option-wrap > form > .form-head > .form-status {
