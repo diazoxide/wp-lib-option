@@ -4,6 +4,8 @@ namespace diazoxide\wp\lib\option;
 
 
 use diazoxide\helpers\HTML;
+use diazoxide\wp\lib\option\fields\Boolean;
+use diazoxide\wp\lib\option\fields\Choice;
 
 class Fields
 {
@@ -16,6 +18,9 @@ class Fields
      */
     public static function createField($params = []): string
     {
+        /**
+         * Main element HTML Attributes
+         * */
         $main_params = $params['main_params'] ?? [];
 
         $value = $params['value'] ?? null;
@@ -102,7 +107,19 @@ class Fields
 
         switch ($type) {
             case Option::TYPE_BOOL:
-                $html .= HTML::tagOpen(
+                $html .= (new Boolean(
+                    [
+                        'name' => $name,
+                        'value' => $value,
+                        'data' => $data,
+                        'readonly' => $readonly,
+                        'disabled' => $disabled,
+                        'required' => $required,
+                        'attrs' => $input_attrs
+                    ]
+                ))->get();
+
+                /*$html .= HTML::tagOpen(
                     'input',
                     ['value' => Option::MASK_BOOL_FALSE, 'type' => 'hidden', 'name' => $name]
                 );
@@ -119,7 +136,7 @@ class Fields
                         $disabled_str,
                         $required_str
                     ]
-                );
+                );*/
                 break;
             case Option::TYPE_OBJECT:
                 $on_change = "var fields = this.parentElement.querySelectorAll('[name]'); for (var i = 0; i < fields.length; i++) { var field = fields[i]; if (this.value != null) { field.removeAttribute('disabled') }; var attr =  field.getAttribute('name'); attr = attr.replace(/{{encode_key}}.*?(?=\])/gm, '{{encode_key}}' + btoa(this.value)); fields[i].setAttribute('name', attr); }";
@@ -301,7 +318,20 @@ class Fields
                 break;
             default:
                 if (!empty($values)) {
-                    if ($markup === null || $markup === Option::MARKUP_SELECT) {
+                    $html .= (new Choice(
+                        [
+                            'name'=>$name,
+                            'value'=>$value,
+                            'choices'=>$values,
+                            'markup'=> $markup,
+                            'multiple'=>$method === Option::METHOD_MULTIPLE,
+                            'disabled'=>$disabled,
+                            'required'=>$required,
+                            'readonly'=>$readonly,
+                            'attrs'=>$input_attrs
+                        ]
+                    ))->get();
+                   /* if ($markup === null || $markup === Option::MARKUP_SELECT) {
                         HTML::addClass($input_attrs['class'], 'full');
 
                         $html .= HTML::tagOpen(
@@ -333,51 +363,30 @@ class Fields
                                 ]
                             );
                         } elseif ($markup === Option::MARKUP_CHECKBOX) {
-                            if ($method === Option::METHOD_MULTIPLE) {
-                                $html .= self::group(
-                                    HTML::tag(
-                                        'label',
-                                        HTML::tagOpen(
-                                            'input',
-                                            [
-                                                'type' => 'checkbox',
-                                                'name' => $name . '[]',
-                                                'value' => $key,
-                                                'data' => $data,
-                                                (($key === $value) || in_array($key, $value, true)) ? 'checked' : '',
-                                                $disabled_str,
-                                                $readonly_str,
-                                                $required_str
-                                            ]
-                                        ) . $_value
-                                    )
-                                );
-                            } else {
-                                $html .= self::group(
-                                    HTML::tag(
-                                        'label',
-                                        HTML::tagOpen(
-                                            'input',
-                                            [
-                                                'type' => 'radio',
-                                                'name' => $name,
-                                                'value' => $key,
-                                                (($key === $value) || in_array($key, $value, true)) ? 'checked' : '',
-                                                'data' => $data,
-                                                $disabled_str,
-                                                $readonly_str,
-                                                $required_str
-                                            ]
-                                        ) . $_value
-                                    )
-                                );
-                            }
+                            $html .= self::group(
+                                HTML::tag(
+                                    'label',
+                                    HTML::tagOpen(
+                                        'input',
+                                        [
+                                            'type' => $method === Option::METHOD_MULTIPLE ? 'checkbox' : 'radio',
+                                            'name' => $name . ($method === Option::METHOD_MULTIPLE ? '[]' : ''),
+                                            'value' => $key,
+                                            'data' => $data,
+                                            (($key === $value) || in_array($key, $value, true)) ? 'checked' : '',
+                                            $disabled_str,
+                                            $readonly_str,
+                                            $required_str
+                                        ]
+                                    ) . $_value
+                                )
+                            );
                         }
                     }
 
                     if (isset($open_tag_select)) {
                         $html .= HTML::tagClose('select');
-                    }
+                    }*/
                 } elseif ($method === Option::METHOD_MULTIPLE) {
                     HTML::addClass($input_attrs['class'], 'full');
                     if (is_array($value)) {
@@ -513,7 +522,7 @@ class Fields
      *
      * @return string
      */
-    private static function group(string $content, array $attrs = []): string
+    public static function group(string $content, array $attrs = []): string
     {
         HTML::addClass($attrs['class'], 'group');
         $html = HTML::tagOpen('div', $attrs);
