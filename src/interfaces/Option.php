@@ -4,6 +4,8 @@
 namespace diazoxide\wp\lib\option\interfaces;
 
 
+use diazoxide\wp\lib\option\fields\Choice;
+
 interface Option
 {
 
@@ -12,11 +14,11 @@ interface Option
     public const TYPE_OBJECT = 'object';
     public const TYPE_GROUP = 'group';
 
-    public const MARKUP_CHECKBOX = 'checkbox';
+    public const MARKUP_CHECKBOX = Choice::MARKUP_CHECKBOX;
+    public const MARKUP_SELECT = Choice::MARKUP_SELECT;
     public const MARKUP_TEXT = 'text';
     public const MARKUP_TEXTAREA = 'textarea';
     public const MARKUP_NUMBER = 'number';
-    public const MARKUP_SELECT = 'select';
 
     public const METHOD_SINGLE = 'single';
     public const METHOD_MULTIPLE = 'multiple';
