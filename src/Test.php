@@ -18,9 +18,9 @@ class Test
                         'template' => [
                             'a_0' => [
                                 'type' => Option::TYPE_GROUP,
-                                'template'=>[
-                                    'b1'=>[],
-                                    'b2'=>[],
+                                'template' => [
+                                    'b1' => [],
+                                    'b2' => [],
                                 ]
                             ],
                             'a_1' => ['type' => Option::TYPE_TEXT],

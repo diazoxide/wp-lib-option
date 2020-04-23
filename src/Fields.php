@@ -9,6 +9,7 @@ use diazoxide\wp\lib\option\fields\Choice;
 use diazoxide\wp\lib\option\fields\Input;
 use diazoxide\wp\lib\option\fields\Number;
 use diazoxide\wp\lib\option\fields\Text;
+use Exception;
 
 class Fields
 {
@@ -18,6 +19,7 @@ class Fields
      * @param array $params
      *
      * @return string
+     * @throws Exception
      */
     public static function createField($params = []): string
     {
