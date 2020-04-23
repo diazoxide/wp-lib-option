@@ -12,11 +12,10 @@ class Input extends Field
     public $type;
 
     public $placeholder;
-
-
+    
     protected function template(): string
     {
-        $this->attrs = array_merge(
+        $attrs = array_merge(
             $this->attrs,
             [
                 'placeholder' => $this->placeholder,
@@ -30,14 +29,16 @@ class Input extends Field
             ]
         );
 
+        $attrs = array_filter($attrs);
+
         if ($this->type === 'textarea') {
-            unset($this->attrs['type']);
-            return HTML::tag('textarea', $this->value, $this->attrs);
+            unset($attrs['type']);
+            return HTML::tag('textarea', $this->value, $attrs);
         }
 
         return HTML::tagOpen(
             'input',
-            $this->attrs
+            $attrs
         );
     }
 }
