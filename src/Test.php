@@ -3,14 +3,26 @@
 
 namespace diazoxide\wp\lib\option;
 
+use diazoxide\helpers\HTML;
 use diazoxide\wp\lib\option\v2\Option;
 
 class Test
 {
+    private const NAME = 'wp-lib-option-test-settings-4';
 
     public static function testFormPrint(): void
     {
         $settings = [
+            'test_bool'=>new Option(
+                [
+                    'type'=>Option::TYPE_BOOL
+                ]
+            ),
+            'test_number'=>new Option(
+                [
+                    'type'=>Option::TYPE_NUMBER,
+                ]
+            ),
             'test_object' => [
                 'test_object_1' => new Option(
                     [
@@ -87,7 +99,14 @@ class Test
             )
         ];
 
-        Option::printForm('wp-lib-option-test-settings-3', $settings);
+        Option::printForm(self::NAME, $settings);
+
+        echo HTML::tagOpen('pre');
+
+        /** @noinspection ForgottenDebugOutputInspection */
+        var_dump(Option::expandOptions($settings, self::NAME));
+
+        echo HTML::tagClose('pre');
     }
 
 }
