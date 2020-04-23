@@ -4,7 +4,6 @@
 namespace diazoxide\wp\lib\option\fields;
 
 
-
 abstract class Field
 {
     /**
@@ -37,12 +36,12 @@ abstract class Field
     /**
      * @var array
      * */
-    public $attrs;
+    public $attrs = [];
 
     /**
      * @var array
      * */
-    public $data;
+    public $data = [];
 
     /**
      * Actions
@@ -51,7 +50,7 @@ abstract class Field
      * @var array
      * */
     public $on = [];
-    
+
     public $errors = [];
 
     public function __construct(array $args)
@@ -64,16 +63,16 @@ abstract class Field
             }
         }
 
-        if(!$this->validate()){
-            throw new \InvalidArgumentException($this->errors);
+        if (!$this->validate()) {
+            throw new \Exception(json_encode($this->errors));
         }
     }
 
     protected function requiredFields(): array
     {
-        return ['name'];
+        return [];
     }
-    
+
     protected function validate(): bool
     {
         foreach ($this->requiredFields() as $required_field) {
