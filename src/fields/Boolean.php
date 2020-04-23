@@ -27,16 +27,19 @@ class Boolean extends Field
 
         $html .= HTML::tagOpen(
             'input',
-            $this->attrs + [
-                'value' => self::MASK_BOOL_TRUE,
-                'type' => 'checkbox',
-                'name' => $this->name,
-                'data' => $this->data,
-                $this->value ? 'checked' : '',
-                $readonly_str,
-                $disabled_str,
-                $required_str
-            ]
+            array_merge(
+                $this->attrs,
+                [
+                    'value' => self::MASK_BOOL_TRUE,
+                    'type' => 'checkbox',
+                    'name' => $this->name,
+                    'data' => $this->data,
+                    $this->value ? 'checked' : '',
+                    $readonly_str,
+                    $disabled_str,
+                    $required_str
+                ]
+            )
         );
 
         return $html;
