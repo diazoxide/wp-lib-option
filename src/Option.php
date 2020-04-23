@@ -714,7 +714,7 @@ class Option implements interfaces\Option
      * @return array
      * @see printForm
      */
-    public static function expandOptions(array $options, ?string $parent = null): array
+    public static function expandOptions(array $options, ?string $parent = null, $serialize = false): array
     {
         static::arrayWalkWithRoute(
             $options,
@@ -725,6 +725,9 @@ class Option implements interfaces\Option
                     }
                     if ($item->getParam('parent') === null) {
                         $item->setParam('parent', $parent);
+                    }
+                    if ($item->getParam('serialize') === null) {
+                        $item->setParam('serialize', $parent);
                     }
                     $item = $item->getValue();
                 }
