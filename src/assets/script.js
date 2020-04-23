@@ -150,13 +150,13 @@
                     collapseAll: function (button) {
                         let labels = button.closest('form').querySelectorAll('ul.wp-lib-option-nested-fields > .label.open');
                         for (let i = 0; i < labels.length; i++) {
-                            this.toggleLabel(labels[i],false,false);
+                            this.toggleLabel(labels[i], false, false);
                         }
                     },
                     expandAll: function (button) {
                         let labels = button.closest('form').querySelectorAll('ul.wp-lib-option-nested-fields > .label:not(.open)');
                         for (let i = 0; i < labels.length; i++) {
-                            this.toggleLabel(labels[i],false,false);
+                            this.toggleLabel(labels[i], false, false);
                         }
                     },
                     removeItem: function (button) {
@@ -166,6 +166,18 @@
                             if (form !== null) {
                                 form.onchange();
                             }
+                        }
+                    },
+                    objectKeyChange(key_field) {
+                        let fields = key_field.parentElement.querySelectorAll('[name]');
+                        for (let i = 0; i < fields.length; i++) {
+                            let field = fields[i];
+                            if (key_field.value != null) {
+                                field.removeAttribute('disabled')
+                            }
+                            let attr = field.getAttribute('name');
+                            attr = attr.replace(/{{encode_key}}.*?(?=])/gm, '{{encode_key}}' + btoa(key_field.value));
+                            fields[i].setAttribute('name', attr);
                         }
                     },
                     duplicateItem: function (button) {
