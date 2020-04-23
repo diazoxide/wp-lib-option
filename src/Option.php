@@ -5,6 +5,7 @@ namespace diazoxide\wp\lib\option;
 use diazoxide\helpers\Environment;
 use diazoxide\helpers\HTML;
 use diazoxide\helpers\URL;
+use Exception;
 
 /**
  * Class Option
@@ -221,6 +222,7 @@ class Option implements interfaces\Option
      * Get option form field
      *
      * @return string
+     * @throws Exception
      * @uses createField
      */
     public function getField(): string
