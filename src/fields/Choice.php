@@ -61,7 +61,7 @@ class Choice extends Field
     {
         $html = '';
 
-        $this->attrs = array_merge(
+        $attrs = array_merge(
             $this->attrs,
             [
                 'data' => $this->data,
@@ -76,7 +76,7 @@ class Choice extends Field
             $html .= HTML::tagOpen(
                 'select',
                 array_merge(
-                    $this->attrs,
+                    $attrs,
                     [
                         'select2' => 'true',
                         $this->multiple ? 'multiple' : '',
@@ -105,7 +105,7 @@ class Choice extends Field
                         HTML::tagOpen(
                             'input',
                             array_merge(
-                                $this->attrs,
+                                $attrs,
                                 [
                                     'type' => $this->multiple ? 'checkbox' : 'radio',
                                     'value' => $key,
