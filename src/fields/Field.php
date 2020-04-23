@@ -113,4 +113,12 @@ abstract class Field
     {
         echo $this->template();
     }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public static function unmask(&$value):bool {
+        return false;
+    }
 }
