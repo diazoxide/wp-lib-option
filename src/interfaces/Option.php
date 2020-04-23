@@ -10,6 +10,7 @@ interface Option
 {
 
     public const TYPE_BOOL = 'bool';
+    public const TYPE_NUMBER = 'number';
     public const TYPE_TEXT = 'text';
     public const TYPE_OBJECT = 'object';
     public const TYPE_GROUP = 'group';
