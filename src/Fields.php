@@ -327,8 +327,7 @@ class Fields
                             'attrs' => $input_attrs,
                             'disabled' => $disabled,
                             'required' => $required,
-                            'readonly' => $readonly,
-                            'test_field'=>'test_field'
+                            'readonly' => $readonly
                         ]
                     ))->get();
                     /* if ($markup === null || $markup === Option::MARKUP_SELECT) {
