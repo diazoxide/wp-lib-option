@@ -6,6 +6,9 @@ namespace diazoxide\wp\lib\option;
 use diazoxide\helpers\HTML;
 use diazoxide\wp\lib\option\fields\Boolean;
 use diazoxide\wp\lib\option\fields\Choice;
+use diazoxide\wp\lib\option\fields\Input;
+use diazoxide\wp\lib\option\fields\Number;
+use diazoxide\wp\lib\option\fields\Text;
 
 class Fields
 {
@@ -70,13 +73,8 @@ class Fields
         }
 
         $disabled = $params['disabled'] ?? false;
-        $disabled_str = $disabled ? 'disabled' : '';
-
         $required = $params['required'] ?? false;
-        $required_str = $required ? 'required' : '';
-
         $readonly = $params['readonly'] ?? false;
-        $readonly_str = $readonly ? 'readonly' : '';
 
         $data = $params['data'] ?? [];
         $data['name'] = $data['name'] ?? $name;
@@ -95,15 +93,15 @@ class Fields
         /**
          * Fix empty values issue
          * */
-        $html .= HTML::tagOpen(
-            'input',
+        $html .= (new Input(
             [
                 'type' => 'hidden',
-                $disabled_str,
                 'name' => $name,
-                'value' => $method === Option::METHOD_MULTIPLE ? Option::MASK_ARRAY : Option::MASK_NULL
+                'value' => $method === Option::METHOD_MULTIPLE ? Option::MASK_ARRAY : Option::MASK_NULL,
+                'disabled' => $disabled
             ]
-        );
+        ))->get();
+
 
         switch ($type) {
             case Option::TYPE_BOOL:
@@ -141,7 +139,7 @@ class Fields
             case Option::TYPE_OBJECT:
                 $on_change = "var fields = this.parentElement.querySelectorAll('[name]'); for (var i = 0; i < fields.length; i++) { var field = fields[i]; if (this.value != null) { field.removeAttribute('disabled') }; var attr =  field.getAttribute('name'); attr = attr.replace(/{{encode_key}}.*?(?=\])/gm, '{{encode_key}}' + btoa(this.value)); fields[i].setAttribute('name', attr); }";
 
-                if ($template !== null && !empty($template)) {
+                if (!empty($template) && !empty($value)) {
                     foreach ($value as $key => $_value) {
                         $_html = '';
 
@@ -163,7 +161,7 @@ class Fields
                                             'type' => 'text',
                                             'placeholder' => $label,
                                             'value' => $key,
-                                            'onchange' => $on_change
+                                            'onchange' => 'diazoxide.wordpress.option.objectKeyChange(this)'
                                         ]
                                     ),
                                     self::group($_html),
@@ -192,7 +190,7 @@ class Fields
                                                 'type' => 'text',
                                                 'placeholder' => $label,
                                                 'value' => $key,
-                                                'onchange' => $on_change
+                                                'onchange' => 'diazoxide.wordpress.option.objectKeyChange(this)'
                                             ]
                                         ),
                                         self::createField($_field),
@@ -228,7 +226,7 @@ class Fields
                                     'class' => 'key full',
                                     'type' => 'text',
                                     'placeholder' => $label,
-                                    'onchange' => $on_change
+                                    'onchange' => 'diazoxide.wordpress.option.objectKeyChange(this)'
                                 ]
                             ),
                             self::group($_html),
@@ -243,182 +241,186 @@ class Fields
 
                 break;
             case Option::TYPE_GROUP:
-                if (!empty($template)) {
-                    $template_description = $template_params['description'] ?? null;
-                    $template_attrs = $template_params['attrs'] ?? [];
-                    $template_attrs['minimised'] = 'false';
+                if (empty($template)) {
+                    break;
+                }
+                $template_description = $template_params['description'] ?? null;
+                $template_attrs = $template_params['attrs'] ?? [];
+                $template_attrs['minimised'] = 'false';
 
-                    if ($method === Option::METHOD_SINGLE) {
-                        foreach ($template as $key => $_field) {
-                            $_field['name'] = $name . '[' . $key . ']';
-                            $_field['value'] = $value[$key] ?? null;
-                            $html .= self::createField($_field);
-                        }
-                    } elseif ($method === Option::METHOD_MULTIPLE) {
-                        $last_key = 1;
-                        if ($value !== null) {
-                            $value = array_values($value);
-                            $last_key = count($value) - 1;
-                            foreach ($value as $key => $_value) {
-                                $__html = '';
+                if ($method === Option::METHOD_MULTIPLE) {
+                    $last_key = 1;
+                    if ($value !== null) {
+                        $value = array_values($value);
+                        $last_key = count($value) - 1;
+                        foreach ($value as $key => $_value) {
+                            $__html = '';
 
-                                foreach ($template as $_key => $_field) {
-                                    $_field = $template[$_key];
-                                    $_field['name'] = $name . '[' . $key . ']' . '[' . $_key . ']';
-                                    $_field['value'] = $_value[$_key] ?? '';
-                                    $__html .= self::createField($_field);
-                                }
-
-                                if (is_callable($template_description)) {
-                                    $template_description = $template_description($key, $_value);
-                                }
-
-                                $__html .= $template_description !== null ? HTML::tag(
-                                    'div',
-                                    $template_description,
-                                    ['class' => 'description']
-                                ) : '';
-
-                                $html .= self::group(
-                                //Todo: Handle group duplication and minimise
-                                    $__html . self::itemButtons(['remove']),
-                                    $template_attrs
-                                );
+                            foreach ($template as $_key => $_field) {
+                                $_field = $template[$_key];
+                                $_field['name'] = $name . '[' . $key . ']' . '[' . $_key . ']';
+                                $_field['value'] = $_value[$_key] ?? '';
+                                $__html .= self::createField($_field);
                             }
+
+                            if (is_callable($template_description)) {
+                                $template_description = $template_description($key, $_value);
+                            }
+
+                            $__html .= $template_description !== null ? HTML::tag(
+                                'div',
+                                $template_description,
+                                ['class' => 'description']
+                            ) : '';
+
+                            $html .= self::group(
+                            //Todo: Handle group duplication and minimise
+                                $__html . self::itemButtons(['remove']),
+                                $template_attrs
+                            );
                         }
+                    }
 
-                        $__html = '';
+                    $__html = '';
 
-                        foreach ($template as $key => $_field) {
-                            $_field['name'] = $name . '[{{LAST_KEY}}]' . '[' . $key . ']';
-                            $_field['disabled'] = true;
-                            $__html .= self::createField($_field);
-                        }
+                    foreach ($template as $key => $_field) {
+                        $_field['name'] = $name . '[{{LAST_KEY}}]' . '[' . $key . ']';
+                        $_field['disabled'] = true;
+                        $__html .= self::createField($_field);
+                    }
 
-                        if (is_callable($template_description)) {
-                            $template_description = $template_description(null, null);
-                        }
+                    if (is_callable($template_description)) {
+                        $template_description = $template_description(null, null);
+                    }
 
-                        $__html .= $template_description !== null ? HTML::tag(
-                            'div',
-                            $template_description,
-                            ['class' => 'description']
-                        ) : '';
+                    $__html .= $template_description !== null ? HTML::tag(
+                        'div',
+                        $template_description,
+                        ['class' => 'description']
+                    ) : '';
 
-                        $template_attrs['new'] = 'true';
-                        $template_attrs['class'] = 'hidden';
-                        $html .= self::group(
-                            $__html . self::itemButtons(['remove']),
-                            $template_attrs
-                        );
+                    $template_attrs['new'] = 'true';
+                    $template_attrs['class'] = 'hidden';
+                    $html .= self::group(
+                        $__html . self::itemButtons(['remove']),
+                        $template_attrs
+                    );
 
-                        $html .= self::addNewButton($last_key);
+                    $html .= self::addNewButton($last_key);
+                } else {
+                    foreach ($template as $key => $_field) {
+                        $_field['name'] = $name . '[' . $key . ']';
+                        $_field['value'] = $value[$key] ?? null;
+                        $html .= self::createField($_field);
                     }
                 }
+
                 break;
             default:
                 if (!empty($values)) {
+                    HTML::addClass($input_attrs['class'], 'full');
                     $html .= (new Choice(
                         [
-                            'name'=>$name,
-                            'value'=>$value,
-                            'choices'=>$values,
-                            'markup'=> $markup,
-                            'multiple'=>$method === Option::METHOD_MULTIPLE,
-                            'disabled'=>$disabled,
-                            'required'=>$required,
-                            'readonly'=>$readonly,
-                            'attrs'=>$input_attrs
+                            'name' => $name,
+                            'value' => $value,
+                            'choices' => $values,
+                            'markup' => $markup,
+                            'multiple' => $method === Option::METHOD_MULTIPLE,
+                            'disabled' => $disabled,
+                            'required' => $required,
+                            'readonly' => $readonly,
+                            'attrs' => $input_attrs
                         ]
                     ))->get();
-                   /* if ($markup === null || $markup === Option::MARKUP_SELECT) {
-                        HTML::addClass($input_attrs['class'], 'full');
+                    /* if ($markup === null || $markup === Option::MARKUP_SELECT) {
+                         HTML::addClass($input_attrs['class'], 'full');
 
-                        $html .= HTML::tagOpen(
-                            'select',
-                            $input_attrs + [
-                                'select2' => 'true',
-                                'name' => $name . ($method === Option::METHOD_MULTIPLE ? '[]' : ''),
-                                $method === Option::METHOD_MULTIPLE ? 'multiple' : '',
-                                'data' => $data,
-                                $disabled_str,
-                                $readonly_str,
-                                $required_str
-                            ]
-                        );
-                        $open_tag_select = true;
-                    }
-                    $value = is_array($value) ? $value : [$value];
+                         $html .= HTML::tagOpen(
+                             'select',
+                             $input_attrs + [
+                                 'select2' => 'true',
+                                 'name' => $name . ($method === Option::METHOD_MULTIPLE ? '[]' : ''),
+                                 $method === Option::METHOD_MULTIPLE ? 'multiple' : '',
+                                 'data' => $data,
+                                 $disabled_str,
+                                 $readonly_str,
+                                 $required_str
+                             ]
+                         );
+                         $open_tag_select = true;
+                     }
+                     $value = is_array($value) ? $value : [$value];
 
-                    self::sortSelectValues($values, $value);
+                     self::sortSelectValues($values, $value);
 
-                    foreach ($values as $key => $_value) {
-                        if ($markup === null || $markup === Option::MARKUP_SELECT) {
-                            $html .= HTML::tag(
-                                'option',
-                                $_value,
-                                [
-                                    'value' => $key,
-                                    (($key === $value) || in_array($key, $value, true)) ? 'selected' : ''
-                                ]
-                            );
-                        } elseif ($markup === Option::MARKUP_CHECKBOX) {
-                            $html .= self::group(
-                                HTML::tag(
-                                    'label',
-                                    HTML::tagOpen(
-                                        'input',
-                                        [
-                                            'type' => $method === Option::METHOD_MULTIPLE ? 'checkbox' : 'radio',
-                                            'name' => $name . ($method === Option::METHOD_MULTIPLE ? '[]' : ''),
-                                            'value' => $key,
-                                            'data' => $data,
-                                            (($key === $value) || in_array($key, $value, true)) ? 'checked' : '',
-                                            $disabled_str,
-                                            $readonly_str,
-                                            $required_str
-                                        ]
-                                    ) . $_value
-                                )
-                            );
-                        }
-                    }
+                     foreach ($values as $key => $_value) {
+                         if ($markup === null || $markup === Option::MARKUP_SELECT) {
+                             $html .= HTML::tag(
+                                 'option',
+                                 $_value,
+                                 [
+                                     'value' => $key,
+                                     (($key === $value) || in_array($key, $value, true)) ? 'selected' : ''
+                                 ]
+                             );
+                         } elseif ($markup === Option::MARKUP_CHECKBOX) {
+                             $html .= self::group(
+                                 HTML::tag(
+                                     'label',
+                                     HTML::tagOpen(
+                                         'input',
+                                         [
+                                             'type' => $method === Option::METHOD_MULTIPLE ? 'checkbox' : 'radio',
+                                             'name' => $name . ($method === Option::METHOD_MULTIPLE ? '[]' : ''),
+                                             'value' => $key,
+                                             'data' => $data,
+                                             (($key === $value) || in_array($key, $value, true)) ? 'checked' : '',
+                                             $disabled_str,
+                                             $readonly_str,
+                                             $required_str
+                                         ]
+                                     ) . $_value
+                                 )
+                             );
+                         }
+                     }
 
-                    if (isset($open_tag_select)) {
-                        $html .= HTML::tagClose('select');
-                    }*/
+                     if (isset($open_tag_select)) {
+                         $html .= HTML::tagClose('select');
+                     }*/
                 } elseif ($method === Option::METHOD_MULTIPLE) {
                     HTML::addClass($input_attrs['class'], 'full');
                     if (is_array($value)) {
                         foreach ($value as $key => $_value) {
                             if (!empty($_value)) {
                                 $html .= self::group(
-                                    HTML::tagOpen(
-                                        'input',
-                                        $input_attrs + [
+                                    (new Input(
+                                        [
                                             'name' => $name . '[]',
                                             'type' => $markup,
                                             'placeholder' => $label,
-                                            'value' => $_value,
-                                            $disabled_str,
-                                            $readonly_str,
-                                            $required_str
+                                            'value' => $value,
+                                            'disabled' => $disabled,
+                                            'readonly' => $readonly,
+                                            'required' => $required,
+                                            'attrs' => $input_attrs
                                         ]
-                                    ) . self::itemButtons(['duplicate', 'remove'])
+                                    ))->get() . self::itemButtons(['duplicate', 'remove'])
                                 );
                             }
                         }
                     }
+
                     $html .= self::group(
-                        HTML::tagOpen(
-                            'input',
-                            $input_attrs + [
-                                'name' => $name . '[]',
+                        (new Input(
+                            [
                                 'type' => $markup,
+                                'name' => $name . '[]',
                                 'placeholder' => $label,
-                                'disabled'
+                                'disabled' => true,
+                                'attrs' => $input_attrs
                             ]
-                        ) . self::itemButtons(['remove']),
+                        ))->get() . self::itemButtons(['remove']),
                         [
                             'class' => 'hidden',
                             'new' => 'true',
@@ -428,37 +430,34 @@ class Fields
 
                     $html .= self::addNewButton();
                 } elseif ($method !== Option::METHOD_MULTIPLE) {
-                    if (in_array($markup, [Option::MARKUP_TEXT, Option::MARKUP_NUMBER], true)) {
-                        $html .= HTML::tagOpen(
-                            'input',
+                    HTML::addClass($input_attrs['class'], 'full');
+                    if ($markup === Option::MARKUP_NUMBER) {
+                        $html .= (new Number(
                             [
-                                'class' => 'full',
-                                'type' => $markup,
-                                'placeholder' => $label,
                                 'name' => $name,
                                 'value' => $value,
-                                'data' => $data,
-                                $disabled_str,
-                                $readonly_str,
-                                $required_str
-                            ]
-                        );
-                    } elseif ($markup === Option::MARKUP_TEXTAREA) {
-                        $html .= HTML::tagOpen(
-                            'textarea',
-                            [
-                                'class' => 'full',
-                                'type' => $markup,
                                 'placeholder' => $label,
-                                'name' => $name,
+                                'attrs' => $input_attrs,
                                 'data' => $data,
-                                $disabled_str,
-                                $readonly_str,
-                                $required_str
+                                'disabled' => $disabled,
+                                'readonly' => $readonly,
+                                'required' => $required
                             ]
-                        );
-                        $html .= $value;
-                        $html .= HTML::tagClose('textarea');
+                        ))->get();
+                    } else {
+                        $html .= (new Text(
+                            [
+                                'name' => $name,
+                                'value' => $value,
+                                'placeholder' => $label,
+                                'attrs' => $input_attrs,
+                                'data' => $data,
+                                'large' => $markup === Option::MARKUP_TEXTAREA,
+                                'disabled' => $disabled,
+                                'readonly' => $readonly,
+                                'required' => $required
+                            ]
+                        ))->get();
                     }
                 } else {
                     $html .= self::group('Not handled!');
@@ -479,39 +478,6 @@ class Fields
         }
 
         return $html;
-    }
-
-    /**
-     * Normalize `<select>` options values order
-     *
-     * @param array $values
-     * @param array $value
-     */
-    private static function sortSelectValues(array &$values, array $value): void
-    {
-        uksort(
-            $values,
-            static function ($a, $b) use ($value) {
-                $a_i = array_search($a, $value, true);
-                $b_i = array_search($b, $value, true);
-
-                if ($a_i === false) {
-                    return 0;
-                }
-
-                if ($b_i === false) {
-                    return 1;
-                }
-
-                $index = $a_i - $b_i;
-
-                if ($index > 0) {
-                    return 1;
-                }
-
-                return -1;
-            }
-        );
     }
 
     /**
