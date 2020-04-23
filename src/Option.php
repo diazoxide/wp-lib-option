@@ -477,7 +477,7 @@ class Option implements interfaces\Option
                     }
 
                     if ($item->getParam('serialize') === null) {
-                        $item->setParam('name', $serialize);
+                        $item->setParam('serialize', $serialize);
                     }
 
                     if ($exported_data !== null) {

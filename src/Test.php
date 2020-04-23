@@ -8,7 +8,7 @@ use diazoxide\wp\lib\option\v2\Option;
 
 class Test
 {
-    private const NAME = 'wp-lib-option-test-settings-4';
+    private const NAME = 'wp-lib-option-test-settings-5';
 
     public static function testFormPrint(): void
     {
