@@ -24,7 +24,7 @@ class Choice extends Field
         if ($this->multiple === true
             && !is_array($this->value)
         ) {
-            if($this->value === null){
+            if ($this->value === null) {
                 $this->value = [];
             } else {
                 $this->errors[] = ['value_must_be_array', '`value` field must be array when multiple field is true.'];
@@ -54,20 +54,23 @@ class Choice extends Field
 
     protected function requiredFields(): array
     {
-        return parent::requiredFields() + ['choices'];
+        return array_merge(parent::requiredFields(), ['choices']);
     }
 
     protected function template(): string
     {
         $html = '';
 
-        $this->attrs += [
-            'data' => $this->data,
-            'name' => $this->name . ($this->multiple ? '[]' : ''),
-            $this->disabled ? 'disabled' : '',
-            $this->required ? 'required' : '',
-            $this->readonly ? 'readonly' : '',
-        ];
+        $this->attrs = array_merge(
+            $this->attrs,
+            [
+                'data' => $this->data,
+                'name' => $this->name . ($this->multiple ? '[]' : ''),
+                $this->disabled ? 'disabled' : '',
+                $this->required ? 'required' : '',
+                $this->readonly ? 'readonly' : '',
+            ]
+        );
 
         if ($this->markup === static::MARKUP_SELECT) {
             $html .= HTML::tagOpen(
