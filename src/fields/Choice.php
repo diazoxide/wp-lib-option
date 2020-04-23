@@ -21,9 +21,15 @@ class Choice extends Field
 
     public function validate(): bool
     {
-        if ($this->multiple === true && !is_array($this->value)) {
-            $this->errors[] = ['value_must_be_array', '`value` field must be array when multiple field is true.'];
-            return false;
+        if ($this->multiple === true
+            && !is_array($this->value)
+        ) {
+            if($this->value === null){
+                $this->value = [];
+            } else {
+                $this->errors[] = ['value_must_be_array', '`value` field must be array when multiple field is true.'];
+                return false;
+            }
         }
 
         if (!is_array($this->choices)) {
@@ -55,24 +61,30 @@ class Choice extends Field
     {
         $html = '';
 
+        $this->attrs += [
+            'data' => $this->data,
+            'name' => $this->name . ($this->multiple ? '[]' : ''),
+            $this->disabled ? 'disabled' : '',
+            $this->required ? 'required' : '',
+            $this->readonly ? 'readonly' : '',
+        ];
+
         if ($this->markup === static::MARKUP_SELECT) {
             $html .= HTML::tagOpen(
                 'select',
-                $this->attrs + [
-                    'select2' => 'true',
-                    'name' => $this->name . ($this->multiple ? '[]' : ''),
-                    $this->multiple ? 'multiple' : '',
-                    'data' => $this->data,
-                    $this->disabled ? 'disabled' : '',
-                    $this->required ? 'required' : '',
-                    $this->readonly ? 'readonly' : ''
-                ]
+                array_merge(
+                    $this->attrs,
+                    [
+                        'select2' => 'true',
+                        $this->multiple ? 'multiple' : '',
+                    ]
+                )
             );
         }
 
         foreach ($this->choices as $key => $_value) {
-            $selected = (!$this->multiple && $key === $this->value)
-                || ($this->multiple && in_array( $key, $this->value,true) );
+            $selected = (!$this->multiple && $key == $this->value)
+                || ($this->multiple && in_array($key, $this->value));
 
             if ($this->markup === static::MARKUP_SELECT) {
                 $html .= HTML::tag(
@@ -89,16 +101,14 @@ class Choice extends Field
                         'label',
                         HTML::tagOpen(
                             'input',
-                            [
-                                'type' => $this->multiple ? 'checkbox' : 'radio',
-                                'name' => $this->name . ($this->multiple ? '[]' : ''),
-                                'value' => $key,
-                                'data' => $this->data,
-                                $selected ? 'checked' : '',
-                                $this->disabled ? 'disabled' : '',
-                                $this->required ? 'required' : '',
-                                $this->readonly ? 'readonly' : ''
-                            ]
+                            array_merge(
+                                $this->attrs,
+                                [
+                                    'type' => $this->multiple ? 'checkbox' : 'radio',
+                                    'value' => $key,
+                                    $selected ? 'checked' : ''
+                                ]
+                            )
                         ) . $_value
                     )
                 );
