@@ -324,10 +324,11 @@ class Fields
                             'choices' => $values,
                             'markup' => $markup,
                             'multiple' => $method === Option::METHOD_MULTIPLE,
+                            'attrs' => $input_attrs,
                             'disabled' => $disabled,
                             'required' => $required,
                             'readonly' => $readonly,
-                            'attrs' => $input_attrs
+                            'test_field'=>'test_field'
                         ]
                     ))->get();
                     /* if ($markup === null || $markup === Option::MARKUP_SELECT) {
@@ -398,10 +399,10 @@ class Fields
                                             'type' => $markup,
                                             'placeholder' => $label,
                                             'value' => $value,
+                                            'attrs' => $input_attrs,
                                             'disabled' => $disabled,
                                             'readonly' => $readonly,
                                             'required' => $required,
-                                            'attrs' => $input_attrs
                                         ]
                                     ))->get() . self::itemButtons(['duplicate', 'remove'])
                                 );
