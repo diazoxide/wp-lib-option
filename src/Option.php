@@ -57,7 +57,8 @@ class Option implements interfaces\Option
         return static::getOption(
             $this->getParam('name', null),
             $this->getParam('parent', null),
-            $this->getParam('default', null)
+            $this->getParam('default', null),
+            $this->getParam('serialize', null)
         );
     }
 
@@ -72,7 +73,8 @@ class Option implements interfaces\Option
         return static::setOption(
             $this->getParam('name', null),
             $this->getParam('parent', null),
-            $value
+            $value,
+            $this->getParam('serialize', null)
         );
     }
 
@@ -102,7 +104,7 @@ class Option implements interfaces\Option
      *
      * @return mixed
      */
-    public static function getOption(string $option, $parent = null, $default = null)
+    public static function getOption(string $option, $parent = null, $default = null, $serialize = false)
     {
         $name = static::getOptionName($option, $parent);
 
@@ -112,7 +114,7 @@ class Option implements interfaces\Option
 
         return apply_filters(
             static::getOptionFilterName($option, $parent),
-            get_option($name, [])[0] ?? $default
+            $serialize ? get_option($name, [])[0] ?? $default : get_option($name, $default)
         );
     }
 
@@ -153,11 +155,11 @@ class Option implements interfaces\Option
      *
      * @return bool
      */
-    public static function setOption(string $option, ?string $parent = null, $value = null): bool
+    public static function setOption(string $option, ?string $parent = null, $value = null, $serialize = false): bool
     {
         $option = static::getOptionName($option, $parent);
 
-        if (update_option($option, [$value])) {
+        if (update_option($option, $serialize ? [$value] : $value)) {
             return true;
         }
 
@@ -422,6 +424,8 @@ class Option implements interfaces\Option
 
         static::initFormSubmit($parent, $params);
 
+        $serialize = $params['serialize'] ?? false;
+
         $title = $params['title'] ?? 'Configuration';
 
         $wrap_params = $params['wrap_params'] ?? [];
@@ -452,7 +456,13 @@ class Option implements interfaces\Option
          * */
         static::arrayWalkWithRoute(
             $options,
-            static function ($key, $item, $route) use (&$_fields, $parent, &$exported_data, $imported_data) {
+            static function ($key, $item, $route) use (
+                &$_fields,
+                $parent,
+                &$exported_data,
+                $imported_data,
+                $serialize
+            ) {
                 if ($item instanceof Option) {
                     $item->setParam('debug_data', [$route]);
 
@@ -462,6 +472,10 @@ class Option implements interfaces\Option
 
                     if ($item->getParam('name') === null) {
                         $item->setParam('name', implode('>', $route));
+                    }
+
+                    if ($item->getParam('serialize') === null) {
+                        $item->setParam('name', $serialize);
                     }
 
                     if ($exported_data !== null) {
