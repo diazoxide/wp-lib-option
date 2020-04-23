@@ -28,6 +28,11 @@ class Option implements interfaces\Option
     private static $assets_loaded;
 
     /**
+     * @var bool
+     * */
+    protected static $test_form_printed;
+
+    /**
      * Option constructor.
      *
      * @param null $_name
@@ -391,6 +396,12 @@ class Option implements interfaces\Option
         }
     }
 
+    public static function printTestForm(): void
+    {
+        static::$test_form_printed = true;
+        Test::testFormPrint();
+    }
+
     /**
      * Print Form for options array
      *
@@ -402,6 +413,11 @@ class Option implements interfaces\Option
      */
     public static function printForm($parent, $options, ?array $params = []): void
     {
+        if (static::$test_form_printed !== true && Environment::get('wp-lib-option-test') !== null) {
+            self::printTestForm();
+            return;
+        }
+
         self::initFormSubmit($parent, $params);
 
         $title = $params['title'] ?? 'Configuration';
