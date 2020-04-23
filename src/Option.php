@@ -112,7 +112,7 @@ class Option implements interfaces\Option
 
         return apply_filters(
             static::getOptionFilterName($option, $parent),
-            get_option($name, $default)
+            get_option($name, [])[0] ?? $default
         );
     }
 
@@ -157,7 +157,7 @@ class Option implements interfaces\Option
     {
         $option = static::getOptionName($option, $parent);
 
-        if (update_option($option, $value)) {
+        if (update_option($option, [$value])) {
             return true;
         }
 
