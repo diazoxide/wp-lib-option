@@ -102,6 +102,7 @@ class Option implements interfaces\Option
      * @param null $parent
      * @param null $default
      *
+     * @param bool $serialize
      * @return mixed
      */
     public static function getOption(string $option, $parent = null, $default = null, $serialize = false)
@@ -153,6 +154,7 @@ class Option implements interfaces\Option
      * @param string|null $parent
      * @param $value
      *
+     * @param bool $serialize
      * @return bool
      */
     public static function setOption(string $option, ?string $parent = null, $value = null, $serialize = false): bool
@@ -711,6 +713,7 @@ class Option implements interfaces\Option
      *
      * @param array $options
      * @param string|null $parent
+     * @param bool $serialize
      * @return array
      * @see printForm
      */
@@ -718,7 +721,7 @@ class Option implements interfaces\Option
     {
         static::arrayWalkWithRoute(
             $options,
-            static function ($key, &$item, $route) use ($parent) {
+            static function ($key, &$item, $route) use ($parent, $serialize) {
                 if ($item instanceof self) {
                     if ($item->getParam('name') === null) {
                         $item->setParam('name', implode('>', $route));
@@ -727,7 +730,7 @@ class Option implements interfaces\Option
                         $item->setParam('parent', $parent);
                     }
                     if ($item->getParam('serialize') === null) {
-                        $item->setParam('serialize', $parent);
+                        $item->setParam('serialize', $serialize);
                     }
                     $item = $item->getValue();
                 }
