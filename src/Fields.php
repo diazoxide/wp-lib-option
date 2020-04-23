@@ -6,6 +6,8 @@ namespace diazoxide\wp\lib\option;
 use diazoxide\helpers\HTML;
 use diazoxide\wp\lib\option\fields\Boolean;
 use diazoxide\wp\lib\option\fields\Choice;
+use diazoxide\wp\lib\option\fields\EmptyField;
+use diazoxide\wp\lib\option\fields\Field;
 use diazoxide\wp\lib\option\fields\Input;
 use diazoxide\wp\lib\option\fields\Number;
 use diazoxide\wp\lib\option\fields\Text;
@@ -13,6 +15,19 @@ use Exception;
 
 class Fields
 {
+
+    /**
+     * @var Field[]
+     */
+    private static $fields_classes = [
+        Boolean::class,
+        Choice::class,
+        EmptyField::class,
+        Input::class,
+        Number::class,
+        Text::class
+    ];
+    
     /**
      * Create field markup static method
      *
@@ -88,18 +103,17 @@ class Fields
 
         $html = '';
 
-        if (!empty($debug_data)) {
-            $html .= '<!--' . var_export($debug_data, true) . '-->';
-        }
+//        if (!empty($debug_data)) {
+//            $html .= '<!--' . var_export($debug_data, true) . '-->';
+//        }
 
         /**
          * Fix empty values issue
          * */
-        $html .= (new Input(
+        $html .= (new EmptyField(
             [
-                'type' => 'hidden',
                 'name' => $name,
-                'value' => $method === Option::METHOD_MULTIPLE ? Option::MASK_ARRAY : Option::MASK_NULL,
+                'array' => $method === Option::METHOD_MULTIPLE,
                 'disabled' => $disabled
             ]
         ))->get();
@@ -118,25 +132,19 @@ class Fields
                         'attrs' => $input_attrs
                     ]
                 ))->get();
-
-                /*$html .= HTML::tagOpen(
-                    'input',
-                    ['value' => Option::MASK_BOOL_FALSE, 'type' => 'hidden', 'name' => $name]
-                );
-
-                $html .= HTML::tagOpen(
-                    'input',
-                    $input_attrs + [
-                        'value' => Option::MASK_BOOL_TRUE,
-                        'type' => 'checkbox',
+                break;
+            case Option::TYPE_NUMBER:
+                $html .= (new Number(
+                    [
                         'name' => $name,
+                        'value' => $value,
                         'data' => $data,
-                        $value ? 'checked' : '',
-                        $readonly_str,
-                        $disabled_str,
-                        $required_str
+                        'readonly' => $readonly,
+                        'disabled' => $disabled,
+                        'required' => $required,
+                        'attrs' => $input_attrs
                     ]
-                );*/
+                ))->get();
                 break;
             case Option::TYPE_OBJECT:
                 if (!empty($template) && !empty($value)) {
@@ -333,62 +341,6 @@ class Fields
                             'readonly' => $readonly
                         ]
                     ))->get();
-                    /* if ($markup === null || $markup === Option::MARKUP_SELECT) {
-                         HTML::addClass($input_attrs['class'], 'full');
-
-                         $html .= HTML::tagOpen(
-                             'select',
-                             $input_attrs + [
-                                 'select2' => 'true',
-                                 'name' => $name . ($method === Option::METHOD_MULTIPLE ? '[]' : ''),
-                                 $method === Option::METHOD_MULTIPLE ? 'multiple' : '',
-                                 'data' => $data,
-                                 $disabled_str,
-                                 $readonly_str,
-                                 $required_str
-                             ]
-                         );
-                         $open_tag_select = true;
-                     }
-                     $value = is_array($value) ? $value : [$value];
-
-                     static::sortSelectValues($values, $value);
-
-                     foreach ($values as $key => $_value) {
-                         if ($markup === null || $markup === Option::MARKUP_SELECT) {
-                             $html .= HTML::tag(
-                                 'option',
-                                 $_value,
-                                 [
-                                     'value' => $key,
-                                     (($key === $value) || in_array($key, $value, true)) ? 'selected' : ''
-                                 ]
-                             );
-                         } elseif ($markup === Option::MARKUP_CHECKBOX) {
-                             $html .= static::group(
-                                 HTML::tag(
-                                     'label',
-                                     HTML::tagOpen(
-                                         'input',
-                                         [
-                                             'type' => $method === Option::METHOD_MULTIPLE ? 'checkbox' : 'radio',
-                                             'name' => $name . ($method === Option::METHOD_MULTIPLE ? '[]' : ''),
-                                             'value' => $key,
-                                             'data' => $data,
-                                             (($key === $value) || in_array($key, $value, true)) ? 'checked' : '',
-                                             $disabled_str,
-                                             $readonly_str,
-                                             $required_str
-                                         ]
-                                     ) . $_value
-                                 )
-                             );
-                         }
-                     }
-
-                     if (isset($open_tag_select)) {
-                         $html .= HTML::tagClose('select');
-                     }*/
                 } elseif ($method === Option::METHOD_MULTIPLE) {
                     HTML::addClass($input_attrs['class'], 'full');
                     if (is_array($value)) {
@@ -498,7 +450,6 @@ class Fields
 
         return $html;
     }
-
 
     /**
      * Get form item buttons
@@ -693,6 +644,17 @@ class Fields
     }
 
     /**
+     * @param $value
+     */
+    public static function unmaskFieldValue(&$value): void
+    {
+        foreach (static::$fields_classes as $class){
+            if($class::unmask($value)){
+                break;
+            }
+        }
+    }
+    /**
      * Decode form keys
      *
      * @param array $input
@@ -709,9 +671,7 @@ class Fields
                 $value = static::decodeKeys($value);
             } elseif (is_string($value)) {
                 $value = stripslashes($value);
-                $value = static::maybeBoolean($value);
-                $value = static::maybeArray($value);
-                $value = static::maybeNull($value);
+                self::unmaskFieldValue($value);
             }
             $return[$key] = $value;
         }
