@@ -144,11 +144,11 @@ class Fields
                         foreach ($template as $_key => $_field) {
                             $_field['value'] = $_value[$_key] ?? null;
                             $_field['data']['name'] = $name . '[{{encode_key}}]' . '[' . $_key . ']';
-                            $_field['name'] = $name . '[' . self::encodeKey($key) . ']' . '[' . $_key . ']';
-                            $_html .= self::createField($_field);
+                            $_field['name'] = $name . '[' . static::encodeKey($key) . ']' . '[' . $_key . ']';
+                            $_html .= static::createField($_field);
                         }
 
-                        $html .= self::group(
+                        $html .= static::group(
                             implode(
                                 '',
                                 [
@@ -162,8 +162,8 @@ class Fields
                                             'onchange' => 'diazoxide.wordpress.option.objectKeyChange(this)'
                                         ]
                                     ),
-                                    self::group($_html),
-                                    self::itemButtons()
+                                    static::group($_html),
+                                    static::itemButtons()
                                 ]
                             ),
                             ['minimised' => 'false']
@@ -175,8 +175,8 @@ class Fields
                             $_field = $field;
                             $_field['value'] = $_value;
                             $_field['data']['name'] = $name . '[{{encode_key}}]';
-                            $_field['name'] = $name . '[' . self::encodeKey($key) . ']';
-                            $html .= self::group(
+                            $_field['name'] = $name . '[' . static::encodeKey($key) . ']';
+                            $html .= static::group(
                                 implode(
                                     '',
                                     [
@@ -191,8 +191,8 @@ class Fields
                                                 'onchange' => 'diazoxide.wordpress.option.objectKeyChange(this)'
                                             ]
                                         ),
-                                        self::createField($_field),
-                                        self::itemButtons()
+                                        static::createField($_field),
+                                        static::itemButtons()
                                     ]
                                 )
                             );
@@ -206,15 +206,15 @@ class Fields
                     foreach ($template as $key => $_field) {
                         $_field['name'] = $name . '[{{encode_key}}]' . '[' . $key . ']';
                         $_field['disabled'] = true;
-                        $_html .= self::createField($_field);
+                        $_html .= static::createField($_field);
                     }
                 } elseif ($field !== null && !empty($field)) {
                     $field['name'] = $name . '[{{encode_key}}]';
                     $field['disabled'] = true;
-                    $_html .= self::createField($field);
+                    $_html .= static::createField($field);
                 }
 
-                $html .= self::group(
+                $html .= static::group(
                     implode(
                         '',
                         [
@@ -227,15 +227,15 @@ class Fields
                                     'onchange' => 'diazoxide.wordpress.option.objectKeyChange(this)'
                                 ]
                             ),
-                            self::group($_html),
-                            self::itemButtons(['duplicate', 'remove'])
+                            static::group($_html),
+                            static::itemButtons(['duplicate', 'remove'])
 
                         ]
                     ),
                     ['new' => 'true', 'class' => 'hidden']
                 );
 
-                $html .= self::addNewButton();
+                $html .= static::addNewButton();
 
                 break;
             case Option::TYPE_GROUP:
@@ -258,7 +258,7 @@ class Fields
                                 $_field = $template[$_key];
                                 $_field['name'] = $name . '[' . $key . ']' . '[' . $_key . ']';
                                 $_field['value'] = $_value[$_key] ?? '';
-                                $__html .= self::createField($_field);
+                                $__html .= static::createField($_field);
                             }
 
                             if (is_callable($template_description)) {
@@ -271,9 +271,9 @@ class Fields
                                 ['class' => 'description']
                             ) : '';
 
-                            $html .= self::group(
+                            $html .= static::group(
                             //Todo: Handle group duplication and minimise
-                                $__html . self::itemButtons(['remove']),
+                                $__html . static::itemButtons(['remove']),
                                 $template_attrs
                             );
                         }
@@ -284,7 +284,7 @@ class Fields
                     foreach ($template as $key => $_field) {
                         $_field['name'] = $name . '[{{LAST_KEY}}]' . '[' . $key . ']';
                         $_field['disabled'] = true;
-                        $__html .= self::createField($_field);
+                        $__html .= static::createField($_field);
                     }
 
                     if (is_callable($template_description)) {
@@ -299,17 +299,18 @@ class Fields
 
                     $template_attrs['new'] = 'true';
                     $template_attrs['class'] = 'hidden';
-                    $html .= self::group(
-                        $__html . self::itemButtons(['remove']),
+                    $html .= static::group(
+                        $__html . static::itemButtons(['remove']),
                         $template_attrs
                     );
 
-                    $html .= self::addNewButton($last_key);
+                    $html .= static::addNewButton($last_key);
                 } else {
                     foreach ($template as $key => $_field) {
                         $_field['name'] = $name . '[' . $key . ']';
                         $_field['value'] = $value[$key] ?? null;
-                        $html .= self::createField($_field);
+                        $_field['disabled'] = $disabled;
+                        $html .= static::createField($_field);
                     }
                 }
 
@@ -349,7 +350,7 @@ class Fields
                      }
                      $value = is_array($value) ? $value : [$value];
 
-                     self::sortSelectValues($values, $value);
+                     static::sortSelectValues($values, $value);
 
                      foreach ($values as $key => $_value) {
                          if ($markup === null || $markup === Option::MARKUP_SELECT) {
@@ -362,7 +363,7 @@ class Fields
                                  ]
                              );
                          } elseif ($markup === Option::MARKUP_CHECKBOX) {
-                             $html .= self::group(
+                             $html .= static::group(
                                  HTML::tag(
                                      'label',
                                      HTML::tagOpen(
@@ -391,7 +392,7 @@ class Fields
                     if (is_array($value)) {
                         foreach ($value as $key => $_value) {
                             if (!empty($_value)) {
-                                $html .= self::group(
+                                $html .= static::group(
                                     (new Input(
                                         [
                                             'name' => $name . '[]',
@@ -403,13 +404,13 @@ class Fields
                                             'readonly' => $readonly,
                                             'required' => $required,
                                         ]
-                                    ))->get() . self::itemButtons(['duplicate', 'remove'])
+                                    ))->get() . static::itemButtons(['duplicate', 'remove'])
                                 );
                             }
                         }
                     }
 
-                    $html .= self::group(
+                    $html .= static::group(
                         (new Input(
                             [
                                 'type' => $markup,
@@ -418,7 +419,7 @@ class Fields
                                 'disabled' => true,
                                 'attrs' => $input_attrs
                             ]
-                        ))->get() . self::itemButtons(['remove']),
+                        ))->get() . static::itemButtons(['remove']),
                         [
                             'class' => 'hidden',
                             'new' => 'true',
@@ -426,7 +427,7 @@ class Fields
                         ]
                     );
 
-                    $html .= self::addNewButton();
+                    $html .= static::addNewButton();
                 } elseif ($method !== Option::METHOD_MULTIPLE) {
                     HTML::addClass($input_attrs['class'], 'full');
                     if ($markup === Option::MARKUP_NUMBER) {
@@ -458,7 +459,7 @@ class Fields
                         ))->get();
                     }
                 } else {
-                    $html .= self::group('Not handled!');
+                    $html .= static::group('Not handled!');
                 }
                 break;
         }
@@ -516,7 +517,7 @@ class Fields
         }
         foreach ($buttons as $button) {
             $fn_name = $button . 'Button';
-            $html .= call_user_func([self::class, $fn_name]);
+            $html .= call_user_func([static::class, $fn_name]);
         }
 
         $html .= HTML::tagClose('div');
@@ -590,7 +591,7 @@ class Fields
      */
     private static function addNewButton(?int $last_key = 0): string
     {
-        return self::group(
+        return static::group(
             HTML::tag(
                 'button',
                 '+ Add new',
@@ -700,15 +701,15 @@ class Fields
     {
         $return = array();
         foreach ($input as $key => $value) {
-            $key = self::maybeDecodeKey($key);
+            $key = static::maybeDecodeKey($key);
 
             if (is_array($value)) {
-                $value = self::decodeKeys($value);
+                $value = static::decodeKeys($value);
             } elseif (is_string($value)) {
                 $value = stripslashes($value);
-                $value = self::maybeBoolean($value);
-                $value = self::maybeArray($value);
-                $value = self::maybeNull($value);
+                $value = static::maybeBoolean($value);
+                $value = static::maybeArray($value);
+                $value = static::maybeNull($value);
             }
             $return[$key] = $value;
         }
