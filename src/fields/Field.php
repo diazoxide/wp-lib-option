@@ -4,6 +4,10 @@
 namespace diazoxide\wp\lib\option\fields;
 
 
+use Exception;
+use InvalidArgumentException;
+use RuntimeException;
+
 abstract class Field
 {
     /**
@@ -53,18 +57,23 @@ abstract class Field
 
     public $errors = [];
 
+    /**
+     * Field constructor.
+     * @param array $args
+     * @throws Exception
+     */
     public function __construct(array $args)
     {
         foreach ($args as $arg => $value) {
             if (property_exists(static::class, $arg)) {
                 $this->{$arg} = $value;
             } else {
-                throw new \InvalidArgumentException("'$arg' is not valid argument for '" . static::class . "'");
+                throw new InvalidArgumentException("'$arg' is not valid argument for '" . static::class . "'");
             }
         }
 
         if (!$this->validate()) {
-            throw new \Exception(json_encode($this->errors));
+            throw new RuntimeException(json_encode($this->errors));
         }
     }
 
