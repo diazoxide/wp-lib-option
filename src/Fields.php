@@ -137,8 +137,6 @@ class Fields
                 );*/
                 break;
             case Option::TYPE_OBJECT:
-                $on_change = "var fields = this.parentElement.querySelectorAll('[name]'); for (var i = 0; i < fields.length; i++) { var field = fields[i]; if (this.value != null) { field.removeAttribute('disabled') }; var attr =  field.getAttribute('name'); attr = attr.replace(/{{encode_key}}.*?(?=\])/gm, '{{encode_key}}' + btoa(this.value)); fields[i].setAttribute('name', attr); }";
-
                 if (!empty($template) && !empty($value)) {
                     foreach ($value as $key => $_value) {
                         $_html = '';

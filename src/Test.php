@@ -17,7 +17,7 @@ class Test
                         'type' => Option::TYPE_OBJECT,
                         'template' => [
                             'a_1' => ['type' => Option::TYPE_TEXT],
-                            'a_2' => [],
+                            'a_2' => ['values'=>['asd','qwe']],
                         ]
                     ]
                 )
