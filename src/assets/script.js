@@ -69,7 +69,7 @@
                     },
                     formSetStatus(form, status) {
                         form.dataset.status = status;
-                        let form_status = form.querySelector('.form-status');
+                        let form_status = form.querySelector('.form-status>button');
                         if (form_status !== null) {
                             let statuses = form_status.querySelectorAll('span');
 
