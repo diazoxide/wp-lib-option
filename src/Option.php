@@ -5,6 +5,7 @@ namespace diazoxide\wp\lib\option;
 use diazoxide\helpers\Environment;
 use diazoxide\helpers\HTML;
 use diazoxide\helpers\URL;
+use diazoxide\wp\lib\option\fields\Input;
 use Exception;
 
 /**
@@ -402,6 +403,12 @@ class Option implements interfaces\Option
         }
     }
 
+    /**
+     * Print test form
+     *
+     * @return void
+     * @since 23042020
+     */
     public static function printTestForm(): void
     {
         static::$test_form_printed = true;
@@ -415,11 +422,18 @@ class Option implements interfaces\Option
      * @param $options
      * @param array|null $params
      * @see expandOptions
-     *
      */
     public static function printForm($parent, $options, ?array $params = []): void
     {
-        if (static::$test_form_printed !== true && Environment::get('wp-lib-option-test') !== null) {
+        /**
+         * Test form. Only for development
+         *
+         * @since 23042020
+         * */
+        if (
+            static::$test_form_printed !== true
+            && Environment::get('wp-lib-option-test') !== null
+        ) {
             static::printTestForm();
             return;
         }
@@ -581,7 +595,16 @@ class Option implements interfaces\Option
 
         wp_nonce_field($parent, static::getNonceFieldName($parent));
 
-        submit_button();
+        echo (new Input(
+            [
+                'type' => 'submit',
+                'name' => $parent . '-form-submit',
+                'value' => 'Save Changes',
+                'attrs' => ['class' => 'button button-primary']
+            ]
+        ))->get();
+
+        //submit_button();
 
         echo HTML::tagClose('form');
 
@@ -653,10 +676,23 @@ class Option implements interfaces\Option
                 [
                     'div',
                     [
-                        ['span', 'Saving...', ['class' => 'saving hidden']],
-                        ['span', 'Saved', ['class' => 'saved hidden']],
-                        ['span', 'Failed', ['class' => 'failed hidden']],
-                        ['span', 'Unsaved', ['class' => 'unsaved hidden']],
+                        [
+                            'button',
+                            [
+                                ['span', 'Save Changes', ['class' => 'save']],
+                                ['span', 'Saving...', ['class' => 'saving hidden']],
+                                ['span', 'Saved', ['class' => 'saved hidden']],
+                                ['span', 'Failed', ['class' => 'failed hidden']],
+                                [
+                                    'span',
+                                    'Unsaved',
+                                    ['class' => 'unsaved hidden']
+                                ],
+                            ],
+                            ['type' => 'submit','class'=>'button button-default']
+
+
+                        ],
                     ],
                     ['class' => 'form-status']
                 ],
