@@ -443,15 +443,10 @@ class Option implements interfaces\Option
         static::initFormSubmit($parent, $params);
 
         $serialize = $params['serialize'] ?? false;
-
         $title = $params['title'] ?? 'Configuration';
-
         $wrap_params = $params['wrap_params'] ?? [];
-
         $title_params = $params['title_params'] ?? [];
-
         $form_params = $params['form_params'] ?? [];
-
         $form_head_params = $params['form_head_params'] ?? [];
 
         $_fields = [];
@@ -606,8 +601,6 @@ class Option implements interfaces\Option
             ]
         ))->get();
 
-        //submit_button();
-
         echo HTML::tagClose('form');
 
         echo HTML::tagClose('div');
@@ -752,7 +745,7 @@ class Option implements interfaces\Option
      * @param array $options
      * @param string|null $parent
      * @param array $params : Valid params
-     *                        `bool` `serialize` `false`
+     *                        `bool` `$serialize` `false`
      * @return array
      * @see printForm
      * @noinspection PhpUnusedParameterInspection
