@@ -589,61 +589,6 @@ class Fields
     }
 
     /**
-     * Check if form field is boolean and return
-     * Real boolean value
-     *
-     * @param $str
-     *
-     * @return bool|string
-     */
-    private static function maybeBoolean($str)
-    {
-        if ($str === Option::MASK_BOOL_TRUE) {
-            return true;
-        }
-
-        if ($str === Option::MASK_BOOL_FALSE) {
-            return false;
-        }
-
-        return $str;
-    }
-
-    /**
-     * Check if form field is boolean and return
-     * Real boolean value
-     *
-     * @param $str
-     *
-     * @return bool|string
-     */
-    private static function maybeNull($str)
-    {
-        if ($str === Option::MASK_NULL) {
-            return null;
-        }
-
-        return $str;
-    }
-
-    /**
-     * Check if form field is array and return
-     * Real array value
-     *
-     * @param $str
-     *
-     * @return array|string
-     */
-    private static function maybeArray($str)
-    {
-        if ($str === Option::MASK_ARRAY) {
-            return [];
-        }
-
-        return $str;
-    }
-
-    /**
      * @param $value
      */
     public static function unmaskFieldValue(&$value): void
