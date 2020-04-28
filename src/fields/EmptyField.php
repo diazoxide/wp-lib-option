@@ -4,10 +4,12 @@
 namespace diazoxide\wp\lib\option\fields;
 
 
+use diazoxide\wp\lib\option\interfaces\Option;
+
 class EmptyField extends Input
 {
-    public const MASK_NULL = '{~0~}';
-    public const MASK_ARRAY = '{~1~}';
+    public const MASK_NULL = Option::MASK_NULL;
+    public const MASK_ARRAY = Option::MASK_ARRAY;
 
     public $array = false;
 

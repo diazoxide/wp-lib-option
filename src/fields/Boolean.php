@@ -5,11 +5,12 @@ namespace diazoxide\wp\lib\option\fields;
 
 
 use diazoxide\helpers\HTML;
+use diazoxide\wp\lib\option\interfaces\Option;
 
 class Boolean extends Field
 {
-    public const MASK_BOOL_TRUE = '{~2~}';
-    public const MASK_BOOL_FALSE = '{~3~}';
+    private const MASK_BOOL_TRUE = Option::MASK_BOOL_TRUE;
+    private const MASK_BOOL_FALSE = Option::MASK_BOOL_FALSE;
 
     public $markup;
 

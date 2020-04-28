@@ -117,6 +117,7 @@ abstract class Field
     /**
      * @param mixed $value
      * @return bool
+     * @noinspection PhpUnusedParameterInspection
      */
     public static function unmask(&$value):bool {
         return false;

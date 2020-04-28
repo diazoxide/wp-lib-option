@@ -5,6 +5,7 @@ namespace diazoxide\wp\lib\option\fields;
 
 
 use diazoxide\helpers\Variables;
+use diazoxide\wp\lib\option\interfaces\Option;
 use Exception;
 
 class Number extends Field
@@ -17,8 +18,8 @@ class Number extends Field
     public $min;
     public $max;
 
-    public const MASK_INT = '{~11~}';
-    public const MASK_FLOAT = '{~12~}';
+    public const MASK_INT = Option::MASK_INT;
+    public const MASK_FLOAT = Option::MASK_FLOAT;
 
     protected function validate(): bool
     {
