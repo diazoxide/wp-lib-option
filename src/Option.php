@@ -421,7 +421,9 @@ class Option implements interfaces\Option
      * @param $parent
      * @param $options
      * @param array|null $params
+     * @throws Exception
      * @see expandOptions
+     * @noinspection PhpUnusedParameterInspection
      */
     public static function printForm($parent, $options, ?array $params = []): void
     {
@@ -689,7 +691,7 @@ class Option implements interfaces\Option
                                     ['class' => 'unsaved hidden']
                                 ],
                             ],
-                            ['type' => 'submit','class'=>'button button-default']
+                            ['type' => 'submit', 'class' => 'button button-default']
 
 
                         ],
@@ -749,15 +751,17 @@ class Option implements interfaces\Option
      *
      * @param array $options
      * @param string|null $parent
-     * @param bool $serialize
+     * @param array $params : Valid params
+     *                        `bool` `serialize` `false`
      * @return array
      * @see printForm
+     * @noinspection PhpUnusedParameterInspection
      */
-    public static function expandOptions(array $options, ?string $parent = null, $serialize = false): array
+    public static function expandOptions(array $options, ?string $parent = null, array $params = []): array
     {
         static::arrayWalkWithRoute(
             $options,
-            static function ($key, &$item, $route) use ($parent, $serialize) {
+            static function ($key, &$item, $route) use ($parent, $params) {
                 if ($item instanceof self) {
                     if ($item->getParam('name') === null) {
                         $item->setParam('name', implode('>', $route));
@@ -766,7 +770,7 @@ class Option implements interfaces\Option
                         $item->setParam('parent', $parent);
                     }
                     if ($item->getParam('serialize') === null) {
-                        $item->setParam('serialize', $serialize);
+                        $item->setParam('serialize', $params['serialize'] ?? false);
                     }
                     $item = $item->getValue();
                 }
