@@ -28,5 +28,7 @@ interface Option
     public const MASK_ARRAY = '{~1~}';
     public const MASK_BOOL_TRUE = '{~2~}';
     public const MASK_BOOL_FALSE = '{~3~}';
+    public const MASK_INT = '{~4~}';
+    public const MASK_FLOAT = '{~5~}';
     
 }
