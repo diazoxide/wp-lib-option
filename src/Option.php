@@ -380,8 +380,10 @@ class Option implements interfaces\Option
         $form_data = static::getFormData($parent);
 
         if ($form_data) {
+            $serialize = $params['serialize'] ?? false;
+
             foreach ($form_data as $key => $field) {
-                static::setOption($key, $parent, $field);
+                static::setOption($key, $parent, $field, $serialize);
             }
 
             $form_saved = $params['form_saved'] ?? null;
