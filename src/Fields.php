@@ -352,7 +352,7 @@ class Fields
                                             'name' => $name . '[]',
                                             'type' => $markup,
                                             'placeholder' => $label,
-                                            'value' => $value,
+                                            'value' => $_value,
                                             'attrs' => $input_attrs,
                                             'disabled' => $disabled,
                                             'readonly' => $readonly,

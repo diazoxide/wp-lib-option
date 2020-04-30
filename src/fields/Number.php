@@ -21,6 +21,8 @@ class Number extends Field
     public const MASK_INT = Option::MASK_INT;
     public const MASK_FLOAT = Option::MASK_FLOAT;
 
+    public $placeholder;
+
     protected function validate(): bool
     {
         $this->attrs['min'] = $this->min;
@@ -46,6 +48,7 @@ class Number extends Field
             'disabled' => $this->disabled,
             'required' => $this->required,
             'readonly' => $this->readonly,
+            'placeholder'=>$this->placeholder,
             'data' => $this->data,
             'attrs' => array_merge(
                 $this->attrs,

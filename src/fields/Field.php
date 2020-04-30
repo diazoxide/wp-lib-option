@@ -55,6 +55,9 @@ abstract class Field
      * */
     public $on = [];
 
+    /**
+     * @var array
+     * */
     public $errors = [];
 
     /**
