@@ -35,6 +35,10 @@
     margin-top: 20px;
 }
 
+.wp-lib-option-wrap .branding {
+    text-align: right;
+}
+
 .wp-lib-option-wrap > form .form-head {
     z-index: 2;
     position: -webkit-sticky;
@@ -60,24 +64,24 @@ body.admin-bar .wp-lib-option-wrap > form .form-head {
 .wp-lib-option-wrap > form > .form-head > .form-status > span {
 }
 
-.wp-lib-option-wrap > form > .form-head > .form-status > button{
-    min-width:150px;
-    font-weight:bold;
+.wp-lib-option-wrap > form > .form-head > .form-status > button {
+    min-width: 150px;
+    font-weight: bold;
 }
 
-.wp-lib-option-wrap > form > .form-head > .form-status > button >.saved {
+.wp-lib-option-wrap > form > .form-head > .form-status > button > .saved {
     color: #00a200;
 }
 
-.wp-lib-option-wrap > form > .form-head > .form-status > button >.saving {
+.wp-lib-option-wrap > form > .form-head > .form-status > button > .saving {
     color: #007cba;
 }
 
-.wp-lib-option-wrap > form .form-head > .form-status >button >.unsaved {
+.wp-lib-option-wrap > form .form-head > .form-status > button > .unsaved {
     color: #dc3232;
 }
 
-.wp-lib-option-wrap > form >.form-head > div {
+.wp-lib-option-wrap > form > .form-head > div {
     display: inline-block;
     vertical-align: middle;
     margin-left: 10px;
