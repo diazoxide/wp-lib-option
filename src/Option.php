@@ -15,6 +15,7 @@ use Exception;
  * */
 class Option implements interfaces\Option
 {
+    public const VERSION = '1.3.5';
     /**
      * Option Params
      *
@@ -55,11 +56,30 @@ class Option implements interfaces\Option
      */
     public function getValue()
     {
-        return static::getOption(
-            $this->getParam('name', null),
-            $this->getParam('parent', null),
-            $this->getParam('default', null),
-            $this->getParam('serialize', null)
+        $parent = $this->getParam('parent', null);
+        $name = $this->getParam('name', null);
+        $default = $this->getParam('default', null);
+        $serialize = $this->getParam('serialize', false);
+
+        if ($this->getParam('single_option', false)) {
+            $value = static::getOption(
+                    '__form-data',
+                    $parent,
+                    $default,
+                    $serialize
+                )[$name] ?? $default;
+        } else {
+            $value = static::getOption(
+                $name,
+                $parent,
+                $default,
+                $serialize
+            );
+        }
+
+        return apply_filters(
+            static::getOptionFilterName($name, $parent),
+            $value
         );
     }
 
@@ -99,25 +119,24 @@ class Option implements interfaces\Option
     /**
      * Get single option value
      *
-     * @param string $option
-     * @param null $parent
+     * @param string $name
+     * @param string $parent
      * @param null $default
      *
      * @param bool $serialize
      * @return mixed
      */
-    public static function getOption(string $option, $parent = null, $default = null, $serialize = false)
+    public static function getOption(string $name, string $parent = null, $default = null, bool $serialize = false)
     {
-        $name = static::getOptionName($option, $parent);
+        $option_name = static::getOptionName($name, $parent);
 
-        if (static::isOptionConstant($option)) {
-            return constant($name);
+        if (static::isOptionConstant($name)) {
+            return constant($option_name);
         }
 
-        return apply_filters(
-            static::getOptionFilterName($option, $parent),
-            $serialize ? get_option($name, [])[0] ?? $default : get_option($name, $default)
-        );
+        return $serialize
+            ? (get_option($option_name, [])[0] ?? $default)
+            : get_option($option_name, $default);
     }
 
     /**
@@ -382,8 +401,14 @@ class Option implements interfaces\Option
         if ($form_data) {
             $serialize = $params['serialize'] ?? false;
 
-            foreach ($form_data as $key => $field) {
-                static::setOption($key, $parent, $field, $serialize);
+            $single_option = $params['single_option'] ?? false;
+
+            if ($single_option) {
+                static::setOption('__form-data', $parent, $form_data, $serialize);
+            } else {
+                foreach ($form_data as $key => $field) {
+                    static::setOption($key, $parent, $field, $serialize);
+                }
             }
 
             $form_saved = $params['form_saved'] ?? null;
@@ -445,6 +470,9 @@ class Option implements interfaces\Option
         static::initFormSubmit($parent, $params);
 
         $serialize = $params['serialize'] ?? false;
+
+        $single_option = $params['single_option'] ?? false;
+
         $title = $params['title'] ?? 'Configuration';
         $wrap_params = $params['wrap_params'] ?? [];
         $title_params = $params['title_params'] ?? [];
@@ -476,7 +504,8 @@ class Option implements interfaces\Option
                 $parent,
                 &$exported_data,
                 $imported_data,
-                $serialize
+                $serialize,
+                $single_option
             ) {
                 if ($item instanceof Option) {
                     $item->setParam('debug_data', [$route]);
@@ -491,6 +520,10 @@ class Option implements interfaces\Option
 
                     if ($item->getParam('serialize') === null) {
                         $item->setParam('serialize', $serialize);
+                    }
+
+                    if ($item->getParam('single_option') === null) {
+                        $item->setParam('single_option', $single_option);
                     }
 
                     if ($exported_data !== null) {
@@ -604,6 +637,14 @@ class Option implements interfaces\Option
         ))->get();
 
         echo HTML::tagClose('form');
+
+        echo HTML::tag(
+            'div',
+            [
+                ['i', 'Version: ' . static::VERSION, ['class' => 'version']]
+            ],
+            ['class' => 'branding']
+        );
 
         echo HTML::tagClose('div');
 
@@ -767,6 +808,10 @@ class Option implements interfaces\Option
                     if ($item->getParam('serialize') === null) {
                         $item->setParam('serialize', $params['serialize'] ?? false);
                     }
+                    if ($item->getParam('single_option') === null) {
+                        $item->setParam('single_option', $params['single_option'] ?? false);
+                    }
+
                     $item = $item->getValue();
                 }
             }
