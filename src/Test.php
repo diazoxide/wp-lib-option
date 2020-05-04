@@ -13,14 +13,25 @@ class Test
     public static function testFormPrint(): void
     {
         $settings = [
-            'test_bool'=>new Option(
+
+            'test_nest' => [
+                'test_nest_2' => [
+                    'test_nest_3' => new Option(
+                        [
+                            'type' => Option::TYPE_BOOL
+                        ]
+                    )
+                ]
+            ],
+
+            'test_bool' => new Option(
                 [
-                    'type'=>Option::TYPE_BOOL
+                    'type' => Option::TYPE_BOOL
                 ]
             ),
-            'test_number'=>new Option(
+            'test_number' => new Option(
                 [
-                    'type'=>Option::TYPE_NUMBER,
+                    'type' => Option::TYPE_NUMBER,
                 ]
             ),
             'test_object' => [
@@ -93,18 +104,27 @@ class Test
             'checkbox_field' => new Option(
                 [
                     'markup' => Option::MARKUP_CHECKBOX,
-                    'values' => ['asd', 'qwe'],
+                    'values' => ['asd'=>'asd','qwe'=> 'qwe'],
                     'method' => Option::METHOD_SINGLE,
                 ]
             )
         ];
 
-        Option::printForm(self::NAME, $settings);
+        Option::printForm(self::NAME, $settings, ['serialize' => true, 'single_option' => true]);
 
         echo HTML::tagOpen('pre');
 
         /** @noinspection ForgottenDebugOutputInspection */
-        var_dump(Option::expandOptions($settings, self::NAME));
+        var_dump(
+            Option::expandOptions(
+                $settings,
+                self::NAME,
+                [
+                    'serialize' => true,
+                    'single_option' => true
+                ]
+            )
+        );
 
         echo HTML::tagClose('pre');
     }
