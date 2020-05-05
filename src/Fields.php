@@ -27,7 +27,7 @@ class Fields
         Number::class,
         Text::class
     ];
-    
+
     /**
      * Create field markup static method
      *
@@ -42,6 +42,16 @@ class Fields
          * Main element HTML Attributes
          * */
         $main_params = $params['main_params'] ?? [];
+
+        $before_field = $params['before_field'] ?? '';
+        if (is_callable($before_field)) {
+            $before_field = $before_field($params);
+        }
+
+        $after_field = $params['after_field'] ?? '';
+        if (is_callable($after_field)) {
+            $after_field = $after_field($params);
+        }
 
         $value = $params['value'] ?? null;
         $name = $params['name'] ?? null;
@@ -101,7 +111,7 @@ class Fields
             $description = $description($params);
         }
 
-        $html = '';
+        $html = $before_field;
 
 //        if (!empty($debug_data)) {
 //            $html .= '<!--' . var_export($debug_data, true) . '-->';
@@ -430,6 +440,8 @@ class Fields
             $html .= HTML::tag('div', $description, $description_params);
         }
 
+        $html .= $after_field;
+
         return $html;
     }
 
@@ -593,12 +605,13 @@ class Fields
      */
     public static function unmaskFieldValue(&$value): void
     {
-        foreach (static::$fields_classes as $class){
-            if($class::unmask($value)){
+        foreach (static::$fields_classes as $class) {
+            if ($class::unmask($value)) {
                 break;
             }
         }
     }
+
     /**
      * Decode form keys
      *

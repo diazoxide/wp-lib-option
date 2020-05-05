@@ -254,6 +254,8 @@ class Option implements interfaces\Option
         return Fields::createField(
             [
                 'main_params' => $this->getParam('main_params', false),
+                'before_field'=>$this->getParam('before_field', null),
+                'after_field'=>$this->getParam('after_field', null),
                 'name' => $this->getParam('name', false),
                 'value' => $this->getValue(),
                 'default' => $this->getParam('default', null),
@@ -335,7 +337,7 @@ class Option implements interfaces\Option
         $parent = $parent ?? 'Option';
 
 
-        echo '<ul class="wp-lib-option-nested-fields ' . $parent . '-nested-fields">';
+        echo sprintf('<ul route="%s" class="wp-lib-option-nested-fields %s-nested-fields">', $route,$parent);
 
         $before = apply_filters('wp-lib-option/' . $parent . '/form-before-nested-fields', null, $route, $parent);
         echo empty($before) ? '' : '<li class="before">' . $before . '</li>';
