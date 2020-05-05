@@ -81,8 +81,8 @@ class Fields
         $field = $params['field'] ?? null;
 
 
-        $input_attrs = $params['input_attrs'] ?? [];
-        HTML::addClass($input_attrs['class'], [$type, $method]);
+        $input_params = $params['input_params'] ?? [];
+        HTML::addClass($input_params['class'], [$type, $method]);
 
 
         if ($parent !== null) {
@@ -129,7 +129,7 @@ class Fields
                         'readonly' => $readonly,
                         'disabled' => $disabled,
                         'required' => $required,
-                        'attrs' => $input_attrs
+                        'attrs' => $input_params
                     ]
                 ))->get();
                 break;
@@ -142,7 +142,7 @@ class Fields
                         'readonly' => $readonly,
                         'disabled' => $disabled,
                         'required' => $required,
-                        'attrs' => $input_attrs
+                        'attrs' => $input_params
                     ]
                 ))->get();
                 break;
@@ -327,7 +327,7 @@ class Fields
                 break;
             default:
                 if (!empty($values)) {
-                    HTML::addClass($input_attrs['class'], 'full');
+                    HTML::addClass($input_params['class'], 'full');
                     $html .= (new Choice(
                         [
                             'name' => $name,
@@ -335,14 +335,14 @@ class Fields
                             'choices' => $values,
                             'markup' => $markup,
                             'multiple' => $method === Option::METHOD_MULTIPLE,
-                            'attrs' => $input_attrs,
+                            'attrs' => $input_params,
                             'disabled' => $disabled,
                             'required' => $required,
                             'readonly' => $readonly
                         ]
                     ))->get();
                 } elseif ($method === Option::METHOD_MULTIPLE) {
-                    HTML::addClass($input_attrs['class'], 'full');
+                    HTML::addClass($input_params['class'], 'full');
                     if (is_array($value)) {
                         foreach ($value as $key => $_value) {
                             if (!empty($_value)) {
@@ -353,7 +353,7 @@ class Fields
                                             'type' => $markup,
                                             'placeholder' => $label,
                                             'value' => $_value,
-                                            'attrs' => $input_attrs,
+                                            'attrs' => $input_params,
                                             'disabled' => $disabled,
                                             'readonly' => $readonly,
                                             'required' => $required,
@@ -371,7 +371,7 @@ class Fields
                                 'name' => $name . '[]',
                                 'placeholder' => $label,
                                 'disabled' => true,
-                                'attrs' => $input_attrs
+                                'attrs' => $input_params
                             ]
                         ))->get() . static::itemButtons(['remove']),
                         [
@@ -383,14 +383,14 @@ class Fields
 
                     $html .= static::addNewButton();
                 } elseif ($method !== Option::METHOD_MULTIPLE) {
-                    HTML::addClass($input_attrs['class'], 'full');
+                    HTML::addClass($input_params['class'], 'full');
                     if ($markup === Option::MARKUP_NUMBER) {
                         $html .= (new Number(
                             [
                                 'name' => $name,
                                 'value' => $value,
                                 'placeholder' => $label,
-                                'attrs' => $input_attrs,
+                                'attrs' => $input_params,
                                 'data' => $data,
                                 'disabled' => $disabled,
                                 'readonly' => $readonly,
@@ -403,7 +403,7 @@ class Fields
                                 'name' => $name,
                                 'value' => $value,
                                 'placeholder' => $label,
-                                'attrs' => $input_attrs,
+                                'attrs' => $input_params,
                                 'data' => $data,
                                 'large' => $markup === Option::MARKUP_TEXTAREA,
                                 'disabled' => $disabled,

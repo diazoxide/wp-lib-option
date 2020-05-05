@@ -259,6 +259,7 @@ class Option implements interfaces\Option
                 'default' => $this->getParam('default', null),
                 'type' => $this->getParam('type', null),
                 'debug_data' => $this->getParam('debug_data', null),
+                'input_params' => $this->getParam('input_params', null),
                 /**
                  * Label
                  * */
