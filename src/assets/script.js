@@ -120,6 +120,7 @@
                         }
                     },
                     addNew: function (button) {
+
                         let form = button.closest('form');
 
                         let last_key = parseInt(button.getAttribute('last-key')) + 1;
@@ -128,7 +129,7 @@
                         c.removeAttribute('new');
                         c.classList.remove('hidden');
                         c.classList.add('added');
-                        let e = c.querySelectorAll('[name]');
+                        let e = c.querySelectorAll(':scope > :not([new]) > [name]');
 
                         for (let i = 0; i < e.length; i++) {
                             e[i].disabled = false;
