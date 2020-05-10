@@ -2,7 +2,6 @@
 
 namespace diazoxide\wp\lib\option;
 
-
 use diazoxide\helpers\HTML;
 use diazoxide\wp\lib\option\fields\Boolean;
 use diazoxide\wp\lib\option\fields\Choice;
@@ -12,6 +11,8 @@ use diazoxide\wp\lib\option\fields\Input;
 use diazoxide\wp\lib\option\fields\Number;
 use diazoxide\wp\lib\option\fields\Text;
 use Exception;
+use diazoxide\wp\lib\option\v2\Option;
+use InvalidArgumentException;
 
 class Fields
 {
@@ -28,90 +29,146 @@ class Fields
         Text::class
     ];
 
-    /**
-     * Create field markup static method
-     *
-     * @param array $params
-     *
-     * @return string
-     * @throws Exception
-     */
-    public static function createField($params = []): string
+    public $main_params = [];
+    public $before_field = '';
+    public $after_field = '';
+    public $value;
+    public $default;
+    public $name;
+    public $relation;
+    public $serialize = false;
+    public $single_option = false;
+    public $parent;
+    public $debug_data;
+    public $label;
+    public $label_params = [];
+
+    public $description;
+    public $description_params = [];
+
+    public $type;
+    public $method;
+    public $markup;
+    public $values = [];
+
+    public $template;
+    public $template_params = [];
+    public $field;
+    public $field_params = [];
+    public $input_params = [];
+
+    public $disabled = false;
+    public $readonly = false;
+    public $required = false;
+
+    public $data = [];
+
+    public function __construct(array $params = [])
     {
-        /**
-         * Main element HTML Attributes
-         * */
-        $main_params = $params['main_params'] ?? [];
-
-        $before_field = $params['before_field'] ?? '';
-        if (is_callable($before_field)) {
-            $before_field = $before_field($params);
+        foreach ($params as $arg => $value) {
+            if (property_exists(static::class, $arg)) {
+                $this->{$arg} = $value;
+            } else {
+                throw new InvalidArgumentException("'$arg' is not valid argument for '" . static::class . "'");
+            }
         }
 
-        $after_field = $params['after_field'] ?? '';
-        if (is_callable($after_field)) {
-            $after_field = $after_field($params);
+        if (is_callable($this->before_field)) {
+            $this->before_field = ($this->before_field)($params);
         }
-
-        $value = $params['value'] ?? null;
-        $name = $params['name'] ?? null;
-
-        $parent = $params['parent'] ?? null;
-
-        $debug_data = $params['debug_data'] ?? null;
+        if (is_callable($this->after_field)) {
+            $this->after_field = ($this->after_field)($params);
+        }
 
         /**
          * Determine Label
          * */
-        $label = $params['label'] ?? null;
-        $label_params = $params['label_params'] ?? null;
-        HTML::addClass($label_params['class'], 'label');
+        HTML::addClass($this->label_params['class'], 'label');
 
         /**
          * Determine Description
          * */
-        $description = $params['description'] ?? null;
-        $description_params = $params['description_params'] ?? null;
-        HTML::addClass($description_params['class'], 'description');
 
-        $type = $params['type'] ?? null;
-        $method = $params['method'] ?? null;
-        $values = $params['values'] ?? [];
-        $markup = $params['markup'] ?? null;
+        HTML::addClass($this->description_params['class'], 'description');
 
         /**
          * Automatically select markup type when it missing
          * */
-        if ($markup === null) {
-            $markup = empty($values) ? Option::MARKUP_TEXT : Option::MARKUP_SELECT;
+        if (!isset($this->markup)) {
+            $this->markup = empty($this->values) ? Option::MARKUP_TEXT : Option::MARKUP_SELECT;
         }
 
-        $template = $params['template'] ?? null;
-        $template_params = $params['template_params'] ?? [];
-        $field = $params['field'] ?? null;
+        HTML::addClass($this->input_params['class'], [$this->type, $this->method]);
 
-
-        $input_params = $params['input_params'] ?? [];
-        HTML::addClass($input_params['class'], [$type, $method]);
-
-
-        if ($parent !== null) {
-            $name = $parent . '[' . $name . ']';
+        if (isset($this->parent)) {
+            $this->name = $this->parent . '[' . $this->name . ']';
         }
 
-        $disabled = $params['disabled'] ?? false;
-        $required = $params['required'] ?? false;
-        $readonly = $params['readonly'] ?? false;
-
-        $data = $params['data'] ?? [];
-        $data['name'] = $data['name'] ?? $name;
+        $this->data['name'] = $this->data['name'] ?? $this->name;
 
 
-        if (is_callable($description)) {
-            $description = $description($params);
+        if (is_callable($this->description)) {
+            $this->description = ($this->description)($params);
         }
+    }
 
-        $html = $before_field;
+    /**
+     * Create field markup static method
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function get(): string
+    {
+        $html = $this->before_field;
+
+        /**
+         * @example
+         * ```php
+         * [
+         *  'with' => [
+         *   'parent' => 'some_another_parent',
+         *   'name' => 'option_name',
+         *   'key' => 'name',
+         *  ],
+         *  'label'=>'label'
+         * ]
+         * ```
+         * */
+        if (isset($this->relation)) {
+            $this->values = [];
+
+            $relation_parent = $this->relation['parent'] ?? null;
+            $relation_with = $this->relation['with'] ?? null;
+            $relation_name = $this->relation['name'] ?? null;
+            $relation_key = $this->relation['key'] ?? null;
+
+            if (is_callable($relation_with)) {
+                $relation_with = $relation_with();
+            } else {
+                throw new \RuntimeException('Only callable accepting.');
+            }
+
+            $relation_label = $this->relation['label'] ?? null;
+
+            $relation_option = Option::initOptions(
+                $relation_with,
+                $relation_parent,
+                ['serialize' => $this->serialize, 'single_option' => $this->single_option]
+            );
+
+            if ($relation_name !== null) {
+                $relation_option = $relation_option[$relation_name] ?? null;
+                if ($relation_option instanceof Option) {
+                    $relation_option = $relation_option->getValue();
+                }
+            }
+
+            foreach ($relation_option as $relation_index => $relation_item) {
+                $relation_item_key = $relation_item[$relation_key] ?? $relation_index;
+                $this->values[$relation_item_key] = $relation_item[$relation_label] ?? $relation_index;
+            }
+        }
 
 //        if (!empty($debug_data)) {
 //            $html .= '<!--' . var_export($debug_data, true) . '-->';
@@ -122,50 +179,50 @@ class Fields
          * */
         $html .= (new EmptyField(
             [
-                'name' => $name,
-                'array' => $method === Option::METHOD_MULTIPLE,
-                'disabled' => $disabled
+                'name' => $this->name,
+                'array' => $this->method === Option::METHOD_MULTIPLE,
+                'disabled' => $this->disabled
             ]
         ))->get();
 
 
-        switch ($type) {
+        switch ($this->type) {
             case Option::TYPE_BOOL:
                 $html .= (new Boolean(
                     [
-                        'name' => $name,
-                        'value' => $value,
-                        'data' => $data,
-                        'readonly' => $readonly,
-                        'disabled' => $disabled,
-                        'required' => $required,
-                        'attrs' => $input_params
+                        'name' => $this->name,
+                        'value' => $this->value,
+                        'data' => $this->data,
+                        'readonly' => $this->readonly,
+                        'disabled' => $this->disabled,
+                        'required' => $this->required,
+                        'attrs' => $this->input_params
                     ]
                 ))->get();
                 break;
             case Option::TYPE_NUMBER:
                 $html .= (new Number(
                     [
-                        'name' => $name,
-                        'value' => $value,
-                        'data' => $data,
-                        'readonly' => $readonly,
-                        'disabled' => $disabled,
-                        'required' => $required,
-                        'attrs' => $input_params
+                        'name' => $this->name,
+                        'value' => $this->value,
+                        'data' => $this->data,
+                        'readonly' => $this->readonly,
+                        'disabled' => $this->disabled,
+                        'required' => $this->required,
+                        'attrs' => $this->input_params
                     ]
                 ))->get();
                 break;
             case Option::TYPE_OBJECT:
-                if (!empty($template) && !empty($value)) {
-                    foreach ($value as $key => $_value) {
+                if (!empty($this->template) && !empty($this->value)) {
+                    foreach ($this->value as $key => $_value) {
                         $_html = '';
 
-                        foreach ($template as $_key => $_field) {
+                        foreach ($this->template as $_key => $_field) {
                             $_field['value'] = $_value[$_key] ?? null;
-                            $_field['data']['name'] = $name . '[{{encode_key}}]' . '[' . $_key . ']';
-                            $_field['name'] = $name . '[' . static::encodeKey($key) . ']' . '[' . $_key . ']';
-                            $_html .= static::createField($_field);
+                            $_field['data']['name'] = $this->name . '[{{encode_key}}]' . '[' . $_key . ']';
+                            $_field['name'] = $this->name . '[' . static::encodeKey($key) . ']' . '[' . $_key . ']';
+                            $_html .= (new static($_field))->get();
                         }
 
                         $html .= static::group(
@@ -177,7 +234,7 @@ class Fields
                                         [
                                             'class' => 'key full',
                                             'type' => 'text',
-                                            'placeholder' => $label,
+                                            'placeholder' => $this->label,
                                             'value' => $key,
                                             'onchange' => 'diazoxide.wordpress.option.objectKeyChange(this)'
                                         ]
@@ -189,13 +246,13 @@ class Fields
                             ['minimised' => 'false']
                         );
                     }
-                } elseif ($field !== null && !empty($field)) {
-                    if (!empty($value)) {
-                        foreach ($value as $key => $_value) {
-                            $_field = $field;
+                } elseif (isset($this->field) && !empty($this->field)) {
+                    if (!empty($this->value)) {
+                        foreach ($this->value as $key => $_value) {
+                            $_field = $this->field;
                             $_field['value'] = $_value;
-                            $_field['data']['name'] = $name . '[{{encode_key}}]';
-                            $_field['name'] = $name . '[' . static::encodeKey($key) . ']';
+                            $_field['data']['name'] = $this->name . '[{{encode_key}}]';
+                            $_field['name'] = $this->name . '[' . static::encodeKey($key) . ']';
                             $html .= static::group(
                                 implode(
                                     '',
@@ -206,12 +263,12 @@ class Fields
                                             [
                                                 'class' => 'key full',
                                                 'type' => 'text',
-                                                'placeholder' => $label,
+                                                'placeholder' => $this->label,
                                                 'value' => $key,
                                                 'onchange' => 'diazoxide.wordpress.option.objectKeyChange(this)'
                                             ]
                                         ),
-                                        static::createField($_field),
+                                        (new static($_field))->get(),
                                         static::itemButtons()
                                     ]
                                 )
@@ -222,16 +279,16 @@ class Fields
 
                 $_html = '';
 
-                if ($template !== null && !empty($template)) {
-                    foreach ($template as $key => $_field) {
-                        $_field['name'] = $name . '[{{encode_key}}]' . '[' . $key . ']';
+                if (isset($this->template) && !empty($this->template)) {
+                    foreach ($this->template as $key => $_field) {
+                        $_field['name'] = $this->name . '[{{encode_key}}]' . '[' . $key . ']';
                         $_field['disabled'] = true;
-                        $_html .= static::createField($_field);
+                        $_html .= (new static($_field))->get();
                     }
-                } elseif ($field !== null && !empty($field)) {
-                    $field['name'] = $name . '[{{encode_key}}]';
-                    $field['disabled'] = true;
-                    $_html .= static::createField($field);
+                } elseif (isset($this->field) && !empty($this->field)) {
+                    $this->field['name'] = $this->name . '[{{encode_key}}]';
+                    $this->field['disabled'] = true;
+                    $_html .= (new static($this->field))->get();
                 }
 
                 $html .= static::group(
@@ -243,7 +300,7 @@ class Fields
                                 [
                                     'class' => 'key full',
                                     'type' => 'text',
-                                    'placeholder' => $label,
+                                    'placeholder' => $this->label,
                                     'onchange' => 'diazoxide.wordpress.option.objectKeyChange(this)'
                                 ]
                             ),
@@ -259,26 +316,26 @@ class Fields
 
                 break;
             case Option::TYPE_GROUP:
-                if (empty($template)) {
+                if (empty($this->template)) {
                     break;
                 }
-                $template_description = $template_params['description'] ?? null;
-                $template_attrs = $template_params['attrs'] ?? [];
+                $template_description = $this->template_params['description'] ?? null;
+                $template_attrs = $this->template_params['attrs'] ?? [];
                 $template_attrs['minimised'] = 'false';
 
-                if ($method === Option::METHOD_MULTIPLE) {
+                if ($this->method === Option::METHOD_MULTIPLE) {
                     $last_key = 1;
-                    if ($value !== null) {
-                        $value = array_values($value);
-                        $last_key = count($value) - 1;
-                        foreach ($value as $key => $_value) {
+                    if (isset($this->value)) {
+                        $this->value = array_values($this->value);
+                        $last_key = count($this->value) - 1;
+                        foreach ($this->value as $key => $_value) {
                             $__html = '';
 
-                            foreach ($template as $_key => $_field) {
-                                $_field = $template[$_key];
-                                $_field['name'] = $name . '[' . $key . ']' . '[' . $_key . ']';
-                                $_field['value'] = $_value[$_key] ?? '';
-                                $__html .= static::createField($_field);
+                            foreach ($this->template as $_key => $_field) {
+                                $_field = $this->template[$_key];
+                                $_field['name'] = $this->name . '[' . $key . ']' . '[' . $_key . ']';
+                                $_field['value'] = $_value[$_key] ?? null;
+                                $__html .= (new static($_field))->get();
                             }
 
                             if (is_callable($template_description)) {
@@ -301,10 +358,10 @@ class Fields
 
                     $__html = '';
 
-                    foreach ($template as $key => $_field) {
-                        $_field['name'] = $name . '[{{LAST_KEY}}]' . '[' . $key . ']';
+                    foreach ($this->template as $key => $_field) {
+                        $_field['name'] = $this->name . '[{{LAST_KEY}}]' . '[' . $key . ']';
                         $_field['disabled'] = true;
-                        $__html .= static::createField($_field);
+                        $__html .= (new static($_field))->get();
                     }
 
                     if (is_callable($template_description)) {
@@ -326,47 +383,47 @@ class Fields
 
                     $html .= static::addNewButton($last_key);
                 } else {
-                    foreach ($template as $key => $_field) {
-                        $_field['name'] = $name . '[' . $key . ']';
-                        $_field['value'] = $value[$key] ?? null;
-                        $_field['disabled'] = $disabled;
-                        $html .= static::createField($_field);
+                    foreach ($this->template as $key => $_field) {
+                        $_field['name'] = $this->name . '[' . $key . ']';
+                        $_field['value'] = $this->value[$key] ?? null;
+                        $_field['disabled'] = $this->disabled;
+                        $html .= (new static($_field))->get();
                     }
                 }
 
                 break;
             default:
-                if (!empty($values)) {
-                    HTML::addClass($input_params['class'], 'full');
+                if (!empty($this->values)) {
+                    HTML::addClass($this->input_params['class'], 'full');
                     $html .= (new Choice(
                         [
-                            'name' => $name,
-                            'value' => $value,
-                            'choices' => $values,
-                            'markup' => $markup,
-                            'multiple' => $method === Option::METHOD_MULTIPLE,
-                            'attrs' => $input_params,
-                            'disabled' => $disabled,
-                            'required' => $required,
-                            'readonly' => $readonly
+                            'name' => $this->name,
+                            'value' => $this->value,
+                            'choices' => $this->values,
+                            'markup' => $this->markup,
+                            'multiple' => $this->method === Option::METHOD_MULTIPLE,
+                            'attrs' => $this->input_params,
+                            'disabled' => $this->disabled,
+                            'required' => $this->required,
+                            'readonly' => $this->readonly
                         ]
                     ))->get();
-                } elseif ($method === Option::METHOD_MULTIPLE) {
-                    HTML::addClass($input_params['class'], 'full');
-                    if (is_array($value)) {
-                        foreach ($value as $key => $_value) {
+                } elseif ($this->method === Option::METHOD_MULTIPLE) {
+                    HTML::addClass($this->input_params['class'], 'full');
+                    if (is_array($this->value)) {
+                        foreach ($this->value as $key => $_value) {
                             if (!empty($_value)) {
                                 $html .= static::group(
                                     (new Input(
                                         [
-                                            'name' => $name . '[]',
-                                            'type' => $markup,
-                                            'placeholder' => $label,
+                                            'name' => $this->name . '[]',
+                                            'type' => $this->markup,
+                                            'placeholder' => $this->label,
                                             'value' => $_value,
-                                            'attrs' => $input_params,
-                                            'disabled' => $disabled,
-                                            'readonly' => $readonly,
-                                            'required' => $required,
+                                            'attrs' => $this->input_params,
+                                            'disabled' => $this->disabled,
+                                            'readonly' => $this->readonly,
+                                            'required' => $this->required,
                                         ]
                                     ))->get() . static::itemButtons(['duplicate', 'remove'])
                                 );
@@ -377,11 +434,11 @@ class Fields
                     $html .= static::group(
                         (new Input(
                             [
-                                'type' => $markup,
-                                'name' => $name . '[]',
-                                'placeholder' => $label,
+                                'type' => $this->markup,
+                                'name' => $this->name . '[]',
+                                'placeholder' => $this->label,
                                 'disabled' => true,
-                                'attrs' => $input_params
+                                'attrs' => $this->input_params
                             ]
                         ))->get() . static::itemButtons(['remove']),
                         [
@@ -392,33 +449,33 @@ class Fields
                     );
 
                     $html .= static::addNewButton();
-                } elseif ($method !== Option::METHOD_MULTIPLE) {
-                    HTML::addClass($input_params['class'], 'full');
-                    if ($markup === Option::MARKUP_NUMBER) {
+                } elseif ($this->method !== Option::METHOD_MULTIPLE) {
+                    HTML::addClass($this->input_params['class'], 'full');
+                    if ($this->markup === Option::MARKUP_NUMBER) {
                         $html .= (new Number(
                             [
-                                'name' => $name,
-                                'value' => $value,
-                                'placeholder' => $label,
-                                'attrs' => $input_params,
-                                'data' => $data,
-                                'disabled' => $disabled,
-                                'readonly' => $readonly,
-                                'required' => $required
+                                'name' => $this->name,
+                                'value' => $this->value,
+                                'placeholder' => $this->label,
+                                'attrs' => $this->input_params,
+                                'data' => $this->data,
+                                'disabled' => $this->disabled,
+                                'readonly' => $this->readonly,
+                                'required' => $this->required
                             ]
                         ))->get();
                     } else {
                         $html .= (new Text(
                             [
-                                'name' => $name,
-                                'value' => $value,
-                                'placeholder' => $label,
-                                'attrs' => $input_params,
-                                'data' => $data,
-                                'large' => $markup === Option::MARKUP_TEXTAREA,
-                                'disabled' => $disabled,
-                                'readonly' => $readonly,
-                                'required' => $required
+                                'name' => $this->name,
+                                'value' => $this->value,
+                                'placeholder' => $this->label,
+                                'attrs' => $this->input_params,
+                                'data' => $this->data,
+                                'large' => $this->markup === Option::MARKUP_TEXTAREA,
+                                'disabled' => $this->disabled,
+                                'readonly' => $this->readonly,
+                                'required' => $this->required
                             ]
                         ))->get();
                     }
@@ -428,19 +485,19 @@ class Fields
                 break;
         }
 
-        $main_params['class'] = $main_params['class'] ?? 'group';
+        $this->main_params['class'] = $this->main_params['class'] ?? 'group';
 
-        $html = HTML::tag('div', $html, $main_params);
+        $html = HTML::tag('div', $html, $this->main_params);
 
-        if (!empty($label)) {
-            $html = HTML::tag('div', $label, $label_params) . $html;
+        if (!empty($this->label)) {
+            $html = HTML::tag('div', $this->label, $this->label_params) . $html;
         }
 
-        if (!empty($description)) {
-            $html .= HTML::tag('div', $description, $description_params);
+        if (!empty($this->description)) {
+            $html .= HTML::tag('div', $this->description, $this->description_params);
         }
 
-        $html .= $after_field;
+        $html .= $this->after_field;
 
         return $html;
     }

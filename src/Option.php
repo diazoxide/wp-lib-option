@@ -56,6 +56,7 @@ class Option implements interfaces\Option
      */
     public function getValue()
     {
+        $before_get_value = $this->getParam('before_get_value', null);
         $parent = $this->getParam('parent', null);
         $name = $this->getParam('name', null);
         $default = $this->getParam('default', null);
@@ -63,11 +64,11 @@ class Option implements interfaces\Option
 
         if ($this->getParam('single_option', false)) {
             $value = static::getOption(
-                    '__form-data',
-                    $parent,
-                    $default,
-                    $serialize
-                )[$name] ?? $default;
+                '__form-data',
+                $parent,
+                $default,
+                $serialize
+            )[$name] ?? $default;
         } else {
             $value = static::getOption(
                 $name,
@@ -77,25 +78,59 @@ class Option implements interfaces\Option
             );
         }
 
-        return apply_filters(
+        $value = apply_filters(
             static::getOptionFilterName($name, $parent),
             $value
         );
+
+        if (is_callable($before_get_value)) {
+            $before_get_value($this, $value);
+        }
+
+        return $value;
     }
 
     /**
      * Get Option value
      *
      * @param mixed $value
-     * @return mixed
+     * @return bool
      */
-    public function setValue($value)
+    public function setValue($value): bool
     {
+        $before_set_value = $this->getParam('before_set_value', null);
+        if (is_callable($before_set_value) && !$before_set_value($this, $value)) {
+            return false;
+        }
+
+        $parent = $this->getParam('parent', null);
+        $name = $this->getParam('name', null);
+        $default = $this->getParam('default', null);
+        $serialize = $this->getParam('serialize', false);
+
+        if ($this->getParam('single_option', false)) {
+            $option_value = static::getOption(
+                '__form-data',
+                $parent,
+                $default,
+                $serialize
+            );
+
+            $option_value[$name] = $value;
+
+            return static::setOption(
+                '__form-data',
+                $parent,
+                $option_value,
+                $serialize
+            );
+        }
+
         return static::setOption(
-            $this->getParam('name', null),
-            $this->getParam('parent', null),
+            $name,
+            $parent,
             $value,
-            $this->getParam('serialize', null)
+            $serialize
         );
     }
 
@@ -251,14 +286,17 @@ class Option implements interfaces\Option
      */
     public function getField(): string
     {
-        return Fields::createField(
+        return (new Fields(
             [
                 'main_params' => $this->getParam('main_params', false),
-                'before_field'=>$this->getParam('before_field', null),
-                'after_field'=>$this->getParam('after_field', null),
+                'before_field' => $this->getParam('before_field', null),
+                'after_field' => $this->getParam('after_field', null),
                 'name' => $this->getParam('name', false),
-                'value' => $this->getValue(),
+                'value' => $this->getParam('value', $this->getValue()),
                 'default' => $this->getParam('default', null),
+                'relation' => $this->getParam('relation', null),
+                'serialize' => $this->getParam('serialize', null),
+                'single_option' => $this->getParam('single_option', null),
                 'type' => $this->getParam('type', null),
                 'debug_data' => $this->getParam('debug_data', null),
                 'input_params' => $this->getParam('input_params', null),
@@ -287,7 +325,7 @@ class Option implements interfaces\Option
                 'readonly' => $this->getParam('readonly', false),
                 'required' => $this->getParam('required', false),
             ]
-        );
+        ))->get();
     }
 
 
@@ -337,7 +375,7 @@ class Option implements interfaces\Option
         $parent = $parent ?? 'Option';
 
 
-        echo sprintf('<ul route="%s" class="wp-lib-option-nested-fields %s-nested-fields">', $route,$parent);
+        echo sprintf('<ul route="%s" class="wp-lib-option-nested-fields %s-nested-fields">', $route, $parent);
 
         $before = apply_filters('wp-lib-option/' . $parent . '/form-before-nested-fields', null, $route, $parent);
         echo empty($before) ? '' : '<li class="before">' . $before . '</li>';
@@ -394,46 +432,6 @@ class Option implements interfaces\Option
     }
 
     /**
-     * @param $parent
-     * @param $params
-     */
-    private static function initFormSubmit($parent, ?array $params): void
-    {
-        $form_data = static::getFormData($parent);
-
-        if ($form_data) {
-            $serialize = $params['serialize'] ?? false;
-
-            $single_option = $params['single_option'] ?? false;
-
-            if ($single_option) {
-                static::setOption('__form-data', $parent, $form_data, $serialize);
-            } else {
-                foreach ($form_data as $key => $field) {
-                    static::setOption($key, $parent, $field, $serialize);
-                }
-            }
-
-            $form_saved = $params['form_saved'] ?? null;
-            if (is_callable($form_saved)) {
-                $form_saved($form_data);
-            }
-
-            do_action('wp-lib-option/' . $parent . '/form-saved', $form_data);
-
-            $success_message = $params['on_save_success_message'] ?? 'Settings saved!';
-
-            echo HTML::tag(
-                'div',
-                [
-                    ['p', $success_message]
-                ],
-                ['class' => 'notice notice-success is-dismissible']
-            );
-        }
-    }
-
-    /**
      * Print test form
      *
      * @return void
@@ -470,8 +468,6 @@ class Option implements interfaces\Option
             return;
         }
 
-        static::initFormSubmit($parent, $params);
-
         $serialize = $params['serialize'] ?? false;
 
         $single_option = $params['single_option'] ?? false;
@@ -496,38 +492,37 @@ class Option implements interfaces\Option
 
         $is_import = $imported_data === null && wp_verify_nonce(Environment::get($parent), 'import');
 
+        $form_data = static::getFormData($parent);
+
+        $options = static::initOptions(
+            $options,
+            $parent,
+            ['serialize' => $serialize, 'single_option' => $single_option]
+        );
+
         /**
          * Setting `parent` and `name` fields
          * Then generate fields HTML
          * */
         static::arrayWalkWithRoute(
             $options,
-            static function ($key, $item, $route) use (
+            static function (
+                $key,
+                $item,
+                $route
+            ) use (
                 &$_fields,
-                $parent,
                 &$exported_data,
                 $imported_data,
-                $serialize,
-                $single_option
+                $form_data
             ) {
                 if ($item instanceof Option) {
+                    $post_data = $form_data[$item->getParam('name')] ?? null;
+                    if ($post_data !== null) {
+                        $item->setValue($post_data);
+                    }
+
                     $item->setParam('debug_data', [$route]);
-
-                    if ($item->getParam('parent') === null) {
-                        $item->setParam('parent', $parent);
-                    }
-
-                    if ($item->getParam('name') === null) {
-                        $item->setParam('name', implode('>', $route));
-                    }
-
-                    if ($item->getParam('serialize') === null) {
-                        $item->setParam('serialize', $serialize);
-                    }
-
-                    if ($item->getParam('single_option') === null) {
-                        $item->setParam('single_option', $single_option);
-                    }
 
                     if ($exported_data !== null) {
                         $exported_data[$item->getParam('name')] =
@@ -556,6 +551,25 @@ class Option implements interfaces\Option
                 }
             }
         );
+
+        if ($form_data !== null) {
+            $form_saved = $params['form_saved'] ?? null;
+            if (is_callable($form_saved)) {
+                $form_saved($form_data);
+            }
+
+            do_action('wp-lib-option/' . $parent . '/form-saved', $form_data);
+
+            $success_message = $params['on_save_success_message'] ?? 'Settings saved!';
+
+            echo HTML::tag(
+                'div',
+                [
+                    ['p', $success_message]
+                ],
+                ['class' => 'notice notice-success is-dismissible']
+            );
+        }
 
         static::printStyle();
 
@@ -768,8 +782,8 @@ class Option implements interfaces\Option
         if (!self::$assets_loaded) {
             static::printSelect2Assets();
             echo '<script type="application/javascript">' . file_get_contents(
-                    __DIR__ . '/assets/script.js'
-                ) . '</script>';
+                __DIR__ . '/assets/script.js'
+            ) . '</script>';
         }
     }
 
@@ -798,6 +812,28 @@ class Option implements interfaces\Option
      */
     public static function expandOptions(array $options, ?string $parent = null, array $params = []): array
     {
+        $options = static::initOptions($options, $parent, $params);
+
+        static::arrayWalkWithRoute(
+            $options,
+            static function ($key, &$item, $route) {
+                if ($item instanceof self) {
+                    $item = $item->getValue();
+                }
+            }
+        );
+
+        return apply_filters('wp-lib-option/' . $parent . '/expanded-option', $options);
+    }
+
+    /**
+     * @param array $options
+     * @param string|null $parent
+     * @param array $params
+     * @return array
+     */
+    public static function initOptions(array $options, ?string $parent = null, array $params = []): array
+    {
         static::arrayWalkWithRoute(
             $options,
             static function ($key, &$item, $route) use ($parent, $params) {
@@ -814,12 +850,9 @@ class Option implements interfaces\Option
                     if ($item->getParam('single_option') === null) {
                         $item->setParam('single_option', $params['single_option'] ?? false);
                     }
-
-                    $item = $item->getValue();
                 }
             }
         );
-
-        return apply_filters('wp-lib-option/' . $parent . '/expanded-option', $options);
+        return $options;
     }
 }

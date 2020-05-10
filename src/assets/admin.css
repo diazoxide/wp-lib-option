@@ -113,9 +113,12 @@ ul.wp-lib-option-nested-fields {
     margin-top: 0;
 }
 
-ul.wp-lib-option-nested-fields .section > .group > .group:hover {
-    outline: solid 5px #ffffff;
-    background: #fff
+ul.wp-lib-option-nested-fields .group > .group {
+    transition: ease all 0.1s;
+}
+
+ul.wp-lib-option-nested-fields .group > .group:hover {
+    background: #0000000a
 }
 
 ul.wp-lib-option-nested-fields > li > .section {
@@ -304,6 +307,17 @@ ul.wp-lib-option-nested-fields .section .group.cloned {
 
 ul.wp-lib-option-nested-fields .section > .group > .group > * > * {
     margin-top: 1px;
+}
+
+ul.wp-lib-option-nested-fields .section > .label {
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+ul.wp-lib-option-nested-fields .section > .label {
+    padding: 10px;
+    background: #ffffff4f;
+    margin-bottom: 10px;
 }
 
 /* Mobile Styles */
