@@ -170,9 +170,9 @@ class Fields
             }
         }
 
-//        if (!empty($debug_data)) {
-//            $html .= '<!--' . var_export($debug_data, true) . '-->';
-//        }
+//        $this->debug_data['serialize'] = $this->serialize;
+//
+//        $html .= '<!--' . var_export($this->debug_data, true) . '-->';
 
         /**
          * Fix empty values issue
@@ -222,6 +222,8 @@ class Fields
                             $_field['value'] = $_value[$_key] ?? null;
                             $_field['data']['name'] = $this->name . '[{{encode_key}}]' . '[' . $_key . ']';
                             $_field['name'] = $this->name . '[' . static::encodeKey($key) . ']' . '[' . $_key . ']';
+                            $_field['serialize'] = $this->serialize;
+                            $_field['single_option'] = $this->single_option;
                             $_html .= (new static($_field))->get();
                         }
 
@@ -253,6 +255,8 @@ class Fields
                             $_field['value'] = $_value;
                             $_field['data']['name'] = $this->name . '[{{encode_key}}]';
                             $_field['name'] = $this->name . '[' . static::encodeKey($key) . ']';
+                            $_field['serialize'] = $this->serialize;
+                            $_field['single_option'] = $this->single_option;
                             $html .= static::group(
                                 implode(
                                     '',
@@ -283,11 +287,15 @@ class Fields
                     foreach ($this->template as $key => $_field) {
                         $_field['name'] = $this->name . '[{{encode_key}}]' . '[' . $key . ']';
                         $_field['disabled'] = true;
+                        $_field['serialize'] = $this->serialize;
+                        $_field['single_option'] = $this->single_option;
                         $_html .= (new static($_field))->get();
                     }
                 } elseif (isset($this->field) && !empty($this->field)) {
                     $this->field['name'] = $this->name . '[{{encode_key}}]';
                     $this->field['disabled'] = true;
+                    $this->field['serialize'] = $this->serialize;
+                    $this->field['single_option'] = $this->single_option;
                     $_html .= (new static($this->field))->get();
                 }
 
@@ -335,6 +343,8 @@ class Fields
                                 $_field = $this->template[$_key];
                                 $_field['name'] = $this->name . '[' . $key . ']' . '[' . $_key . ']';
                                 $_field['value'] = $_value[$_key] ?? null;
+                                $_field['serialize'] = $this->serialize;
+                                $_field['single_option'] = $this->single_option;
                                 $__html .= (new static($_field))->get();
                             }
 
@@ -361,6 +371,8 @@ class Fields
                     foreach ($this->template as $key => $_field) {
                         $_field['name'] = $this->name . '[{{LAST_KEY}}]' . '[' . $key . ']';
                         $_field['disabled'] = true;
+                        $_field['serialize'] = $this->serialize;
+                        $_field['single_option'] = $this->single_option;
                         $__html .= (new static($_field))->get();
                     }
 
@@ -387,6 +399,8 @@ class Fields
                         $_field['name'] = $this->name . '[' . $key . ']';
                         $_field['value'] = $this->value[$key] ?? null;
                         $_field['disabled'] = $this->disabled;
+                        $_field['serialize'] = $this->serialize;
+                        $_field['single_option'] = $this->single_option;
                         $html .= (new static($_field))->get();
                     }
                 }

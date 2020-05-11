@@ -64,11 +64,11 @@ class Option implements interfaces\Option
 
         if ($this->getParam('single_option', false)) {
             $value = static::getOption(
-                '__form-data',
-                $parent,
-                $default,
-                $serialize
-            )[$name] ?? $default;
+                    '__form-data',
+                    $parent,
+                    $default,
+                    $serialize
+                )[$name] ?? $default;
         } else {
             $value = static::getOption(
                 $name,
@@ -529,7 +529,7 @@ class Option implements interfaces\Option
                         $item->setValue($post_data);
                     }
 
-                    $item->setParam('debug_data', [$route]);
+                    $item->setParam('debug_data', ['route' => $route]);
 
                     if ($exported_data !== null) {
                         $exported_data[$item->getParam('name')] =
@@ -789,8 +789,8 @@ class Option implements interfaces\Option
         if (!self::$assets_loaded) {
             static::printSelect2Assets();
             echo '<script type="application/javascript">' . file_get_contents(
-                __DIR__ . '/assets/script.js'
-            ) . '</script>';
+                    __DIR__ . '/assets/script.js'
+                ) . '</script>';
         }
     }
 
@@ -851,6 +851,7 @@ class Option implements interfaces\Option
                     if ($item->getParam('parent') === null) {
                         $item->setParam('parent', $parent);
                     }
+                    global $asd;
                     if ($item->getParam('serialize') === null) {
                         $item->setParam('serialize', $params['serialize'] ?? false);
                     }
