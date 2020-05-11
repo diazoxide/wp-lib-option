@@ -13,6 +13,7 @@ use diazoxide\wp\lib\option\fields\Text;
 use Exception;
 use diazoxide\wp\lib\option\v2\Option;
 use InvalidArgumentException;
+use RuntimeException;
 
 class Fields
 {
@@ -36,8 +37,8 @@ class Fields
     public $default;
     public $name;
     public $relation;
-    public $serialize = false;
-    public $single_option = false;
+    public $serialize;
+    public $single_option;
     public $parent;
     public $debug_data;
     public $label;
@@ -146,7 +147,7 @@ class Fields
             if (is_callable($relation_with)) {
                 $relation_with = $relation_with();
             } else {
-                throw new \RuntimeException('Only callable accepting.');
+                throw new RuntimeException('Only callable accepting.');
             }
 
             $relation_label = $this->relation['label'] ?? null;
@@ -156,7 +157,6 @@ class Fields
                 $relation_parent,
                 ['serialize' => $this->serialize, 'single_option' => $this->single_option]
             );
-
             if ($relation_name !== null) {
                 $relation_option = $relation_option[$relation_name] ?? null;
                 if ($relation_option instanceof Option) {
@@ -519,7 +519,7 @@ class Fields
 
         return $html;
     }
-    
+
     /**
      * Get form item buttons
      *
