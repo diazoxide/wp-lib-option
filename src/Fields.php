@@ -312,7 +312,7 @@ class Fields
                     ['new' => 'true', 'class' => 'hidden']
                 );
 
-                $html .= static::addNewButton();
+                $html .= $this->addNewButton();
 
                 break;
             case Option::TYPE_GROUP:
@@ -381,7 +381,7 @@ class Fields
                         $template_attrs
                     );
 
-                    $html .= static::addNewButton($last_key);
+                    $html .= $this->addNewButton($last_key);
                 } else {
                     foreach ($this->template as $key => $_field) {
                         $_field['name'] = $this->name . '[' . $key . ']';
@@ -448,7 +448,7 @@ class Fields
                         ]
                     );
 
-                    $html .= static::addNewButton();
+                    $html .= $this->addNewButton();
                 } elseif ($this->method !== Option::METHOD_MULTIPLE) {
                     HTML::addClass($this->input_params['class'], 'full');
                     if ($this->markup === Option::MARKUP_NUMBER) {
@@ -519,7 +519,7 @@ class Fields
 
         return $html;
     }
-
+    
     /**
      * Get form item buttons
      *
@@ -611,18 +611,19 @@ class Fields
      *
      * @return string
      */
-    private static function addNewButton(?int $last_key = 0): string
+    private function addNewButton(?int $last_key = 0): string
     {
+        $label = strtolower($this->label);
         return static::group(
             HTML::tag(
                 'button',
-                '+ Add new',
+                '+ Add ' . $label,
                 [
                     'type' => 'button',
                     'last-key' => $last_key,
                     'class' => 'button button-primary',
                     'onclick' => 'diazoxide.wordpress.option.addNew(this)',
-                    'title' => 'Add new item'
+                    'title' => 'Click to add new ' . $label
                 ]
             )
         );

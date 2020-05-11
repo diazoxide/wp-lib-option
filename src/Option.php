@@ -379,7 +379,6 @@ class Option implements interfaces\Option
             ['route' => $route, 'class' => 'wp-lib-option-nested-fields ' . $parent . '-nested-fields']
         );
 
-
         $before = apply_filters('wp-lib-option/' . $parent . '/form-before-nested-fields', null, $route, $parent);
         echo empty($before) ? '' : HTML::tag('div', $before, ['class' => 'before']);
 
