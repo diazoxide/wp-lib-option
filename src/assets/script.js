@@ -1,32 +1,10 @@
 (function () {
 
-    document.addEventListener("DOMContentLoaded", function () {
-
-        window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
-
-        let hash = decodeURI(window.location.hash.substr(1));
-        if (hash) {
-            let element = document.querySelector("[route='" + hash + "']");
-            if (element !== null) {
-                element.click();
-            }
-        } else {
-            /**
-             * Expand all first fields
-             * */
-            let fields = document.querySelectorAll('ul.wp-lib-option-nested-fields>li.label:first-child');
-            for (let i = 0; i < fields.length; i++) {
-                if (fields[i].offsetParent !== null) {
-                    window.diazoxide.wordpress.option.toggleLabel(fields[i], false);
-                }
-            }
-        }
-    });
 
     /**
      * Normalize sections
      * */
-    let sections = document.querySelectorAll('ul.wp-lib-option-nested-fields>li>.section');
+    let sections = document.querySelectorAll('.wp-lib-option-nested-fields>.content>.section');
     for (let i = 0; i < sections.length; i++) {
         let section = sections[i];
         section.parentNode.parentNode.classList.add('include-section');
@@ -42,7 +20,6 @@
                     formSubmit: function (form) {
                         let _this = this;
                         if (form.dataset.ajax_submit === 'true') {
-
                             let data = new FormData(form);
                             let xhr = new XMLHttpRequest();
                             xhr.onload = function (data) {
@@ -149,13 +126,13 @@
                         this.select2Init(item);
                     },
                     collapseAll: function (button) {
-                        let labels = button.closest('form').querySelectorAll('ul.wp-lib-option-nested-fields > .label.open');
+                        let labels = button.closest('form').querySelectorAll('.wp-lib-option-nested-fields > .label.open');
                         for (let i = 0; i < labels.length; i++) {
                             this.toggleLabel(labels[i], false, false);
                         }
                     },
                     expandAll: function (button) {
-                        let labels = button.closest('form').querySelectorAll('ul.wp-lib-option-nested-fields > .label:not(.open)');
+                        let labels = button.closest('form').querySelectorAll('.wp-lib-option-nested-fields > .label:not(.open)');
                         for (let i = 0; i < labels.length; i++) {
                             this.toggleLabel(labels[i], false, false);
                         }
@@ -216,13 +193,11 @@
                             window.diazoxide.wordpress.option.select2MoveElementToEndOfParent(element)
                         });
                     },
-
                     select2MoveElementToEndOfParent: function (element) {
                         let parent = element.parent();
                         element.detach();
                         parent.append(element);
                     },
-
                     select2Init(item) {
                         if (!window.hasOwnProperty('jQuery')) {
                             return;
@@ -258,4 +233,27 @@
             }
         }
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
+
+        let hash = decodeURI(window.location.hash.substr(1));
+        if (hash) {
+            let element = document.querySelector(".label[route='" + hash + "']");
+            if (element !== null) {
+                element.click();
+            }
+        } else {
+            /**
+             * Expand all first fields
+             * */
+            let fields = document.querySelectorAll('.wp-lib-option-nested-fields>.label:first-child');
+            for (let i = 0; i < fields.length; i++) {
+                if (fields[i].offsetParent !== null) {
+                    window.diazoxide.wordpress.option.toggleLabel(fields[i], false);
+                }
+            }
+        }
+    });
 })();

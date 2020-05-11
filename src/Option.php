@@ -15,7 +15,7 @@ use Exception;
  * */
 class Option implements interfaces\Option
 {
-    public const VERSION = '1.3.5';
+    public const VERSION = '1.3.6';
     /**
      * Option Params
      *
@@ -64,11 +64,11 @@ class Option implements interfaces\Option
 
         if ($this->getParam('single_option', false)) {
             $value = static::getOption(
-                '__form-data',
-                $parent,
-                $default,
-                $serialize
-            )[$name] ?? $default;
+                    '__form-data',
+                    $parent,
+                    $default,
+                    $serialize
+                )[$name] ?? $default;
         } else {
             $value = static::getOption(
                 $name,
@@ -374,11 +374,14 @@ class Option implements interfaces\Option
     {
         $parent = $parent ?? 'Option';
 
+        echo HTML::tagOpen(
+            'div',
+            ['route' => $route, 'class' => 'wp-lib-option-nested-fields ' . $parent . '-nested-fields']
+        );
 
-        echo sprintf('<ul route="%s" class="wp-lib-option-nested-fields %s-nested-fields">', $route, $parent);
 
         $before = apply_filters('wp-lib-option/' . $parent . '/form-before-nested-fields', null, $route, $parent);
-        echo empty($before) ? '' : '<li class="before">' . $before . '</li>';
+        echo empty($before) ? '' : HTML::tag('div', $before, ['class' => 'before']);
 
         foreach ($array as $k => $v) {
             $_route = $route;
@@ -388,24 +391,29 @@ class Option implements interfaces\Option
                 $label = apply_filters('wp-lib-option/' . $parent . '/form-nested-label', $k, $route, $parent);
                 $label = str_replace('_', ' ', ucfirst($label));
 
-                echo sprintf(
-                    '<li route="%s" onclick="window.diazoxide.wordpress.option.toggleLabel(this, true)" class="label">%s</li>',
-                    $_route,
-                    $label
+                HTML::tag(
+                    'div',
+                    $label,
+                    [
+                        'route' => $_route,
+                        'onclick' => 'window.diazoxide.wordpress.option.toggleLabel(this, true)',
+                        'class' => 'label'
+                    ]
                 );
+
                 static::printArrayList($v, $parent, $_route);
                 continue;
             }
 
             $content = apply_filters('wp-lib-option/' . $parent . '/form-nested-content', $v, $route, $parent);
 
-            echo '<li>' . $content . '</li>';
+            echo HTML::tag('div', $content, ['class' => 'content']);
         }
 
-        $before = apply_filters('wp-lib-option/' . $parent . '/form-after-nested-fields', null, $route, $parent);
-        echo empty($before) ? '' : '<li class="after">' . $before . '</li>';
+        $after = apply_filters('wp-lib-option/' . $parent . '/form-after-nested-fields', null, $route, $parent);
+        echo empty($after) ? '' : HTML::tag('div', $after, ['class' => 'after']);
 
-        echo '</ul>';
+        echo HTML::tagClose('div');
     }
 
     /**
@@ -782,8 +790,8 @@ class Option implements interfaces\Option
         if (!self::$assets_loaded) {
             static::printSelect2Assets();
             echo '<script type="application/javascript">' . file_get_contents(
-                __DIR__ . '/assets/script.js'
-            ) . '</script>';
+                    __DIR__ . '/assets/script.js'
+                ) . '</script>';
         }
     }
 

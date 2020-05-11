@@ -95,58 +95,58 @@ body.admin-bar .wp-lib-option-wrap > form .form-head {
     width: 98%;
 }
 
-ul.wp-lib-option-nested-fields .section > .group .group {
+.wp-lib-option-nested-fields .section > .group .group {
     position: relative;
 }
 
-ul.wp-lib-option-nested-fields > li {
+.wp-lib-option-nested-fields > div {
     margin-top: 15px
 }
 
-ul.wp-lib-option-nested-fields > ul.wp-lib-option-nested-fields {
+.wp-lib-option-nested-fields > .wp-lib-option-nested-fields {
     display: none;
 }
 
-ul.wp-lib-option-nested-fields {
+.wp-lib-option-nested-fields {
     background: #00000008;
     font-size: 0.95em;
     margin-top: 0;
 }
 
-ul.wp-lib-option-nested-fields .group > .group {
+.wp-lib-option-nested-fields .group > .group {
     transition: ease all 0.1s;
 }
 
-ul.wp-lib-option-nested-fields .group > .group:hover {
+.wp-lib-option-nested-fields .group > .group:hover {
     background: #0000000a
 }
 
-ul.wp-lib-option-nested-fields > li > .section {
+.wp-lib-option-nested-fields > div > .section {
     padding: 5px;
 }
 
-ul.wp-lib-option-nested-fields > .label {
+.wp-lib-option-nested-fields > .label {
     position: sticky;
     position: -webkit-sticky;
     top: 0;
     z-index: 1;
 }
 
-ul.wp-lib-option-nested-fields > .label.open {
+.wp-lib-option-nested-fields > .label.open {
     background: #23282d;
     color: #fff;
     font-weight: bolder;
 }
 
-body.admin-bar ul.wp-lib-option-nested-fields > .label.open {
+body.admin-bar .wp-lib-option-nested-fields > .label.open {
     top: 32px;
 }
 
-ul.wp-lib-option-nested-fields > ul.wp-lib-option-nested-fields.open {
+.wp-lib-option-nested-fields > .wp-lib-option-nested-fields.open {
     display: block;
 }
 
-ul.wp-lib-option-nested-fields > .label:after {
+.wp-lib-option-nested-fields > .label:after {
     content: "\00FF0B";
     font-weight: bolder;
     font-size: 15px;
@@ -154,36 +154,36 @@ ul.wp-lib-option-nested-fields > .label:after {
     color: #007cba
 }
 
-ul.wp-lib-option-nested-fields > .open.label:after {
+.wp-lib-option-nested-fields > .open.label:after {
     content: "\002212";
     color: #fff
 }
 
-ul.wp-lib-option-nested-fields ul.wp-lib-option-nested-fields {
+.wp-lib-option-nested-fields .wp-lib-option-nested-fields {
     padding: 10px 0 10px 10px;
     margin: 0 0 10px 0;
     border-left: solid 1px #dedede;
     border-bottom: solid 1px #dedede
 }
 
-ul.wp-lib-option-nested-fields > ul.wp-lib-option-nested-fields.include-section {
+.wp-lib-option-nested-fields > .wp-lib-option-nested-fields.include-section {
     display: block;
     padding: 0;
     background: unset;
 }
 
-ul.wp-lib-option-nested-fields .group button {
+.wp-lib-option-nested-fields .group button {
     margin: 0;
 }
 
-ul.wp-lib-option-nested-fields .label {
+.wp-lib-option-nested-fields .label {
     color: #007cba;
     font-weight: normal;
     cursor: default;
     margin-bottom: 3px;
 }
 
-ul.wp-lib-option-nested-fields .description:before {
+.wp-lib-option-nested-fields .description:before {
     content: "\1F6C8";
     font-size: 16px;
     color: #007cba;
@@ -191,7 +191,7 @@ ul.wp-lib-option-nested-fields .description:before {
     margin-right: 5px;
 }
 
-ul.wp-lib-option-nested-fields .description {
+.wp-lib-option-nested-fields .description {
     color: #8c8c8c;
     font-size: 13px;
     margin-top: 5px;
@@ -199,7 +199,7 @@ ul.wp-lib-option-nested-fields .description {
     margin-bottom: 5px;
 }
 
-ul.wp-lib-option-nested-fields > .label {
+.wp-lib-option-nested-fields > .label {
     background: #ffffff;
     padding: 8px;
     color: #23282d;
@@ -209,69 +209,69 @@ ul.wp-lib-option-nested-fields > .label {
     cursor: pointer;
 }
 
-ul.wp-lib-option-nested-fields > li:not(:last-child) .section {
+.wp-lib-option-nested-fields > div:not(:last-child) .section {
     border-bottom: solid 1px #e4e4e4;
     padding-bottom: 10px;
 }
 
-ul.wp-lib-option-nested-fields .section > .group > .group {
+.wp-lib-option-nested-fields .section > .group > .group {
     break-inside: avoid-column;
     margin-bottom: 35px;
     position: relative;
 }
 
-ul.wp-lib-option-nested-fields .section > .group > .group > * {
+.wp-lib-option-nested-fields .section > .group > .group > * {
     vertical-align: top;
     margin-bottom: 3px;
 }
 
-ul.wp-lib-option-nested-fields .section > .group .group > .full {
+.wp-lib-option-nested-fields .section > .group .group > .full {
     width: 100%;
     max-width: 100%;
 }
 
-ul.wp-lib-option-nested-fields .section > .group > .group > .key {
+.wp-lib-option-nested-fields .section > .group > .group > .key {
     background: #ffffff;
     padding: 3px;
     border: solid 2px #0073aa;
 }
 
-ul.wp-lib-option-nested-fields .section > .group .group .buttons button {
+.wp-lib-option-nested-fields .section > .group .group .buttons button {
     vertical-align: top;
 }
 
-ul.wp-lib-option-nested-fields .section .group > .buttons button.minimise:before {
+.wp-lib-option-nested-fields .section .group > .buttons button.minimise:before {
     content: "―";
     color: #fff;
 }
 
-ul.wp-lib-option-nested-fields .section .group[minimised=true] > .buttons button.minimise:before {
+.wp-lib-option-nested-fields .section .group[minimised=true] > .buttons button.minimise:before {
     content: "\20DE";
     color: #fff;
 }
 
-ul.wp-lib-option-nested-fields .section > .group .group .buttons {
+.wp-lib-option-nested-fields .section > .group .group .buttons {
     position: absolute;
     top: 0;
     right: 0;
     margin-right: 3px;
 }
 
-ul.wp-lib-option-nested-fields .section > .group > .group[minimised=true] > :not(.buttons):not(:first-child) {
+.wp-lib-option-nested-fields .section > .group > .group[minimised=true] > :not(.buttons):not(:first-child) {
     display: none;
 }
 
-ul.wp-lib-option-nested-fields .section > .group > .group[minimised=true] > .buttons button {
+.wp-lib-option-nested-fields .section > .group > .group[minimised=true] > .buttons button {
     background: #005780;
     height: 30px;
     width: 35px;
 }
 
-ul.wp-lib-option-nested-fields .section > .group > .group[minimised=true] {
+.wp-lib-option-nested-fields .section > .group > .group[minimised=true] {
     padding: 0 120px 0 0;
 }
 
-ul.wp-lib-option-nested-fields .section > .group .group button.item-button {
+.wp-lib-option-nested-fields .section > .group .group button.item-button {
     height: 17px;
     width: 20px;
     margin-left: 2px;
@@ -286,35 +286,35 @@ ul.wp-lib-option-nested-fields .section > .group .group button.item-button {
     font-weight: bolder;
 }
 
-ul.wp-lib-option-nested-fields .section > .group .group button.item-button:hover {
+.wp-lib-option-nested-fields .section > .group .group button.item-button:hover {
     background: #007cba;
     opacity: 1;
 }
 
-ul.wp-lib-option-nested-fields .section > .group {
+.wp-lib-option-nested-fields .section > .group {
     padding: 0 1em;
     display: grid;
     grid-column-gap: 0.5em;
 }
 
-ul.wp-lib-option-nested-fields .section .group.clone {
+.wp-lib-option-nested-fields .section .group.clone {
     background: #e5f6ff;
 }
 
-ul.wp-lib-option-nested-fields .section .group.cloned {
+.wp-lib-option-nested-fields .section .group.cloned {
     background: #fff9e9;
 }
 
-ul.wp-lib-option-nested-fields .section > .group > .group > * > * {
+.wp-lib-option-nested-fields .section > .group > .group > * > * {
     margin-top: 1px;
 }
 
-ul.wp-lib-option-nested-fields .section > .label {
+.wp-lib-option-nested-fields .section > .label {
     padding: 10px;
     margin-bottom: 15px;
 }
 
-ul.wp-lib-option-nested-fields .section > .label {
+.wp-lib-option-nested-fields .section > .label {
     padding: 10px;
     background: #ffffff4f;
     margin-bottom: 10px;
@@ -322,21 +322,21 @@ ul.wp-lib-option-nested-fields .section > .label {
 
 /* Mobile Styles */
 @media only screen and (max-width: 400px) {
-    ul.wp-lib-option-nested-fields .section > .group {
+    .wp-lib-option-nested-fields .section > .group {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 /* Tablet Styles */
 @media only screen and (min-width: 401px) and (max-width: 960px) {
-    ul.wp-lib-option-nested-fields .section > .group {
+    .wp-lib-option-nested-fields .section > .group {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
 /* Desktop Styles */
 @media only screen and (min-width: 961px) {
-    ul.wp-lib-option-nested-fields .section > .group {
+    .wp-lib-option-nested-fields .section > .group {
         grid-template-columns: repeat(4, 1fr);
     }
 }
