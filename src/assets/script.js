@@ -1,5 +1,26 @@
 (function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
+        window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
+
+        let hash = decodeURI(window.location.hash.substr(1));
+        if (hash) {
+            let element = document.querySelector(".label[route='" + hash + "']");
+            if (element !== null) {
+                element.click();
+            }
+        } else {
+            /**
+             * Expand all first fields
+             * */
+            let fields = document.querySelectorAll('.wp-lib-option-nested-fields>.label:first-child');
+            for (let i = 0; i < fields.length; i++) {
+                if (fields[i].offsetParent !== null) {
+                    window.diazoxide.wordpress.option.toggleLabel(fields[i], false);
+                }
+            }
+        }
+    });
 
     /**
      * Normalize sections
@@ -233,27 +254,4 @@
             }
         }
     }
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-        window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
-
-        let hash = decodeURI(window.location.hash.substr(1));
-        if (hash) {
-            let element = document.querySelector(".label[route='" + hash + "']");
-            if (element !== null) {
-                element.click();
-            }
-        } else {
-            /**
-             * Expand all first fields
-             * */
-            let fields = document.querySelectorAll('.wp-lib-option-nested-fields>.label:first-child');
-            for (let i = 0; i < fields.length; i++) {
-                if (fields[i].offsetParent !== null) {
-                    window.diazoxide.wordpress.option.toggleLabel(fields[i], false);
-                }
-            }
-        }
-    });
 })();

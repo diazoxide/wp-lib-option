@@ -391,7 +391,7 @@ class Option implements interfaces\Option
                 $label = apply_filters('wp-lib-option/' . $parent . '/form-nested-label', $k, $route, $parent);
                 $label = str_replace('_', ' ', ucfirst($label));
 
-                HTML::tag(
+                echo HTML::tag(
                     'div',
                     $label,
                     [
