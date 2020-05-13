@@ -108,9 +108,14 @@ class Fields
         $this->data['name'] = $this->data['name'] ?? $this->name;
 
 
-        if (is_callable($this->description)) {
-            $this->description = ($this->description)($params);
+        foreach ($params as $arg => &$param) {
+            $this->{$arg} = self::maybeClosure($param, [$params]);
         }
+        unset($param);
+//
+//        if (is_callable($this->description)) {
+//            $this->description = ($this->description)($params);
+//        }
     }
 
     /**
@@ -393,6 +398,7 @@ class Fields
                         $template_attrs
                     );
 
+
                     $html .= $this->addNewButton($last_key);
                 } else {
                     foreach ($this->template as $key => $_field) {
@@ -517,6 +523,19 @@ class Fields
     }
 
     /**
+     * @param $value
+     * @param array|null $params
+     * @return mixed
+     */
+    private static function maybeClosure($value, ?array $params = [])
+    {
+        if (is_callable($value)) {
+            $value = $value(...$params);
+        }
+        return $value;
+    }
+
+    /**
      * Create group HTML tag
      *
      * @param string $content
@@ -634,7 +653,7 @@ class Fields
                 '+ Add ' . $label,
                 [
                     'type' => 'button',
-                    'last-key' => $last_key,
+                    'last-key' => (string) $last_key,
                     'class' => 'button button-primary',
                     'onclick' => 'diazoxide.wordpress.option.addNew(this)',
                     'title' => 'Click to add new ' . $label
