@@ -64,21 +64,18 @@ class Fields
 
     public $data = [];
 
+    /**
+     * Fields constructor.
+     * @param array $params
+     */
     public function __construct(array $params = [])
     {
         foreach ($params as $arg => $value) {
             if (property_exists(static::class, $arg)) {
-                $this->{$arg} = $value;
+                $this->{$arg} = self::maybeClosure($value, [$params]);
             } else {
                 throw new InvalidArgumentException("'$arg' is not valid argument for '" . static::class . "'");
             }
-        }
-
-        if (is_callable($this->before_field)) {
-            $this->before_field = ($this->before_field)($params);
-        }
-        if (is_callable($this->after_field)) {
-            $this->after_field = ($this->after_field)($params);
         }
 
         /**
@@ -106,16 +103,6 @@ class Fields
         }
 
         $this->data['name'] = $this->data['name'] ?? $this->name;
-
-
-        foreach ($params as $arg => &$param) {
-            $this->{$arg} = self::maybeClosure($param, [$params]);
-        }
-        unset($param);
-//
-//        if (is_callable($this->description)) {
-//            $this->description = ($this->description)($params);
-//        }
     }
 
     /**
@@ -653,7 +640,7 @@ class Fields
                 '+ Add ' . $label,
                 [
                     'type' => 'button',
-                    'last-key' => (string) $last_key,
+                    'last-key' => (string)$last_key,
                     'class' => 'button button-primary',
                     'onclick' => 'diazoxide.wordpress.option.addNew(this)',
                     'title' => 'Click to add new ' . $label

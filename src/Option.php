@@ -351,13 +351,10 @@ class Option implements interfaces\Option
     public static function getFormData(?string $parent = null): ?array
     {
         $nonce_field = Environment::post(static::getNonceFieldName($parent));
-
         $fields = wp_verify_nonce($nonce_field, $parent) ? Environment::post($parent) : null;
-
         if ($fields !== null) {
             $fields = Fields::decodeKeys($fields);
         }
-
         return $fields;
     }
 
