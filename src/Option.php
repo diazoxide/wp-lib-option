@@ -15,7 +15,7 @@ use Exception;
  * */
 class Option implements interfaces\Option
 {
-    public const VERSION = '1.3.6';
+    public const VERSION = '1.3.7';
     /**
      * Option Params
      *
