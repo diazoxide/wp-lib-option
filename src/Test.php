@@ -68,7 +68,16 @@ class Test
                         'method' => Option::METHOD_MULTIPLE,
                         'template' => [
                             'a_1' => ['type' => Option::TYPE_TEXT],
-                            'a_2' => [],
+                            'a_2' => ['values' => ['asd', 'qwe']],
+                            'a_3' => [
+                                'type' => Option::TYPE_GROUP,
+                                'method' => Option::METHOD_MULTIPLE,
+
+                                'template' => [
+                                    'k' => ['values' => ['asd', 'qwe']],
+                                    'z' => ['values' => ['asd', 'qwe']],
+                                ]
+                            ],
                         ]
                     ]
                 ),
@@ -104,7 +113,7 @@ class Test
             'checkbox_field' => new Option(
                 [
                     'markup' => Option::MARKUP_CHECKBOX,
-                    'values' => ['asd'=>'asd','qwe'=> 'qwe'],
+                    'values' => ['asd' => 'asd', 'qwe' => 'qwe'],
                     'method' => Option::METHOD_SINGLE,
                 ]
             )

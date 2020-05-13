@@ -1,4 +1,4 @@
-(function () {
+(function ($) {
     document.addEventListener("DOMContentLoaded", function () {
 
         window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
@@ -121,27 +121,28 @@
 
                         let form = button.closest('form');
 
-                        let last_key = parseInt(button.getAttribute('last-key')) + 1;
-                        button.setAttribute('last-key', last_key);
-                        let c = button.parentElement.parentElement.querySelector(':scope>[new]').cloneNode(true);
-                        c.removeAttribute('new');
-                        c.classList.remove('hidden');
-                        c.classList.add('added');
-                        let e = c.querySelectorAll(':scope > :not([new]) > [name]');
+                        let last_key = parseInt($(button).attr('last-key')) + 1;
+                        $(button).attr('last-key', last_key);
+                        let $c = $(button).parent().parent().children('[new]').clone();
+                        $c.removeAttr('new');
+                        $c.removeClass('hidden');
+                        $c.addClass('added');
+                        $c.find('[name]:not([new] [name])').each(function () {
+                            $(this).prop('disabled', false);
+                            let name = $(this).attr('name');
+                            name = name.replace('{{LAST_KEY}}', last_key);
+                            $(this).attr('name', name);
+                        })
 
-                        for (let i = 0; i < e.length; i++) {
-                            e[i].disabled = false;
-                            e[i].name = (e[i].name).replace('{{LAST_KEY}}', last_key);
-                        }
-                        button.parentElement.parentElement.insertBefore(c, button.parentElement);
+                        $c.insertBefore($(button).parent());
 
                         form.onchange();
 
                         setTimeout(function () {
-                            c.classList.remove('added');
+                            $c.removeClass('added');
                         }, 1000);
 
-                        this.afterItemInsert(c);
+                        this.afterItemInsert($c);
                     },
                     afterItemInsert: function (item) {
                         this.select2Init(item);
@@ -220,11 +221,6 @@
                         parent.append(element);
                     },
                     select2Init(item) {
-                        if (!window.hasOwnProperty('jQuery')) {
-                            return;
-                        }
-                        let $ = window.jQuery;
-
                         $(item).find('select[select2=true]').each(function () {
                             if ($(this).parents('[new=true]').length === 0) {
                                 let _field = this;
@@ -254,4 +250,4 @@
             }
         }
     }
-})();
+})(jQuery);
