@@ -1,36 +1,32 @@
 (function ($) {
-    document.addEventListener("DOMContentLoaded", function () {
 
+    $(document).ready(function () {
         window.diazoxide.wordpress.option.select2Init(document.getElementsByClassName('wp-lib-option-wrap')[0]);
 
         let hash = decodeURI(window.location.hash.substr(1));
         if (hash) {
-            let element = document.querySelector(".label[route='" + hash + "']");
-            if (element !== null) {
-                element.click();
-            }
+            $(".label[route='" + hash + "']").click();
         } else {
             /**
              * Expand all first fields
              * */
-            let fields = document.querySelectorAll('.wp-lib-option-nested-fields>.label:first-child');
-            for (let i = 0; i < fields.length; i++) {
-                if (fields[i].offsetParent !== null) {
-                    window.diazoxide.wordpress.option.toggleLabel(fields[i], false);
+            $('.wp-lib-option-nested-fields>.label:first-child').each(
+                function () {
+                    if (this.offsetParent !== null) {
+                        window.diazoxide.wordpress.option.toggleLabel(this, false);
+                    }
                 }
-            }
+            )
         }
     });
 
     /**
      * Normalize sections
      * */
-    let sections = document.querySelectorAll('.wp-lib-option-nested-fields>.content>.section');
-    for (let i = 0; i < sections.length; i++) {
-        let section = sections[i];
-        section.parentNode.parentNode.classList.add('include-section');
-        section.parentNode.parentNode.previousSibling.style.display = "none";
-    }
+    $('.wp-lib-option-nested-fields>.content>.section').each(function () {
+        $(this).parent().parent().addClass('include-section');
+        $(this).parent().parent().prev().hide();
+    })
 
     if (!window.hasOwnProperty('diazoxide')) {
         window.diazoxide = {};
@@ -119,14 +115,15 @@
                     },
                     addNew: function (button) {
 
-                        let form = button.closest('form');
-
+                        let $form = $(button).closest('form');
                         let last_key = parseInt($(button).attr('last-key')) + 1;
                         $(button).attr('last-key', last_key);
+
                         let $c = $(button).parent().parent().children('[new]').clone();
                         $c.removeAttr('new');
                         $c.removeClass('hidden');
                         $c.addClass('added');
+
                         $c.find('[name]:not([new] [name])').each(function () {
                             $(this).prop('disabled', false);
                             let name = $(this).attr('name');
@@ -136,7 +133,7 @@
 
                         $c.insertBefore($(button).parent());
 
-                        form.onchange();
+                        $form.trigger('change');
 
                         setTimeout(function () {
                             $c.removeClass('added');
@@ -204,10 +201,6 @@
                         }
                     },
                     select2OrderSortedValues: function (_field) {
-                        if (!window.hasOwnProperty('jQuery')) {
-                            return;
-                        }
-                        let $ = window.jQuery;
                         $(_field).parent().find("ul.select2-selection__rendered").children("li[title]").each(function (i, obj) {
                             let element = $(_field).children('option').filter(function () {
                                 return $(this).html() === obj.title
