@@ -49,6 +49,21 @@ class Option implements interfaces\Option
         $this->setParams($_params);
     }
 
+    public function getHash(): string
+    {
+        return md5(
+            serialize(
+                [
+                    $this->getParam('parent'),
+                    $this->getParam('name'),
+                    $this->getParam('method'),
+                    $this->getParam('type'),
+                ]
+            )
+        );
+    }
+
+
     /**
      * Get Option value
      *
@@ -531,14 +546,14 @@ class Option implements interfaces\Option
                     if ($exported_data !== null) {
                         $exported_data[$item->getParam('name')] =
                             [
-                                md5(serialize($item)),
+                                $item->getHash(),
                                 $item->getValue()
                             ];
                     }
 
                     if ($imported_data !== null) {
                         $imported = $imported_data[$item->getParam('name')];
-                        if (($imported[0] ?? null) === md5(serialize($item))) {
+                        if (($imported[0] ?? null) === $item->getHash()) {
                             $item->setValue($imported[1] ?? null);
                         }
                     }
