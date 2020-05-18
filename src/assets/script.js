@@ -221,7 +221,12 @@
                             if ($(this).parents('[new=true]').length === 0) {
                                 let _field = this;
 
-                                $(_field).select2().on("select2:select", function (evt) {
+                                $(_field).select2(
+                                    {
+                                        placeholder: "Select a state",
+                                        allowClear: true
+                                    }
+                                ).on("select2:select", function (evt) {
                                     let id = evt.params.data.id;
 
                                     let element = $(this).children("option[value='" + id + "']");
