@@ -79,11 +79,11 @@ class Option implements interfaces\Option
 
         if ($this->getParam('single_option', false)) {
             $value = static::getOption(
-                    '__form-data',
-                    $parent,
-                    $default,
-                    $serialize
-                )[$name] ?? $default;
+                '__form-data',
+                $parent,
+                $default,
+                $serialize
+            )[$name] ?? $default;
         } else {
             $value = static::getOption(
                 $name,
@@ -513,22 +513,13 @@ class Option implements interfaces\Option
 
         $form_data = static::getFormData($parent);
 
-        $options = static::initOptions(
+        static::initOptions(
             $options,
             $parent,
-            ['serialize' => $serialize, 'single_option' => $single_option]
-        );
-
-        /**
-         * Setting `parent` and `name` fields
-         * Then generate fields HTML
-         * */
-        static::arrayWalkWithRoute(
-            $options,
+            ['serialize' => $serialize, 'single_option' => $single_option],
             static function (
-                $key,
-                $item,
-                $route
+                self $item,
+                array $route
             ) use (
                 &$_fields,
                 &$exported_data,
@@ -801,8 +792,8 @@ class Option implements interfaces\Option
         if (!self::$assets_loaded) {
             static::printSelect2Assets();
             echo '<script type="application/javascript">' . file_get_contents(
-                    __DIR__ . '/assets/script.js'
-                ) . '</script>';
+                __DIR__ . '/assets/script.js'
+            ) . '</script>';
         }
     }
 
@@ -827,18 +818,15 @@ class Option implements interfaces\Option
      *                        `bool` `$serialize` `false`
      * @return array
      * @see printForm
-     * @noinspection PhpUnusedParameterInspection
      */
     public static function expandOptions(array $options, ?string $parent = null, array $params = []): array
     {
-        $options = static::initOptions($options, $parent, $params);
-
-        static::arrayWalkWithRoute(
+        static::initOptions(
             $options,
-            static function ($key, &$item, $route) {
-                if ($item instanceof self) {
-                    $item = $item->getValue();
-                }
+            $parent,
+            $params,
+            static function (self &$option) {
+                $option = $option->getValue();
             }
         );
 
@@ -849,30 +837,39 @@ class Option implements interfaces\Option
      * @param array $options
      * @param string|null $parent
      * @param array $params
-     * @return array
+     * @param callable|null $callback
      */
-    public static function initOptions(array $options, ?string $parent = null, array $params = []): array
-    {
+    public static function initOptions(
+        array &$options,
+        ?string $parent = null,
+        array $params = [],
+        ?callable $callback = null
+    ): void {
         static::arrayWalkWithRoute(
             $options,
-            static function ($key, &$item, $route) use ($parent, $params) {
+            static function ($key, &$item, $route) use ($parent, $params, $callback) {
                 if ($item instanceof self) {
                     if ($item->getParam('name') === null) {
                         $item->setParam('name', implode('>', $route));
                     }
+
                     if ($item->getParam('parent') === null) {
                         $item->setParam('parent', $parent);
                     }
-                    global $asd;
+
                     if ($item->getParam('serialize') === null) {
                         $item->setParam('serialize', $params['serialize'] ?? false);
                     }
+
                     if ($item->getParam('single_option') === null) {
                         $item->setParam('single_option', $params['single_option'] ?? false);
+                    }
+
+                    if ($callback !== null) {
+                        $callback($item, $route);
                     }
                 }
             }
         );
-        return $options;
     }
 }

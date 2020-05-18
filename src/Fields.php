@@ -132,23 +132,24 @@ class Fields
             $this->values = [];
 
             $relation_parent = $this->relation['parent'] ?? null;
-            $relation_with = $this->relation['with'] ?? null;
+            $relation_option = $this->relation['with'] ?? null;
             $relation_name = $this->relation['name'] ?? null;
             $relation_key = $this->relation['key'] ?? null;
 
-            if (is_callable($relation_with)) {
-                $relation_with = $relation_with();
+            if (is_callable($relation_option)) {
+                $relation_option = $relation_option();
             } else {
                 throw new RuntimeException('Only callable accepting.');
             }
 
             $relation_label = $this->relation['label'] ?? null;
 
-            $relation_option = Option::initOptions(
-                $relation_with,
+            Option::initOptions(
+                $relation_option,
                 $relation_parent,
                 ['serialize' => $this->serialize, 'single_option' => $this->single_option]
             );
+
             if ($relation_name !== null) {
                 $relation_option = $relation_option[$relation_name] ?? null;
                 if ($relation_option instanceof Option) {
