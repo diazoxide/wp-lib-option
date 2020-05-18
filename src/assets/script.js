@@ -124,11 +124,14 @@
                         $c.removeClass('hidden');
                         $c.addClass('added');
 
-                        $c.find('[name]:not([new] [name])').each(function () {
-                            $(this).prop('disabled', false);
+                        $c.find('[name]').each(function () {
                             let name = $(this).attr('name');
                             name = name.replace('{{LAST_KEY}}', last_key);
                             $(this).attr('name', name);
+                        })
+
+                        $c.find('[name]:not([new] [name])').each(function () {
+                            $(this).prop('disabled', false);
                         })
 
                         $c.insertBefore($(button).parent());
