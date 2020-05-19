@@ -74,21 +74,20 @@ class Option implements interfaces\Option
         $before_get_value = $this->getParam('before_get_value', null);
         $parent = $this->getParam('parent', null);
         $name = $this->getParam('name', null);
-        $default = $this->getParam('default', null);
         $serialize = $this->getParam('serialize', false);
 
         if ($this->getParam('single_option', false)) {
             $value = static::getOption(
-                '__form-data',
-                $parent,
-                $default,
-                $serialize
-            )[$name] ?? $default;
+                    '__form-data',
+                    $parent,
+                    null,
+                    $serialize
+                )[$name] ?? null;
         } else {
             $value = static::getOption(
                 $name,
                 $parent,
-                $default,
+                null,
                 $serialize
             );
         }
@@ -120,14 +119,13 @@ class Option implements interfaces\Option
 
         $parent = $this->getParam('parent', null);
         $name = $this->getParam('name', null);
-        $default = $this->getParam('default', null);
         $serialize = $this->getParam('serialize', false);
 
         if ($this->getParam('single_option', false)) {
             $option_value = static::getOption(
                 '__form-data',
                 $parent,
-                $default,
+                null,
                 $serialize
             );
 
@@ -792,8 +790,8 @@ class Option implements interfaces\Option
         if (!self::$assets_loaded) {
             static::printSelect2Assets();
             echo '<script type="application/javascript">' . file_get_contents(
-                __DIR__ . '/assets/script.js'
-            ) . '</script>';
+                    __DIR__ . '/assets/script.js'
+                ) . '</script>';
         }
     }
 

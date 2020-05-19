@@ -103,6 +103,8 @@ class Fields
         }
 
         $this->data['name'] = $this->data['name'] ?? $this->name;
+
+        $this->value = $this->value ?? $this->default;
     }
 
     /**
