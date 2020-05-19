@@ -528,7 +528,7 @@ class Option implements interfaces\Option
             ) {
                 if ($item instanceof Option) {
                     $post_data = $form_data[$item->getParam('name')] ?? null;
-                    if ($post_data !== null) {
+                    if ($form_data !== null) {
                         $item->setValue($post_data);
                     }
 

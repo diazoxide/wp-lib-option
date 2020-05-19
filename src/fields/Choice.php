@@ -1,8 +1,6 @@
 <?php
 
-
 namespace diazoxide\wp\lib\option\fields;
-
 
 use diazoxide\helpers\HTML;
 use diazoxide\wp\lib\option\Fields;
@@ -21,7 +19,8 @@ class Choice extends Field
 
     public function validate(): bool
     {
-        if ($this->multiple === true
+        if (
+            $this->multiple === true
             && !is_array($this->value)
         ) {
             if ($this->value === null) {
@@ -37,11 +36,13 @@ class Choice extends Field
             return false;
         }
 
-        if (!in_array(
-            $this->markup,
-            [self::MARKUP_SELECT, self::MARKUP_CHECKBOX],
-            true
-        )) {
+        if (
+            !in_array(
+                $this->markup,
+                [self::MARKUP_SELECT, self::MARKUP_CHECKBOX],
+                true
+            )
+        ) {
             $this->markup = self::MARKUP_SELECT;
         }
 
