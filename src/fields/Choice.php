@@ -11,12 +11,24 @@ class Choice extends Field
     public const MARKUP_CHECKBOX = 'checkbox';
     public const MARKUP_SELECT = 'select';
 
+    /**
+     * @var array
+     */
     public $choices;
 
+    /**
+     * @var bool
+     */
     public $multiple = false;
 
+    /**
+     * @var string
+     */
     public $markup = self::MARKUP_SELECT;
 
+    /**
+     * @return bool
+     */
     public function validate(): bool
     {
         if (
@@ -36,13 +48,7 @@ class Choice extends Field
             return false;
         }
 
-        if (
-            !in_array(
-                $this->markup,
-                [self::MARKUP_SELECT, self::MARKUP_CHECKBOX],
-                true
-            )
-        ) {
+        if (!in_array($this->markup, [self::MARKUP_SELECT, self::MARKUP_CHECKBOX], true)) {
             $this->markup = self::MARKUP_SELECT;
         }
 
@@ -53,11 +59,17 @@ class Choice extends Field
         return parent::validate();
     }
 
+    /**
+     * @return array
+     */
     protected function requiredFields(): array
     {
         return array_merge(parent::requiredFields(), ['choices']);
     }
 
+    /**
+     * @return string
+     */
     protected function template(): string
     {
         $html = '';
@@ -85,6 +97,8 @@ class Choice extends Field
                 )
             );
         }
+
+        $this->choices = [null => 'Select value'] + $this->choices;
 
         foreach ($this->choices as $key => $_value) {
             $selected = (!$this->multiple && $key == $this->value)
