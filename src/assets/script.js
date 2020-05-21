@@ -169,16 +169,23 @@
                         }
                     },
                     objectKeyChange(key_field) {
-                        let fields = key_field.parentElement.querySelectorAll('[name]');
-                        for (let i = 0; i < fields.length; i++) {
-                            let field = fields[i];
+                        let level = parseInt($(key_field).attr('level'));
+                        $(key_field).parent().find('[name]').each(function () {
                             if (key_field.value != null) {
-                                field.removeAttribute('disabled')
+                                this.removeAttribute('disabled')
                             }
-                            let attr = field.getAttribute('name');
-                            attr = attr.replace(/{{encode_key}}.*?(?=])/gm, '{{encode_key}}' + btoa(key_field.value));
-                            fields[i].setAttribute('name', attr);
-                        }
+                            let attr = $(this).attr('name');
+                            const re = /{{encode_key}}.*?(?=])/g;
+                            let index = 1;
+                            attr = attr.replace(re, function (matched) {
+                                if (index === level) {
+                                    matched = '{{encode_key}}' + btoa(key_field.value);
+                                }
+                                index++;
+                                return matched;
+                            });
+                            $(this).attr('name', attr);
+                        });
                     },
                     duplicateItem: function (button) {
                         let item = button.parentElement.parentElement;

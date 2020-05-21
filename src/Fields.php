@@ -30,6 +30,7 @@ class Fields
         Text::class
     ];
 
+    public $level = 1;
     public $main_params = [];
     public $before_field = '';
     public $after_field = '';
@@ -191,7 +192,7 @@ class Fields
                         'readonly' => $this->readonly,
                         'disabled' => $this->disabled,
                         'required' => $this->required,
-                        'attrs' => $this->input_params
+                        'attrs' => $this->input_params,
                     ]
                 ))->get();
                 break;
@@ -204,7 +205,7 @@ class Fields
                         'readonly' => $this->readonly,
                         'disabled' => $this->disabled,
                         'required' => $this->required,
-                        'attrs' => $this->input_params
+                        'attrs' => $this->input_params,
                     ]
                 ))->get();
                 break;
@@ -219,6 +220,7 @@ class Fields
                             $_field['name'] = $this->name . '[' . static::encodeKey($key) . ']' . '[' . $_key . ']';
                             $_field['serialize'] = $this->serialize;
                             $_field['single_option'] = $this->single_option;
+                            $_field['level'] = $this->level + 1;
                             $_html .= (new static($_field))->get();
                         }
 
@@ -232,6 +234,7 @@ class Fields
                                             'class' => 'key full',
                                             'type' => 'text',
                                             'placeholder' => $this->label,
+                                            'level' => $this->level,
                                             'value' => $key,
                                             'onchange' => 'diazoxide.wordpress.option.objectKeyChange(this)'
                                         ]
@@ -240,7 +243,7 @@ class Fields
                                     static::itemButtons()
                                 ]
                             ),
-                            ['minimised' => 'false']
+                            ['minimised' => 'false', 'level' => $this->level]
                         );
                     }
                 } elseif (isset($this->field) && !empty($this->field)) {
@@ -252,11 +255,12 @@ class Fields
                             $_field['name'] = $this->name . '[' . static::encodeKey($key) . ']';
                             $_field['serialize'] = $this->serialize;
                             $_field['single_option'] = $this->single_option;
+                            $_field['level'] = $this->level + 1;
+
                             $html .= static::group(
                                 implode(
                                     '',
                                     [
-
                                         HTML::tagOpen(
                                             'input',
                                             [
@@ -264,13 +268,15 @@ class Fields
                                                 'type' => 'text',
                                                 'placeholder' => $this->label,
                                                 'value' => $key,
+                                                'level' => $this->level,
                                                 'onchange' => 'diazoxide.wordpress.option.objectKeyChange(this)'
                                             ]
                                         ),
                                         (new static($_field))->get(),
                                         static::itemButtons()
                                     ]
-                                )
+                                ),
+                                [ 'level' => $this->level]
                             );
                         }
                     }
@@ -284,6 +290,7 @@ class Fields
                         $_field['disabled'] = true;
                         $_field['serialize'] = $this->serialize;
                         $_field['single_option'] = $this->single_option;
+                        $_field['level'] = $this->level + 1;
                         $_html .= (new static($_field))->get();
                     }
                 } elseif (isset($this->field) && !empty($this->field)) {
@@ -291,6 +298,8 @@ class Fields
                     $this->field['disabled'] = true;
                     $this->field['serialize'] = $this->serialize;
                     $this->field['single_option'] = $this->single_option;
+                    $this->field['level'] = $this->level + 1;
+
                     $_html .= (new static($this->field))->get();
                 }
 
@@ -312,7 +321,7 @@ class Fields
 
                         ]
                     ),
-                    ['new' => 'true', 'class' => 'hidden']
+                    ['new' => 'true', 'class' => 'hidden', 'level' => $this->level]
                 );
 
                 $html .= $this->addNewButton();
@@ -340,6 +349,7 @@ class Fields
                                 $_field['value'] = $_value[$_key] ?? null;
                                 $_field['serialize'] = $this->serialize;
                                 $_field['single_option'] = $this->single_option;
+                                $_field['level'] = $this->level + 1;
                                 $__html .= (new static($_field))->get();
                             }
 
@@ -368,6 +378,8 @@ class Fields
                         $_field['disabled'] = true;
                         $_field['serialize'] = $this->serialize;
                         $_field['single_option'] = $this->single_option;
+                        $_field['level'] = $this->level + 1;
+
                         $__html .= (new static($_field))->get();
                     }
 
@@ -397,6 +409,7 @@ class Fields
                         $_field['disabled'] = $this->disabled;
                         $_field['serialize'] = $this->serialize;
                         $_field['single_option'] = $this->single_option;
+                        $_field['level'] = $this->level + 1;
                         $html .= (new static($_field))->get();
                     }
                 }
