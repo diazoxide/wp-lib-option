@@ -1,8 +1,6 @@
 <?php
 
-
 namespace diazoxide\wp\lib\option\fields;
-
 
 use Exception;
 use InvalidArgumentException;
@@ -122,7 +120,8 @@ abstract class Field
      * @return bool
      * @noinspection PhpUnusedParameterInspection
      */
-    public static function unmask(&$value):bool {
+    public static function unmask(&$value): bool
+    {
         return false;
     }
 }

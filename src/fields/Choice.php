@@ -3,7 +3,7 @@
 namespace diazoxide\wp\lib\option\fields;
 
 use diazoxide\helpers\HTML;
-use diazoxide\wp\lib\option\Fields;
+use diazoxide\wp\lib\option\Bundle;
 
 class Choice extends Field
 {
@@ -114,7 +114,7 @@ class Choice extends Field
                     ]
                 );
             } elseif ($this->markup === static::MARKUP_CHECKBOX) {
-                $html .= Fields::group(
+                $html .= Bundle::group(
                     HTML::tag(
                         'label',
                         HTML::tagOpen(

@@ -15,7 +15,7 @@ use Exception;
  * */
 class Option implements interfaces\Option
 {
-    public const VERSION = '1.3.7';
+    public const VERSION = '1.3.8';
     /**
      * Option Params
      *
@@ -49,6 +49,9 @@ class Option implements interfaces\Option
         $this->setParams($_params);
     }
 
+    /**
+     * @return string
+     */
     public function getHash(): string
     {
         return md5(
@@ -62,7 +65,6 @@ class Option implements interfaces\Option
             )
         );
     }
-
 
     /**
      * Get Option value
@@ -300,7 +302,7 @@ class Option implements interfaces\Option
      */
     public function getField(): string
     {
-        return (new Fields(
+        return (new Bundle(
             [
                 'main_params' => $this->getParam('main_params', false),
                 'before_field' => $this->getParam('before_field', null),
@@ -367,7 +369,7 @@ class Option implements interfaces\Option
         $nonce_field = Environment::post(static::getNonceFieldName($parent));
         $fields = wp_verify_nonce($nonce_field, $parent) ? Environment::post($parent) : null;
         if ($fields !== null) {
-            $fields = Fields::decodeKeys($fields);
+            $fields = Bundle::decodeKeys($fields);
         }
         return $fields;
     }
@@ -469,7 +471,6 @@ class Option implements interfaces\Option
      * @param array|null $params
      * @throws Exception
      * @see expandOptions
-     * @noinspection PhpUnusedParameterInspection
      */
     public static function printForm($parent, $options, ?array $params = []): void
     {

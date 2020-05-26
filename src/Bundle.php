@@ -15,7 +15,7 @@ use diazoxide\wp\lib\option\v2\Option;
 use InvalidArgumentException;
 use RuntimeException;
 
-class Fields
+class Bundle
 {
 
     /**
