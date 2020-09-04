@@ -17,15 +17,20 @@ class Boolean extends Field
     protected function template(): string
     {
         $disabled_str = $this->disabled ? 'disabled' : '';
-
         $required_str = $this->required ? 'required' : '';
-
         $readonly_str = $this->readonly ? 'readonly' : '';
 
         $html = '';
         $html .= HTML::tagOpen(
             'input',
-            ['value' => self::MASK_BOOL_FALSE, 'type' => 'hidden', 'name' => $this->name]
+            [
+                'value' => self::MASK_BOOL_FALSE,
+                'type' => 'hidden',
+                'name' => $this->name,
+                $readonly_str,
+                $disabled_str,
+                $required_str
+            ]
         );
 
         $html .= HTML::tagOpen(

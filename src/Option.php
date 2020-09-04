@@ -15,7 +15,7 @@ use Exception;
  * */
 class Option implements interfaces\Option
 {
-    public const VERSION = '1.3.8';
+    public const VERSION = '1.4.0.2';
     /**
      * Option Params
      *
@@ -81,11 +81,11 @@ class Option implements interfaces\Option
 
         if ($this->getParam('single_option', false)) {
             $value = static::getOption(
-                '__form-data',
-                $parent,
-                null,
-                $serialize
-            )[$name] ?? $default;
+                    '__form-data',
+                    $parent,
+                    null,
+                    $serialize
+                )[$name] ?? $default;
         } else {
             $value = static::getOption(
                 $name,
@@ -792,8 +792,8 @@ class Option implements interfaces\Option
         if (!self::$assets_loaded) {
             static::printSelect2Assets();
             echo '<script type="application/javascript">' . file_get_contents(
-                __DIR__ . '/assets/script.js'
-            ) . '</script>';
+                    __DIR__ . '/assets/script.js'
+                ) . '</script>';
         }
     }
 
