@@ -1,8 +1,6 @@
 <?php
 
-
 namespace diazoxide\wp\lib\option\fields;
-
 
 use diazoxide\helpers\HTML;
 use diazoxide\wp\lib\option\interfaces\Option;

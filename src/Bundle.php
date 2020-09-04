@@ -276,7 +276,7 @@ class Bundle
                                         static::itemButtons()
                                     ]
                                 ),
-                                [ 'level' => $this->level]
+                                ['level' => $this->level]
                             );
                         }
                     }
