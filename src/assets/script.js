@@ -18,15 +18,15 @@
                 }
             )
         }
-    });
 
-    /**
-     * Normalize sections
-     * */
-    $('.wp-lib-option-nested-fields>.content>.section').each(function () {
-        $(this).parent().parent().addClass('include-section');
-        $(this).parent().parent().prev().hide();
-    })
+        /**
+         * Normalize sections
+         * */
+        $('.wp-lib-option-nested-fields>.content>.section').each(function () {
+            $(this).parent().parent().addClass('include-section');
+            $(this).parent().parent().prev().hide();
+        })
+    });
 
     if (!window.hasOwnProperty('diazoxide')) {
         window.diazoxide = {};
@@ -169,6 +169,7 @@
                         }
                     },
                     objectKeyChange(key_field) {
+                        console.log('Changed Key');
                         let level = parseInt($(key_field).attr('level'));
                         $(key_field).parent().find('[name]').each(function () {
                             if (key_field.value != null) {
@@ -253,6 +254,44 @@
                             }
                         });
 
+                    },
+                    disableOption: function (option_id) {
+                        let elements = document.querySelectorAll("[option_id='" + option_id + "']");
+                        elements.forEach(function (element) {
+                            element.classList.add('hidden');
+                            element.disabled = true;
+                            element.dispatchEvent(new Event('change'))
+                        });
+                    },
+                    maskValue(value, mask) {
+                        return mask + value;
+                    },
+                    enableOption: function (option_id) {
+                        let elements = document.querySelectorAll("[option_id='" + option_id + "']");
+                        elements.forEach(function (element) {
+                            element.classList.remove('hidden');
+                            element.disabled = false;
+                            element.dispatchEvent(new Event('change'))
+                        });
+                    },
+                    registerDependencyChangeListener(option_id, dependency_id, defined_value) {
+                        let options = document.querySelectorAll(".input[option_id='" + dependency_id + "']");
+                        options.forEach(function (option) {
+                            $(option).on("change", function () {
+                                if (option.hasAttribute('listener') && option.getAttribute('listener') === 'no') {
+                                    return;
+                                }
+                                let option_value = option.value;
+                                if (option.type === 'checkbox' && !option.checked) {
+                                    option_value = null;
+                                }
+                                if (!($(this).prop('disabled')) && option_value === defined_value) {
+                                    diazoxide.wordpress.option.enableOption(option_id);
+                                } else {
+                                    diazoxide.wordpress.option.disableOption(option_id);
+                                }
+                            });
+                        })
                     }
                 };
             }

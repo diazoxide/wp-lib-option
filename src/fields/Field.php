@@ -2,6 +2,8 @@
 
 namespace diazoxide\wp\lib\option\fields;
 
+use diazoxide\helpers\Variables;
+use diazoxide\wp\lib\option\Option;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
@@ -57,6 +59,8 @@ abstract class Field
      * @var array
      * */
     public $errors = [];
+
+    public $depends_on = [];
 
     /**
      * Field constructor.
@@ -118,10 +122,60 @@ abstract class Field
     /**
      * @param mixed $value
      * @return bool
-     * @noinspection PhpUnusedParameterInspection
      */
     public static function unmask(&$value): bool
     {
+
+        if ($value === Option::MASK_BOOL_TRUE) {
+            $value = true;
+            return true;
+        }
+        if ($value === Option::MASK_BOOL_FALSE) {
+            $value = false;
+            return true;
+        }
+        if ($value === Option::MASK_NULL) {
+            $value = null;
+            return true;
+        }
+        if ($value === Option::MASK_ARRAY) {
+            $value = [];
+            return true;
+        }
+
+        if (Variables::compare(Variables::COMPARE_STARTS_WITH, $value, Option::MASK_INT)) {
+            $value = (int)substr($value, strlen(Option::MASK_INT));
+            return true;
+        }
+        if (Variables::compare(Variables::COMPARE_STARTS_WITH, $value, Option::MASK_FLOAT)) {
+            $value = (float)substr($value, strlen(Option::MASK_FLOAT));
+            return true;
+        }
+
         return false;
+    }
+
+    /**
+     * @param  mixed  $value
+     * @param  string  $mask
+     *
+     * @return bool
+     */
+    public static function mask(&$value): bool
+    {
+        if ($value === true) {
+            $value = Option::MASK_BOOL_TRUE;
+        } elseif ($value === false) {
+            $value = Option::MASK_BOOL_FALSE;
+        } elseif ($value === null) {
+            $value = Option::MASK_NULL;
+        } elseif (is_array($value) && empty($value)) {
+            $value = Option::MASK_ARRAY;
+        } elseif (is_int($value)) {
+            $value = Option::MASK_INT . $value;
+        } elseif (is_float($value)) {
+            $value = Option::MASK_FLOAT . $value;
+        }
+        return true;
     }
 }

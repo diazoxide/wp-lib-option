@@ -22,26 +22,4 @@ class EmptyField extends Input
         return parent::validate();
     }
 
-    /**
-     * Check if form field is boolean or array and return
-     * Real boolean value
-     *
-     * @param $str
-     *
-     * @return mixed
-     */
-    public static function unmask(&$str):bool
-    {
-        if ($str === static::MASK_NULL) {
-            $str = null;
-            return true;
-        }
-
-        if ($str === static::MASK_ARRAY) {
-            $str = [];
-            return true;
-        }
-
-        return parent::unmask($str);
-    }
 }

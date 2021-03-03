@@ -50,27 +50,4 @@ class Boolean extends Field
 
         return $html;
     }
-
-    /**
-     * Check if form field is boolean and return
-     * Real boolean value
-     *
-     * @param $str
-     *
-     * @return mixed
-     */
-    public static function unmask(&$str): bool
-    {
-        if ($str === static::MASK_BOOL_TRUE) {
-            $str = true;
-            return true;
-        }
-
-        if ($str === static::MASK_BOOL_FALSE) {
-            $str = false;
-            return true;
-        }
-
-        return parent::unmask($str);
-    }
 }
