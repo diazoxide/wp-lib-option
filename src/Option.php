@@ -4,6 +4,7 @@ namespace diazoxide\wp\lib\option;
 
 use diazoxide\helpers\Environment;
 use diazoxide\helpers\HTML;
+use diazoxide\helpers\Strings;
 use diazoxide\helpers\URL;
 use diazoxide\wp\lib\option\fields\Input;
 use Exception;
@@ -417,7 +418,7 @@ class Option implements interfaces\Option
 
             if (is_array($v)) {
                 $label = apply_filters('wp-lib-option/' . $parent . '/form-nested-label', $k, $route, $parent);
-                $label = str_replace('_', ' ', ucfirst($label));
+                $label = Strings::toLabel($label);
 
                 echo HTML::tag(
                     'div',

@@ -3,6 +3,7 @@
 namespace diazoxide\wp\lib\option;
 
 use diazoxide\helpers\HTML;
+use diazoxide\helpers\Strings;
 use diazoxide\wp\lib\option\fields\Boolean;
 use diazoxide\wp\lib\option\fields\Choice;
 use diazoxide\wp\lib\option\fields\EmptyField;
@@ -378,7 +379,10 @@ class Bundle
                                 $_field['serialize']     = $this->serialize;
                                 $_field['single_option'] = $this->single_option;
                                 $_field['level']         = $this->level + 1;
-                                $__html                  .= (new static($_field))->get();
+                                if (! isset($_field['label']) && ! is_numeric($key)) {
+                                    $_field['label'] = Strings::toLabel($key);
+                                }
+                                $__html .= (new static($_field))->get();
                             }
 
                             if (is_callable($template_description)) {
@@ -407,6 +411,9 @@ class Bundle
                         $_field['serialize']     = $this->serialize;
                         $_field['single_option'] = $this->single_option;
                         $_field['level']         = $this->level + 1;
+                        if (! isset($_field['label']) && ! is_numeric($key)) {
+                            $_field['label'] = Strings::toLabel($key);
+                        }
 
                         $__html .= (new static($_field))->get();
                     }
@@ -432,9 +439,14 @@ class Bundle
                     $html .= $this->addNewButton($last_key);
                 } else {
                     foreach ($this->template as $key => $_field) {
-                        $_field['name']          = $this->name . '[' . $key . ']';
-                        $_field['value']         = $this->value[$key] ?? null;
-                        $_field['disabled']      = $this->disabled;
+                        $_field['name']     = $this->name . '[' . $key . ']';
+                        $_field['value']    = $this->value[$key] ?? null;
+                        $_field['disabled'] = $this->disabled;
+
+                        if (! isset($_field['label']) && ! is_numeric($key)) {
+                            $_field['label'] = Strings::toLabel($key);
+                        }
+
                         $_field['serialize']     = $this->serialize;
                         $_field['single_option'] = $this->single_option;
                         $_field['level']         = $this->level + 1;
@@ -559,7 +571,7 @@ class Bundle
      */
     private static function maybeClosure($value, ?array $params = [])
     {
-        if (is_callable($value)) {
+        if (! is_string($value) && is_callable($value) && function_exists($value)) {
             $value = $value(...$params);
         }
 
