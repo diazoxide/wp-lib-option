@@ -425,7 +425,7 @@ class Option implements interfaces\Option
                     $label,
                     [
                         'route'   => $_route,
-                        'onclick' => 'window.diazoxide.wordpress.option.toggleLabel(this, true)',
+                        'onclick' => 'window.diazoxide.wordpress.option.toggleLabel(this, true, true)',
                         'class'   => 'label'
                     ]
                 );
@@ -674,15 +674,6 @@ class Option implements interfaces\Option
 
         wp_nonce_field($parent, static::getNonceFieldName($parent));
 
-        echo (new Input(
-            [
-                'type'  => 'submit',
-                'name'  => $parent . '-form-submit',
-                'value' => 'Save Changes',
-                'attrs' => ['class' => 'button button-primary']
-            ]
-        ))->get();
-
         echo HTML::tagClose('form');
 
         echo HTML::tag(
@@ -769,7 +760,7 @@ class Option implements interfaces\Option
                                 ['span', 'Failed', ['class' => 'failed hidden']],
                                 [
                                     'span',
-                                    'Unsaved',
+                                    'Unsaved (Click to save)',
                                     ['class' => 'unsaved hidden']
                                 ],
                             ],
