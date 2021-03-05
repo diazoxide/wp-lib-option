@@ -120,6 +120,7 @@ class Bundle
                     if ($option->getValue() != ($defined_value ?? null)) {
                         HTML::addClass($this->main_params['class'], 'hidden');
                         HTML::addClass($this->label_params['class'], 'hidden');
+                        HTML::addClass($this->description_params['class'], 'hidden');
                     }
                     $option_id     = $this->id;
                     $dependency_id = $option->getParam('id');
