@@ -82,6 +82,12 @@ class Bundle
                 throw new InvalidArgumentException("'$arg' is not valid argument for '" . static::class . "'");
             }
         }
+        self::initCallableArray($this->main_params, $params);
+        self::initCallableArray($this->input_params, $params);
+        self::initCallableArray($this->field_params, $params);
+        self::initCallableArray($this->label_params, $params);
+        self::initCallableArray($this->description_params, $params);
+        self::initCallableArray($this->template_params, $params);
 
         $this->main_params['option_id']        = $this->id;
         $this->input_params['option_id']       = $this->id;
@@ -142,6 +148,16 @@ class Bundle
         $this->value = $this->value ?? $this->default;
     }
 
+    /**
+     * @param $array
+     * @param $params
+     */
+    private static function initCallableArray(&$array, array $params):void
+    {
+        if (is_callable($array)) {
+            $array = (array) $array($params);
+        }
+    }
     /**
      * Create field markup static method
      *
