@@ -836,8 +836,11 @@ class Option implements interfaces\Option
             $options,
             $parent,
             $params,
-            static function (self &$option) {
-                $option = $option->getValue();
+            static function (self &$option) use ($parent) {
+                $option = apply_filters(
+                        static::getOptionFilterName($option->getParam('name'), $parent) . '/expanded',
+                        $option->getValue()
+                );
             }
         );
 
